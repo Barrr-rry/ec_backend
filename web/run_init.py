@@ -119,10 +119,11 @@ def generate_super_admin():
     from django.contrib.auth.models import User
 
     # create admin
-    user = User.objects.create_user('admin', password='1111')
-    user.is_superuser = True
-    user.is_staff = True
-    user.save()
+    if not User.objects.first():
+        user = User.objects.create_user('admin', password='1111')
+        user.is_superuser = True
+        user.is_staff = True
+        user.save()
 
 
 def generate_cart():

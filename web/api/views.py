@@ -12,7 +12,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework_nested import routers
 from rest_framework.parsers import MultiPartParser, FormParser
 from .models import (BannerContent, Banner, File, Permission, Manager, AdminTokens, Member, Category, Tag, Brand,
-                     Product,
+                     Product, ConfigSetting,
                      ProductImage, Cart, ProductQuitShot, TagImage, FreeShipping, Coupon, MemberStore)
 from .serializers import (BannerSerializer, FileSerializer, PermissionSerializer, ManagerSerializer,
                           ManagerLoginSerializer,
@@ -1343,6 +1343,22 @@ class CacheViewSet(MyMixin):
     authentication_classes = []
     permission_classes = []
 
+    def retrieve(self, request, *args, **kwargs):
+        super().retrieve()
+
     def list(self, request, *args, **kwargs):
         ret = pickle_redis.get_data('cache')
         return Response(ret)
+
+
+@router_url('configsetting')
+class ConfigSettingViewSet(UpdateModelMixin, ListModelMixin, viewsets.GenericViewSet):
+    queryset = serializers.ConfigSetting.objects.all()
+    serializer_class = serializers.serializers.Serializer
+    authentication_classes = []
+    permission_classes = []
+
+    def list(self, request, *args, **kwargs):
+        instance = ConfigSetting.objects.first()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)

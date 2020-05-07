@@ -119,7 +119,7 @@ WSGI_APPLICATION = 'web.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'public-ec',
+        'NAME': 'public_ec',
         'USER': 'root',
         'PASSWORD': 'conquers666',
         "DEFAULT-CHARACTER-SET": 'utf8',

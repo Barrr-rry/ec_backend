@@ -1,13 +1,17 @@
 from django.contrib import admin
-from .models import (BannerContent, Banner, File, Permission, Manager, AdminTokens, Member, Category, Tag, Brand,
-                     Product,
-                     ProductImage, Cart, ProductQuitShot, TagImage, FreeShipping, Coupon, MemberStore)
+from .models import (BannerContent, Banner, File, Permission, Manager, AdminTokens, Member, Brand, Product,
+                     Specification, MemberTokens, Order, MemberStore, Reward, RewardRecord, MemberAddress,
+                     ProductImage, Category, Tag, TagImage, Cart, ProductQuitShot, FreeShipping, Coupon,
+                     MemberWish, ConfigSetting
+                     )
 from django.db.models.fields.related import ForeignKey, ManyToManyField
 from django.db.models.fields.reverse_related import ManyToOneRel, ManyToManyRel
 
-modellist = (BannerContent, Banner, File, Permission, Manager, AdminTokens, Member, Category, Tag, Brand,
-             Product,
-             ProductImage, Cart, ProductQuitShot, TagImage, FreeShipping, Coupon, MemberStore)
+modellist = (BannerContent, Banner, File, Permission, Manager, AdminTokens, Member, Brand, Product,
+             Specification, MemberTokens, Order, MemberStore, Reward, RewardRecord, MemberAddress,
+             ProductImage, Category, Tag, TagImage, Cart, ProductQuitShot, FreeShipping, Coupon,
+             MemberWish, ConfigSetting
+             )
 
 for md in modellist:
     list_display = []

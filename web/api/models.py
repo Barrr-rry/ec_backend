@@ -429,3 +429,14 @@ class RewardRecord(DefaultAbstract):
 
     class Meta:
         ordering = ['-end_date']
+
+
+class ConfigSetting(DefaultAbstract):
+    # 商品庫存
+    product_stock_setting = models.SmallIntegerField(help_text="商品庫存 1: 沒有庫存功能 2: 只有庫存文案顯示 3: 完整庫存功能")
+    # 商品規格
+    product_specifications_setting = models.SmallIntegerField(help_text="商品規格 1: 只有規格名稱 2: 詳細規格(兩層)")
+    # 重量
+    weight = models.BooleanField(help_text="是否顯示重量")
+    # 會員回饋金
+    feeback_money_setting = models.SmallIntegerField(help_text="會員回饋金 1: 沒有回饋金功能 2: 針對訂單 3: 針對會員")
