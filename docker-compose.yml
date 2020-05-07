@@ -1,0 +1,36 @@
+version: '3'
+services:
+  public-ec-db:
+    image: mariadb
+    restart: always
+    command: ['--character-set-server=utf8', '--collation-server=utf8_unicode_ci']
+    environment:
+      MYSQL_ROOT_PASSWORD: conquers666
+      MYSQL_USER: conquers666
+      MYSQL_PASSWORD: conquers666
+      MYSQL_DATABASE: public-ec
+    ports:
+      - "5555:3306"
+    volumes:
+      - ./mysql/conf:/etc/mysql/conf.d  # 挂载自定义配置目录，即上述的 mysql/conf/django-blog.cnf 中的配置
+      - ./mysql/data:/var/lib/mysql  # 挂载数据目录
+      - ./mysql/log:/var/log  # 挂载日志目录
+  public-ec-redis:
+    image: redis:alpine
+    restart: always
+    ports:
+      - 7777:6379
+    volumes:
+      - ./data/redis-data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+  public-ec-web:
+    container_name: public-ec-django-web
+    build: .
+    ports:
+      - "4545:4545"
+    volumes:
+      - ./web:/app
+      - ./log:/root/var/log
+    depends_on:
+      - public-ec-db
+      - public-ec-redis

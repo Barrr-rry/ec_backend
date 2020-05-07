@@ -1,0 +1,103 @@
+version: '3'
+services:
+  public-ec-db:
+    image: mariadb
+    restart: always
+    command: ['--character-set-server=utf8', '--collation-server=utf8_unicode_ci']
+    environment:
+      MYSQL_ROOT_PASSWORD: conquers666
+      MYSQL_USER: conquers666
+      MYSQL_PASSWORD: conquers666
+      MYSQL_DATABASE: public-ec
+    ports:
+      - "5555:3306"
+    volumes:
+      - ./mysql/conf:/etc/mysql/conf.d  # 挂载自定义配置目录，即上述的 mysql/conf/django-blog.cnf 中的配置
+      - ./mysql/data:/var/lib/mysql  # 挂载数据目录
+      - ./mysql/log:/var/log  # 挂载日志目录
+  public-ec-web:
+    container_name: public-ec-django-web
+    sysctls:
+      net.core.somaxconn: 32768
+    build:
+      context: .
+      dockerfile: Dockerfile_test
+    restart: always
+    command: >
+      bash -c "./init.sh
+      &&uwsgi  --emperor uwsgi.ini
+      "
+    ports:
+      - "2002:2000"
+    depends_on:
+      - public-ec-db
+      - public-ec-redis
+    volumes:
+      - ./web:/app
+      - ./log:/root/var/log
+  public-ec-redis:
+    image: redis:alpine
+    restart: always
+    ports:
+      - 7777:6379
+    volumes:
+      - ./data/redis-data:/data
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+  nginx:
+    container_name: nginx-public-ec-django-web
+    build:
+      context: .
+      dockerfile: Dockerfile_nginx
+    depends_on:
+      - public-ec-web
+    volumes:
+      - dhparam:/etc/nginx/dhparam
+      - vhost:/etc/nginx/vhost.d
+      - certs:/etc/nginx/certs:ro
+      - ./web:/app
+      - ./log:/var/log/nginx
+    restart: always
+    environment:
+      - VIRTUAL_HOST=li1731-160.members.linode.com
+      - VIRTUAL_NETWORK=nginx-proxy
+      - VIRTUAL_PORT=80
+      - LETSENCRYPT_HOST=li1731-160.members.linode.com
+      - LETSENCRYPT_EMAIL=max@conquers.co
+
+  nginx-proxy:
+    image: jwilder/nginx-proxy:alpine
+    restart: always
+    container_name: nginx-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - html:/usr/share/nginx/html
+      - dhparam:/etc/nginx/dhparam
+      - vhost:/etc/nginx/vhost.d
+      - certs:/etc/nginx/certs:ro
+    labels:
+      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true"
+
+  nginx-proxy-letsencrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: always
+    depends_on:
+      - "nginx-proxy"
+      - "nginx"
+    volumes:
+      - certs:/etc/nginx/certs
+      - vhost:/etc/nginx/vhost.d
+      - html:/usr/share/nginx/html
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    environment:
+      - NGINX_PROXY_CONTAINER=nginx-proxy
+
+
+
+volumes:
+  certs:
+  html:
+  vhost:
+  dhparam:
