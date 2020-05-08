@@ -63,7 +63,7 @@ MIDDLEWARE = [
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://public-ec-redis:6379/0",
+        "LOCATION": "redis://public-redis:6379/0",
         "TIMEOUT": 60 * 60,
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
@@ -123,7 +123,7 @@ DATABASES = {
         'USER': 'root',
         'PASSWORD': 'conquers666',
         "DEFAULT-CHARACTER-SET": 'utf8',
-        'HOST': 'public-ec-db',
+        'HOST': 'public-db',
         'PORT': '3306',
         'TEST': {
             'ENGINE': 'django.db.backends.sqlite3',
