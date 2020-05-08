@@ -1,9 +1,0 @@
-https://Max_conquers@bitbucket.org/cq_project/ezgo.git
-https://Max_conquers@bitbucket.org/cq_project/ezgo.git
-
-
-connect() to unix failed (111: Connection refused) while connecting to upstream
-
-
-sudo apt-get install docker-ce=5:18.09.1~3-0~ubuntu-xenial docker-ce-cli=5:18.09.1~3-0~ubuntu-xenial containerd.io
-sudo apt-get install docker-ce=5:19.03.8~3-0~ubuntu-bionic docker-ce-cli=5:19.03.8~3-0~ubuntu-bionic containerd.io
