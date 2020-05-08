@@ -44,8 +44,8 @@ services:
   nginx:
     container_name: nginx-ezgo-django-web
     build:
-      context: ./nginx
-      dockerfile: ../Dockerfile_nginx
+      context: .
+      dockerfile: ./Dockerfile_nginx
     restart: always
     ports:
       - "2000:80"
