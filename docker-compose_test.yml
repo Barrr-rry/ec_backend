@@ -17,11 +17,9 @@ services:
       - ./mysql/log:/var/log  # 挂载日志目录
   public-ec-web:
     container_name: public-ec-django-web
-    sysctls:
-      net.core.somaxconn: 32768
     build:
       context: .
-      dockerfile: Dockerfile_test
+      dockerfile: Dockerfile_pd
     restart: always
     command: >
       bash -c "./init.sh
@@ -46,58 +44,13 @@ services:
   nginx:
     container_name: nginx-public-ec-django-web
     build:
-      context: .
-      dockerfile: Dockerfile_nginx
-    depends_on:
-      - public-ec-web
+      context: ./nginx
+      dockerfile: ../Dockerfile_nginx
+    restart: always
+    ports:
+      - "2000:80"
     volumes:
-      - dhparam:/etc/nginx/dhparam
-      - vhost:/etc/nginx/vhost.d
-      - certs:/etc/nginx/certs:ro
       - ./web:/app
       - ./log:/var/log/nginx
-    restart: always
-    environment:
-      - VIRTUAL_HOST=li1731-160.members.linode.com
-      - VIRTUAL_NETWORK=nginx-proxy
-      - VIRTUAL_PORT=80
-      - LETSENCRYPT_HOST=li1731-160.members.linode.com
-      - LETSENCRYPT_EMAIL=max@conquers.co
-
-  nginx-proxy:
-    image: jwilder/nginx-proxy:alpine
-    restart: always
-    container_name: nginx-proxy
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - /var/run/docker.sock:/tmp/docker.sock:ro
-      - html:/usr/share/nginx/html
-      - dhparam:/etc/nginx/dhparam
-      - vhost:/etc/nginx/vhost.d
-      - certs:/etc/nginx/certs:ro
-    labels:
-      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy=true"
-
-  nginx-proxy-letsencrypt:
-    image: jrcs/letsencrypt-nginx-proxy-companion
-    restart: always
     depends_on:
-      - "nginx-proxy"
-      - "nginx"
-    volumes:
-      - certs:/etc/nginx/certs
-      - vhost:/etc/nginx/vhost.d
-      - html:/usr/share/nginx/html
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-    environment:
-      - NGINX_PROXY_CONTAINER=nginx-proxy
-
-
-
-volumes:
-  certs:
-  html:
-  vhost:
-  dhparam:
+      - public-ec-web
