@@ -17,6 +17,8 @@ services:
       - ./mysql/log:/var/log  # 挂载日志目录
   public-ec-web:
     container_name: public-ec-django-web
+    sysctls:
+      net.core.somaxconn: 32768
     build:
       context: .
       dockerfile: Dockerfile_pd
@@ -44,8 +46,8 @@ services:
   nginx:
     container_name: nginx-ezgo-django-web
     build:
-      context: ./nginx
-      dockerfile: ../Dockerfile_nginx
+      context: .
+      dockerfile: ./Dockerfile_nginx
     restart: always
     ports:
       - "2000:80"
