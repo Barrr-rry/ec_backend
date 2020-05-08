@@ -41,7 +41,7 @@ services:
     volumes:
       - ./data/redis-data:/data
       - ./redis.conf:/usr/local/etc/redis/redis.conf
-  nginx:
+  backend-nginx:
     container_name: nginx-public-ec-django-web
     build:
       context: ./nginx
