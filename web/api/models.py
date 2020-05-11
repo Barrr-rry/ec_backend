@@ -263,16 +263,17 @@ class Product(DefaultAbstract):
     order_count = models.IntegerField(help_text='訂單數量', default=0)
     title = models.CharField(max_length=1024, help_text='標題', null=True)
     sub_title = models.CharField(max_length=1024, help_text='副標', null=True)
-    weight = models.FloatField(help_text='重量', null=True)
-    price = models.FloatField(help_text='售價')
-    fake_price = models.FloatField(help_text='原價', null=True)
     description = models.TextField(help_text='商品說明', null=True)
     description_2 = models.TextField(help_text='詳細資訊', null=True)
     tag = models.ManyToManyField(Tag, related_name='product', help_text='標籤流水號')
     category = models.ManyToManyField(Category, related_name='product', help_text='分類流水號')
     product_info = models.TextField(help_text='商品資訊', null=True, blank=True)
     detail_info = models.TextField(help_text='詳細資訊', null=True, blank=True)
-    quantity = models.IntegerField(help_text='庫存量')
+    level1_title = models.CharField(max_length=128, help_text="規則1 的主題 只有在config:product_specifications_setting",
+                                    null=True)
+    level2_title = models.CharField(max_length=128, help_text="規則1 的主題 只有在config:product_specifications_setting",
+                                    null=True)
+    # todo 活動?
 
 
 class MemberWish(DefaultAbstract):
@@ -286,6 +287,23 @@ class Specification(DefaultAbstract):
     product = models.ForeignKey(Product, related_name='specifications', on_delete=models.CASCADE,
                                 help_text='產品編號')
     name = models.CharField(max_length=128, help_text='規格名稱')
+    level = models.SmallIntegerField(help_text="LEVEL 1, 2", default=1)
+
+
+class SpecificationDetail(DefaultAbstract):
+    product = models.ForeignKey(Product, related_name='specifications_detail', on_delete=models.CASCADE,
+                                help_text='產品編號')
+    level1_spec = models.ForeignKey(Specification, related_name="specification_detail_level1", on_delete=models.CASCADE,
+                                    help_text="Level 1 規格")
+    level2_spec = models.ForeignKey(Specification, related_name="specification_detail_level2", on_delete=models.CASCADE,
+                                    help_text="Level 2 規格", null=True)
+    product_code = models.CharField(max_length=128, help_text="商品貨號", unique=True, null=True)
+    # config 規格
+    weight = models.FloatField(help_text='重量', null=True)
+    price = models.FloatField(help_text='售價', null=None)
+    fake_price = models.FloatField(help_text='原價', null=True)
+    quantity = models.IntegerField(help_text='庫存量', null=True)
+    inventory_status = models.SmallIntegerField(help_text='庫存狀況 0: 無庫存功能，或者是庫存使用數量表示 1：有庫存；2：無庫存；3：預購品', default=0)
 
 
 class Cart(DefaultAbstract):
@@ -304,6 +322,7 @@ class ProductQuitShot(DefaultAbstract):
     title = models.CharField(max_length=1024, help_text='標題')
     weight = models.FloatField(help_text='重量')
     price = models.FloatField(help_text='價格')
+    # todo 詳細的話該怎麼辦?
     specification = models.CharField(max_length=128, help_text='規格 用逗號隔開不同選項')
     quantity = models.IntegerField(help_text='訂購數量')
 
@@ -313,6 +332,9 @@ class ProductImage(DefaultAbstract):
                                 help_text='產品編號')
     image_url = models.CharField(max_length=1024, help_text='圖片路徑')
     main_image = models.BooleanField(help_text='是否為主圖', default=False)
+    specification = models.ForeignKey(Specification,
+                                      related_name="product_image",
+                                      on_delete=models.CASCADE, help_text="規格的圖片", null=True)
 
     class Meta:
         ordering = ['-main_image', '-created_at']
@@ -440,3 +462,4 @@ class ConfigSetting(DefaultAbstract):
     weight = models.BooleanField(help_text="是否顯示重量")
     # 會員回饋金
     feeback_money_setting = models.SmallIntegerField(help_text="會員回饋金 1: 沒有回饋金功能 2: 針對訂單 3: 針對會員")
+    activity = models.BooleanField(default=False, help_text="活動： 買幾算幾")

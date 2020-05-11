@@ -1572,3 +1572,26 @@ class TestMemberStore(DefaultTestMixin, APITestCase):
         r = self.member_user.delete(url)
         # stauts 200
         self.assertEqual(r.status_code, 204)
+
+
+class TestConfigSetting(DefaultTestMixin, APITestCase):
+
+    def test_configsetting_list(self):
+        url = '/api/configsetting/'
+        r = self.anonymous_user.get(url)
+        # status 200
+        self.assertEqual(r.status_code, 200)
+        # response type
+        self.assertIsInstance(r.data, dict)
+
+    def test_configsetting_update(self):
+        instance = ConfigSetting.objects.first()
+        url = f'/api/configsetting/{instance.id}/'
+        data = dict(
+            weight=instance.weight
+        )
+        r = self.anonymous_user.put(url, data)
+        # status 200
+        self.assertEqual(r.status_code, 200)
+        # type dict
+        self.assertIsInstance(r.data, dict)

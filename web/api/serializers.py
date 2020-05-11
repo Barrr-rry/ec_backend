@@ -11,7 +11,7 @@ from django.http.request import QueryDict
 from .models import (BannerContent, Banner, File, Permission, Manager, AdminTokens, Member, Brand, Product,
                      Specification, MemberTokens, Order, MemberStore, Reward, RewardRecord, MemberAddress,
                      ProductImage, Category, Tag, TagImage, Cart, ProductQuitShot, FreeShipping, Coupon,
-                     MemberWish, ConfigSetting
+                     MemberWish, ConfigSetting, SpecificationDetail
                      )
 from django.utils.functional import cached_property
 from rest_framework.utils.serializer_helpers import BindingDict

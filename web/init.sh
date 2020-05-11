@@ -1,6 +1,6 @@
 #!/bin/sh
 rm api/migrations/00*.py
-rm db.sqlite3
+rm test.db
 python clear_mysql.py
 python manage.py makemigrations
 python manage.py migrate

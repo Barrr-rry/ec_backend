@@ -31,4 +31,4 @@ def recreate_db(prefix=None):
 
 if __name__ == "__main__":
     recreate_db()
-    drop_db(prefix='test')
+    # drop_db(prefix='test')

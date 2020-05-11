@@ -12,7 +12,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework_nested import routers
 from rest_framework.parsers import MultiPartParser, FormParser
 from .models import (BannerContent, Banner, File, Permission, Manager, AdminTokens, Member, Category, Tag, Brand,
-                     Product, ConfigSetting,
+                     Product, ConfigSetting, SpecificationDetail,
                      ProductImage, Cart, ProductQuitShot, TagImage, FreeShipping, Coupon, MemberStore)
 from .serializers import (BannerSerializer, FileSerializer, PermissionSerializer, ManagerSerializer,
                           ManagerLoginSerializer,
@@ -58,44 +58,15 @@ import logging
 
 from django.utils.decorators import method_decorator
 from django.db.models import Q
-from django.core.cache import cache
-import uuid
-import pickle
+from .util import pickle_redis, get_config
 
-
-class PickleRedis:
-    def __init__(self, r=None):
-        self.r = r
-
-    def set_data(self, key, data):
-        fkey = f'nuxt:{key}'
-        self.r.set(fkey, pickle.dumps(data))
-
-    def remove_data(self, key):
-        fkey = f'nuxt:{key}'
-        self.r.delete(fkey)
-
-    def get_data(self, key):
-        fkey = f'nuxt:{key}'
-        data = self.r.get(fkey)
-        if data is not None:
-            return pickle.loads(data)
-
-
+# init router url
 logger = logging.getLogger()
 logger.info('views init')
 
 router = routers.DefaultRouter()
 nested_routers = []
 orderdct = OrderedDict()
-
-default_cache = dict()
-cache_list = ['coupon', 'product', 'banner', 'caetegory', 'tag', 'price', 'brand']
-for key in cache_list:
-    default_cache[key] = str(uuid.uuid4())
-
-pickle_redis = PickleRedis(cache)
-pickle_redis.set_data('cache', default_cache)
 
 
 class UpdateCache:
@@ -119,7 +90,7 @@ class UpdateCache:
         data = pickle_redis.get_data('cache')
         if not data:
             data = dict()
-            cache_list = ['coupon', 'product', 'banner', 'caetegory', 'tag', 'price']
+            cache_list = ['coupon', 'product', 'banner', 'caetegory', 'tag', 'price', 'configsetting']
             for key in cache_list:
                 data[key] = str(uuid.uuid4())
         else:
@@ -232,6 +203,7 @@ class EcpayViewSet(GenericViewSet):
         if not carts:
             raise serializers.serializers.ValidationError('no carts')
         product_shot = []
+        # todo 沒有檢查庫存
         for cart in carts:
             # 更新商品 order count
             cart.product.order_count += 1
@@ -1352,13 +1324,24 @@ class CacheViewSet(MyMixin):
 
 
 @router_url('configsetting')
-class ConfigSettingViewSet(UpdateModelMixin, ListModelMixin, viewsets.GenericViewSet):
+class ConfigSettingViewSet(UpdateCache, UpdateModelMixin, ListModelMixin, viewsets.GenericViewSet):
     queryset = serializers.ConfigSetting.objects.all()
-    serializer_class = serializers.serializers.Serializer
+    serializer_class = serializers.ConfigSettingSerializer
     authentication_classes = []
     permission_classes = []
 
     def list(self, request, *args, **kwargs):
-        instance = ConfigSetting.objects.first()
-        serializer = self.get_serializer(instance)
-        return Response(serializer.data)
+        config = get_config()
+        return Response(config)
+
+    def update(self, request, *args, **kwargs):
+        import subprocess
+        # todo 如果更新 update redis
+        ret = super().update(request, *args, **kwargs)
+        key = 'configsetting'
+        pickle_redis.remove_data(key)
+        config = get_config()
+        with open('./config.json', 'w') as f:
+            f.write(json.dumps(config))
+        subprocess.call('./init.sh')
+        return ret
