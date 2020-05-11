@@ -234,7 +234,7 @@ class EcpayViewSet(GenericViewSet):
         product_shot = []
         for cart in carts:
             # 更新商品 order count
-            cart.product.order_count += 1
+            cart.product.order_count += cart.quantity
             cart.product.save()
 
             obj = serializers.ProductSerializer(cart.product).data
