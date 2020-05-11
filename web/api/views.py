@@ -208,7 +208,7 @@ class EcpayViewSet(GenericViewSet):
         # todo 沒有檢查庫存
         for cart in carts:
             # 更新商品 order count
-            cart.product.order_count += 1
+            cart.product.order_count += cart.quantity
             cart.product.save()
 
             obj = serializers.ProductSerializer(cart.product).data
@@ -384,6 +384,25 @@ class EcpayViewSet(GenericViewSet):
         if int(request.data['RtnCode']) == 10100141:
             instance.simple_status_display = '付款失敗'
             instance.simple_status = 2
+        instance.ecpay_data = json.dumps(request.data)
+        instance.payment_type = request.data.get('PaymentType')
+        instance.save()
+        return Response('ok')
+
+    @action(methods=['POST'], detail=False, authentication_classes=[], permission_classes=[])
+    def paynent_info_url(self, request, *args, **kwargs):
+        """payment info return url"""
+        logger.info('return url: %s', request.data['MerchantTradeNo'])
+        instance = serializers.Order.objects.filter(order_number=request.data['MerchantTradeNo'][:-2]).first()
+        if not instance:
+            print('no return instance:', request.data['MerchantTradeNo'])
+        if int(request.data['RtnCode']) == 2 or int(request.data['RtnCode']) == 10100073:
+            instance.take_number = 1
+            instance.simple_status_display = '取號成功'
+            instance.simple_status = 3
+        else:
+            instance.simple_status_display = '取號失敗'
+            instance.simple_status = 4
         instance.ecpay_data = json.dumps(request.data)
         instance.payment_type = request.data.get('PaymentType')
         instance.save()

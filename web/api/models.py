@@ -385,6 +385,7 @@ class Order(DefaultAbstract):
     shipping_area = models.CharField(max_length=64, help_text="郵遞區號", null=True)
     pay_status = models.SmallIntegerField(help_text='1: 已付款 0: 未付款', default=0)
     pay_type = models.SmallIntegerField(help_text='1: 貨到付款 0: 線上付款', default=0)
+    take_number = models.SmallIntegerField(help_text='1: 取號成功 0: 取號失敗', default=0)
     shipping_status = models.IntegerField(help_text='shipping map', null=True)
     simple_status = models.IntegerField(help_text="簡單對status 做分類", null=True, default=0)
     simple_status_display = models.CharField(max_length=64, help_text="簡單對status 做分類", null=True, default='未付款')
