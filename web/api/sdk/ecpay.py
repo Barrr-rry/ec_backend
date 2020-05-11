@@ -9,7 +9,7 @@ import os
 logger = logging.getLogger()
 host_url_map = dict(
     prod='http://172.105.194.178:2000/',
-    dev='https://e40a7355.ngrok.io/',
+    dev='https://d52a0893.ngrok.io/',
     test='https://li1731-160.members.linode.com/'
 )
 ENV = os.environ.get('ENV')
@@ -74,6 +74,7 @@ def create_html(callback_url, order, lang=''):
     product_name = "#".join(names)
     trader_no = order.order_number + ''.join(random.choices(string.digits, k=2))
     return_url = f'{host_url}api/ecpay/return_url/'
+    paynent_info_url = f'{host_url}api/ecpay/paynent_info_url/'
     logger.info('ecpay create html: %s %s', trader_no, return_url)
     order_params = {
         'MerchantTradeNo': trader_no,
@@ -102,7 +103,6 @@ def create_html(callback_url, order, lang=''):
 
     extend_params_1 = {
         'ExpireDate': 7,
-        'PaymentInfoURL': 'https://www.ecpay.com.tw/payment_info_url.php',
         'ClientRedirectURL': '',
     }
 
@@ -112,7 +112,7 @@ def create_html(callback_url, order, lang=''):
         'Desc_2': '',
         'Desc_3': '',
         'Desc_4': '',
-        'PaymentInfoURL': 'https://www.ecpay.com.tw/payment_info_url.php',
+        'PaymentInfoURL': paynent_info_url,
         'ClientRedirectURL': '',
     }
 
@@ -155,7 +155,8 @@ def create_html(callback_url, order, lang=''):
 
 def create_shipping_map(sub_type, member_id, callback_url):
     assert sub_type in ['FAMI', 'UNIMART', 'HILIFE']
-    sub_type += 'C2C'
+    if check_env(ENV) is False:
+        sub_type += 'C2C'
 
     cvs_map_params = {
         "MerchantTradeNo": "anyno",
