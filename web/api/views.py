@@ -59,6 +59,8 @@ import logging
 from django.utils.decorators import method_decorator
 from django.db.models import Q
 from .util import pickle_redis, get_config
+import uuid
+from django.db.models import Max, Min
 
 # init router url
 logger = logging.getLogger()
@@ -1032,9 +1034,8 @@ class ProductViewSet(MyMixin, UpdateCache):
         page = self.paginate_queryset(queryset)
         if page is not None:
             q = self.get_queryset()
-            q = q.order_by('price')
-            min_price = q.first().price
-            max_price = q.last().price
+            min_price = queryset.aggregate(min_price=Min('specifications_detail__price'))['min_price']
+            max_price = queryset.aggregate(max_price=Max('specifications_detail__price'))['max_price']
             serializer = self.get_serializer(page, many=True)
             ret = self.get_paginated_response(serializer.data)
             ret.data['min_price'] = min_price
@@ -1056,7 +1057,7 @@ class ProductListViewSet(NestedViewSetBase, ListModelMixin, viewsets.GenericView
 
 @router_url('cart')
 class CartViewSet(MyMixin):
-    queryset = serializers.Cart.objects.select_related('product').select_related('specification'). \
+    queryset = serializers.Cart.objects.select_related('product').select_related('specification_detail'). \
         prefetch_related('product__productimages').all()
     serializer_class = serializers.CartSerializer
     permission_classes = []

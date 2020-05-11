@@ -171,10 +171,6 @@ class ProductFilter(filters.BaseFilterBackend):
         if no_tag is not None:
             q = and_q(q, Q(tag__isnull=True))
 
-        order_by = request.query_params.get('order_by')
-        if order_by:
-            queryset = queryset.order_by(order_by)
-
         only_tag = request.query_params.get('only_tag')
         if only_tag is not None:
             q = and_q(q, Q(tag__isnull=False))
@@ -186,9 +182,9 @@ class ProductFilter(filters.BaseFilterBackend):
         max_price = request.query_params.get('max_price')
         min_price = request.query_params.get('min_price')
         if max_price is not None:
-            q = and_q(q, Q(price__lte=max_price))
+            q = and_q(q, Q(specifications_detail__price__lte=max_price))
         if min_price is not None:
-            q = and_q(q, Q(price__gte=min_price))
+            q = and_q(q, Q(specifications_detail__price__gte=max_price))
 
         ids = request.query_params.get('ids')
         if ids:

@@ -139,7 +139,7 @@ def generate_cart():
     Cart.objects.create(
         member=member,
         product=product,
-        specification=product.specifications.first(),
+        specification_detail=product.specifications_detail.first(),
         quantity=1
     )
 
@@ -432,10 +432,10 @@ def generate_products_for_test(count, config_data):
                 product=product,
                 name='一般',
             )
-            SpecificationDetail(
+            SpecificationDetail.objects.create(
                 product=product,
                 level1_spec=spec1,
-                product_code=f'{generate_members(10)}',
+                product_code=f'{get_random_number(10)}',
                 weight=weight,
                 price=price,
                 fake_price=fake_price,

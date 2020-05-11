@@ -350,9 +350,11 @@ class BrandSerializer(DefaultModelSerializer):
 
 
 class ProductImageSerializer(DefaultModelSerializer):
+    specification_name = serializers.CharField(max_length=128, write_only=True, required=False, help_text='規格名字')
+
     class Meta:
         model = ProductImage
-        fields = ('main_image', 'image_url')
+        fields = ('main_image', 'image_url', 'specification_name')
 
 
 # todo
@@ -369,7 +371,22 @@ class SpecificationSerializer(DefaultModelSerializer):
         model = Specification
 
 
-class ProductSerializer(NestedModelSerializer):
+class SpecificationWriteSerializer(serializers.Serializer):
+    name = serializers.CharField(max_length=128, help_text='規格名稱')
+
+    def create(self, validated_data):
+        pass
+
+    def update(self, instance, validated_data):
+        pass
+
+
+class SpecificationDetailSerializer(DefaultModelSerializer):
+    class Meta(CommonMeta):
+        model = SpecificationDetail
+
+
+class ProductSerializer(DefaultModelSerializer):
     product_number = serializers.CharField(max_length=256, help_text="商品編號 P+mmdd+流水號", read_only=True)
     brand_en_name = serializers.CharField(source='brand.en_name', read_only=True)
     brand_cn_name = serializers.CharField(source='brand.cn_name', read_only=True)
@@ -377,46 +394,32 @@ class ProductSerializer(NestedModelSerializer):
     tag_detail = serializers.SerializerMethodField(read_only=True)
     category = serializers.PrimaryKeyRelatedField(many=True, required=False, help_text='分類流水號',
                                                   queryset=Category.objects.all())
-
-    # category_name = serializers.CharField(source='category.name', read_only=True)
     tag_name = serializers.CharField(source='tag.name', read_only=True)
     categories = CategorySerializer(many=True, read_only=True, source='category')
-    inventory_status = serializers.SerializerMethodField(read_only=True)
-    inventory_status_display = serializers.SerializerMethodField(read_only=True)
+    specification_level1 = SpecificationWriteSerializer(many=True, write_only=True,
+                                                        help_text='規格name ex: [{name: \'規格\']')
+    specification_level2 = SpecificationWriteSerializer(many=True, write_only=True,
+                                                        required=False,
+                                                        help_text='規格name ex: [{name: \'規格\']')
+    specifications_detail_data = serializers.ListField(
+        child=serializers.DictField(), write_only=True, required=False,
+        help_text="規格etail ex: {'level1_spec': '213', 'weight': 222, 'price': 222, 'fake_price': 222, 'inventory_status': 1}]")
+
+    productimages = ProductImageSerializer(many=True, help_text='Product Images')
 
     class Meta(CommonMeta):
         model = Product
-        nested_fields = {'productimages': 'product',
-                         'specifications': 'product'}  # {related_name: field_name}
-        update_fields = {'productimages': ['image_url', 'main_image'],
-                         'specifications': ['name']}
 
     def get_tag_detail(self, instance):
         return TagListSerializer(many=True, instance=instance.tag.all()).data
-
-    def get_inventory_status(self, instance):
-        quantity = instance.quantity
-        if quantity >= 10:
-            return 1
-        elif quantity > 0:
-            return 3
-        else:
-            return 2
-
-    def get_inventory_status_display(self, instance):
-        quantity = instance.quantity
-        if quantity >= 10:
-            return '有庫存'
-        elif quantity > 0:
-            return '庫存緊張，不到十件'
-        else:
-            return '缺貨'
 
     def create(self, validated_data):
         now = timezone.now().strftime('%m%d')
         validated_data['product_number'] = uuid.uuid1()
         product_images = self.pull_validate_data(validated_data, 'productimages', [])
-        specifications = self.pull_validate_data(validated_data, 'specifications', [])
+        specification_level1 = self.pull_validate_data(validated_data, 'specification_level1', [])
+        specification_level2 = self.pull_validate_data(validated_data, 'specification_level2', [])
+        specifications_detail_data = self.pull_validate_data(validated_data, 'specifications_detail_data', [])
         category = self.pull_validate_data(validated_data, 'category', [])
         tag = self.pull_validate_data(validated_data, 'tag')
 
@@ -430,13 +433,33 @@ class ProductSerializer(NestedModelSerializer):
                 product.tag.add(t)
             product.save()
 
+            for specification in specification_level1:
+                specification['product'] = product
+                specification['level'] = 1
+                Specification.objects.create(**specification)
+
+            for specification in specification_level2:
+                specification['product'] = product
+                specification['level'] = 2
+                Specification.objects.create(**specification)
+
             for product_image in product_images:
                 product_image['product'] = product
+                if 'specification_name' in product_image:
+                    specification_name = product_image['specification_name']
+                    del product_image['specification_name']
+                    specification = Specification.objects.filter(product=product, name=specification_name).first()
+                    product_image['specification'] = specification
                 ProductImage.objects.create(**product_image)
 
-            for specification in specifications:
-                specification['product'] = product
-                Specification.objects.create(**specification)
+            for spec_detail in specifications_detail_data:
+                for key in ['level1_spec', 'level2_spec']:
+                    if key in spec_detail:
+                        spec = Specification.objects.filter(product=product, name=spec_detail[key]).first()
+                        spec_detail[key] = spec
+
+                spec_detail['product'] = product
+                SpecificationDetail.objects.create(**spec_detail)
 
         return product
 
@@ -556,7 +579,7 @@ class ProductForCartSerializer(ProductListSerializer):
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'product_number', 'productimages', 'specifications', 'price', 'weight')
+        fields = ('id', 'name', 'product_number', 'productimages', 'specifications')
 
 
 class MemberWishSerializer(DefaultModelSerializer):
@@ -570,7 +593,8 @@ class MemberWishSerializer(DefaultModelSerializer):
 
 class CartResposneSerializer(CartSerializer):
     product = ProductForCartSerializer(read_only=True)
-    specification_name = serializers.CharField(source='specification.name', read_only=True)
+    # todo 不顯示這個了 但前端要顯示啥？
+    # specification_name = serializers.CharField(source='specification.name', read_only=True)
 
 
 class RewardSerializer(DefaultModelSerializer):

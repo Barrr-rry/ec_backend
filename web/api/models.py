@@ -311,7 +311,7 @@ class Cart(DefaultAbstract):
                                help_text='會員編號')
     product = models.ForeignKey(Product, related_name='cart', on_delete=models.CASCADE,
                                 help_text='產品編號')
-    specification = models.ForeignKey(Specification, related_name='cart', on_delete=models.CASCADE)
+    specification_detail = models.ForeignKey(SpecificationDetail, related_name='cart', on_delete=models.CASCADE)
     quantity = models.IntegerField(help_text='數量')
 
 
