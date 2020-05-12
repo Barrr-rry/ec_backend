@@ -419,6 +419,8 @@ class EcpayViewSet(GenericViewSet):
     def paynent_info_url(self, request, *args, **kwargs):
         """payment info return url"""
         logger.info('payment info url: %s', request.data['MerchantTradeNo'])
+        logger.info('PaymentType: %s', request.data['PaymentType'])
+        logger.info('RtnCode: %s', request.data['RtnCode'])
         instance = serializers.Order.objects.filter(order_number=request.data['MerchantTradeNo'][:-2]).first()
         if not instance:
             print('no return instance:', request.data['MerchantTradeNo'])
