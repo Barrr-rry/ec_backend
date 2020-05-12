@@ -998,7 +998,8 @@ class ProductViewSet(MyMixin, UpdateCache):
     queryset = serializers.Product.objects.select_related('brand'). \
         prefetch_related('tag'). \
         prefetch_related('category'). \
-        prefetch_related('productimages').prefetch_related('specifications').all()
+        prefetch_related('productimages').\
+        prefetch_related('specifications').prefetch_related('specifications_detail').all()
     serializer_class = serializers.ProductSerializer
     filter_backends = (filters.ProductFilter,)
     pagination_class = LimitOffsetPagination

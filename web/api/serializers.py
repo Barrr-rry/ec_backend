@@ -406,6 +406,8 @@ class ProductSerializer(DefaultModelSerializer):
         help_text="規格etail ex: {'level1_spec': '213', 'weight': 222, 'price': 222, 'fake_price': 222, 'inventory_status': 1}]")
 
     productimages = ProductImageSerializer(many=True, help_text='Product Images')
+    specifications_detail = SpecificationDetailSerializer(many=True, read_only=True)
+    specifications = SpecificationSerializer(many=True, read_only=True)
 
     class Meta(CommonMeta):
         model = Product
