@@ -9,8 +9,8 @@ import os
 logger = logging.getLogger()
 host_url_map = dict(
     prod='http://172.105.194.178:2000/',
-    dev='https://2568bf6c.ngrok.io/',
-    test='http://172.105.204.106:2000/'
+    dev='https://ccf7830f.ngrok.io/',
+    test='https://ccf7830f.ngrok.io/'
 )
 ENV = os.environ.get('ENV')
 host_url = host_url_map[ENV]
@@ -33,7 +33,7 @@ else:
         HashKey='1KNuJ3exSlgXEtrp',
         HashIV='YNOdMJKcofOCyC1x'
     )
-logging.info('ENV: %s', ENV)
+logging.info('ENV: %s %s', ENV, host_url)
 logger.info(f'ecpay_keys: %s', ecpay_keys)
 payment_type = dict(
     WebATM_TAISHIN='台新銀行 WebATM',
