@@ -10,7 +10,7 @@ logger = logging.getLogger()
 host_url_map = dict(
     prod='http://172.105.194.178:2000/',
     dev='https://ccf7830f.ngrok.io/',
-    test='https://ccf7830f.ngrok.io/'
+    test='http://ccf7830f.ngrok.io/'
 )
 ENV = os.environ.get('ENV')
 host_url = host_url_map[ENV]
