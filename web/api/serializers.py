@@ -564,8 +564,8 @@ class CartSerializer(DefaultModelSerializer):
 
     def update(self, instance, validated_data):
         find_instance = Cart.objects.filter(member=instance.member, product=instance.product,
-                                            specification=validated_data['specification']).first()
-        if find_instance and instance.specification != validated_data.get('specification'):
+                                            specification_detail=validated_data['specification_detail']).first()
+        if find_instance and instance.specification_detail != validated_data.get('specification_detail'):
             find_instance.quantity += instance.quantity
             find_instance.save()
             instance.delete()

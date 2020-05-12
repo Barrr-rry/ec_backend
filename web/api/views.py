@@ -1085,7 +1085,7 @@ class CartViewSet(MyMixin):
     def create(self, request, *args, **kwargs):
         instance = serializers.Cart.objects.filter(
             member=request.user, product=request.data.get('product'),
-            specification=request.data.get('specification')).first()
+            specification_detail=request.data.get('specification_detail')).first()
         if not instance:
             return super().create(request, *args, **kwargs)
         else:

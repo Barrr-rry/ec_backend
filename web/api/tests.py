@@ -1117,7 +1117,7 @@ class TestCart(DefaultTestMixin, APITestCase):
         product = Product.objects.first()
         data = dict(
             product=product.id,
-            specification=product.specifications.first().id,
+            specification_detail=product.specifications_detail.first().id,
             quantity=1
         )
         r = self.member_user.post(url, data)
@@ -1136,7 +1136,7 @@ class TestCart(DefaultTestMixin, APITestCase):
         url = f'/api/cart/{instance.id}/'
         data = dict(
             quantity=2,
-            specification=product.specifications.first().id,
+            specification_detail=product.specifications_detail.first().id,
         )
         r = self.member_user.put(url, data)
         # status 200
