@@ -1112,6 +1112,10 @@ class TestCart(DefaultTestMixin, APITestCase):
         # todo
         # self.assertEqual(set(item.keys()), set(self.response_keys))
 
+    def test_cart_list_with_params(self):
+        # todo 未登入顯示購物車資料
+        pass
+
     def test_cart_post(self):
         url = '/api/cart/'
         product = Product.objects.first()

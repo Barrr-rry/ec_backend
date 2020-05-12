@@ -560,9 +560,19 @@ class TagImageSerializer(DefaultModelSerializer):
 
 class CartSerializer(DefaultModelSerializer):
     member = serializers.HiddenField(default=MemberHiddenField())
+    spec1_name = serializers.SerializerMethodField()
+    spec2_name = serializers.SerializerMethodField()
+    specification_detail = SpecificationDetailSerializer(read_only=True)
 
     class Meta(CommonMeta):
         model = Cart
+
+    def get_spec1_name(self, instance):
+        return instance.specification_detail.level1_spec.name
+
+    def get_spec2_name(self, instance):
+        level2_spec = instance.specification_detail.level2_spec
+        return level2_spec.name if level2_spec else None
 
     def update(self, instance, validated_data):
         find_instance = Cart.objects.filter(member=instance.member, product=instance.product,

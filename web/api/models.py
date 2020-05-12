@@ -270,6 +270,7 @@ class Product(DefaultAbstract):
     product_info = models.TextField(help_text='商品資訊', null=True, blank=True)
     detail_info = models.TextField(help_text='詳細資訊', null=True, blank=True)
     level1_title = models.CharField(max_length=128, help_text="規則1 的主題 只有在config:product_specifications_setting",
+                                    default='規格',
                                     null=True)
     level2_title = models.CharField(max_length=128, help_text="規則1 的主題 只有在config:product_specifications_setting",
                                     null=True)
@@ -353,10 +354,19 @@ class MemberStore(DefaultAbstract):
 class MemberAddress(DefaultAbstract):
     member = models.ForeignKey(Member, related_name='memberaddress', on_delete=models.CASCADE,
                                help_text='會員編號')
-    shipping_name = models.CharField(max_length=64, help_text="收貨人姓名")
+    shipping_name = models.CharField(max_length=64, help_text="收貨人姓名", null=True)
     phone = models.CharField(max_length=64, help_text="收貨人電話", null=True)
     shipping_address = models.CharField(max_length=64, help_text="宅配", null=True)
     shipping_area = models.CharField(max_length=64, help_text="郵遞區號", null=True)
+    location = models.SmallIntegerField(help_text="地區: 1：國內 2: 國外", default=1)
+    # ---- 國外 only ----
+    first_name = models.CharField(max_length=64, help_text="First Name(海外)", null=True)
+    last_name = models.CharField(max_length=64, help_text="Last Name(海外)", null=True)
+    country = models.CharField(max_length=64, help_text="Country", null=True)
+    building = models.CharField(max_length=64, help_text="大樓名字(海外)", null=True)
+    company_name = models.CharField(max_length=64, help_text="公司名字(海外)", null=True)
+    city = models.CharField(max_length=64, help_text="City(海外)", null=True)
+    postal_code = models.CharField(max_length=64, help_text="Postal (海外)", null=True)
 
     class Meta:
         ordering = ['created_at']

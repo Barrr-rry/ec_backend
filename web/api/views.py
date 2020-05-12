@@ -1124,7 +1124,7 @@ class CartViewSet(MyMixin):
         if not isinstance(request.user, AnonymousUser):
             queryset = self.filter_queryset(self.get_queryset())
             for cart in queryset:
-                total += cart.product.price * cart.quantity
+                total += cart.specification_detail.price * cart.quantity
         return Response(dict(total=int(total)))
 
     def list(self, request, *args, **kwargs):
