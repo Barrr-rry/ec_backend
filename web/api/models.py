@@ -421,6 +421,9 @@ class FreeShipping(DefaultAbstract):
     price = models.IntegerField(help_text='運費金額')
     # 店家的代號 之前的設計 名字不改掉 不然要改掉的部分太多
     sub_type = models.CharField(max_length=128, help_text='店家的代號 ex: FAMI', null=True)
+    enable = models.BooleanField(default=True, help_text="開啟功能")
+    location = models.SmallIntegerField(help_text="地區: 1：國內 2: 國外", default=1)
+    use_ecpay_delivery = models.BooleanField(default=False, help_text="使用ecpay 的物流機制")
 
 
 class Coupon(DefaultAbstract):

@@ -511,28 +511,56 @@ def generate_products_ezgo(config_data):
 
 
 def generate_freeshipping():
+    print('free.....')
+    oversea = FreeShipping.objects.create(
+        title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='1', price=60,
+        cash_on_delivery=False, frontend_name='DHL', backstage_name='海外（DHL）', location=2,
+        use_ecpay_delivery=False,
+    )
+    oversea = FreeShipping.objects.create(
+        title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='1', price=60,
+        cash_on_delivery=False, frontend_name='EMS', backstage_name='海外（EMS）', location=2,
+        use_ecpay_delivery=False,
+    )
+    oversea = FreeShipping.objects.create(
+        title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='1', price=60,
+        cash_on_delivery=False, frontend_name='郵寄', backstage_name='海外（郵寄）', location=2,
+        use_ecpay_delivery=False,
+    )
+    store = FreeShipping.objects.create(
+        title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='5', price=65,
+        cash_on_delivery=True, frontend_name='OK 超商', backstage_name='超商取貨（OK 超商）',
+        sub_type=None, location=1,
+        use_ecpay_delivery=False,
+
+    )
     store = FreeShipping.objects.create(
         title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='5', price=65,
         cash_on_delivery=True, frontend_name='萊爾富', backstage_name='超商取貨（萊爾富）',
-        sub_type='HILIFE'
+        sub_type='HILIFE', location=1,
+        use_ecpay_delivery=True,
     )
     store = FreeShipping.objects.create(
         title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='5', price=65,
         cash_on_delivery=True, frontend_name='7-11', backstage_name='超商取貨（7-11）',
-        sub_type='UNIMART'
+        sub_type='UNIMART', location=1,
+        use_ecpay_delivery=True,
     )
     store = FreeShipping.objects.create(
         title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='5', price=65,
         cash_on_delivery=True, frontend_name='全家', backstage_name='超商取貨（全家）',
-        sub_type='FAMI'
+        sub_type='FAMI', location=1,
+        use_ecpay_delivery=True,
     )
     home_delivery = FreeShipping.objects.create(
         title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='999', price=90,
-        cash_on_delivery=False, frontend_name='宅配', backstage_name='宅配'
+        cash_on_delivery=False, frontend_name='宅配', backstage_name='宅配', location=1,
+        use_ecpay_delivery=False,
     )
     post = FreeShipping.objects.create(
         title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='1', price=60,
-        cash_on_delivery=False, frontend_name='郵寄', backstage_name='郵寄'
+        cash_on_delivery=False, frontend_name='郵寄', backstage_name='郵寄', location=1,
+        use_ecpay_delivery=False,
     )
 
 

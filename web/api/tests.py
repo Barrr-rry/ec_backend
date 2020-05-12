@@ -1337,6 +1337,17 @@ class TestFreeShipping(DefaultTestMixin, APITestCase):
         self.assertIsInstance(r.data, list)
         item = r.data[0]
 
+    def test_freeshipping_list_enable_query(self):
+        url = '/api/freeshipping/'
+        r = self.super_manager.get(url)
+        manager_count = len(r.data)
+        instance = FreeShipping.objects.first()
+        instance.enable = False
+        instance.save()
+        r = self.anonymous_user.get(url)
+        anonymous_count = len(r.data)
+        self.assertNotEqual(manager_count, anonymous_count)
+
     def test_freeshipping_update(self):
         instance = FreeShipping.objects.first()
         url = f'/api/freeshipping/{instance.id}/'

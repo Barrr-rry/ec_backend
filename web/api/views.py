@@ -998,7 +998,7 @@ class ProductViewSet(MyMixin, UpdateCache):
     queryset = serializers.Product.objects.select_related('brand'). \
         prefetch_related('tag'). \
         prefetch_related('category'). \
-        prefetch_related('productimages').\
+        prefetch_related('productimages'). \
         prefetch_related('specifications').prefetch_related('specifications_detail').all()
     serializer_class = serializers.ProductSerializer
     filter_backends = (filters.ProductFilter,)
@@ -1188,6 +1188,12 @@ class FreeShippingViewSet(UpdateModelMixin, ListModelMixin, viewsets.GenericView
             return [permission() for permission in permission_classes]
 
         return super().get_permissions()
+
+    def get_queryset(self):
+        ret = super().get_queryset()
+        if not isinstance(self.request.user, Manager):
+            ret = ret.filter(enable=True)
+        return ret
 
 
 @router_url('coupon')
