@@ -393,7 +393,7 @@ class EcpayViewSet(GenericViewSet):
             point=point,
         )
 
-    @action(methods=['POST', 'GET'], detail=False, authentication_classes=[], permission_classes=[])
+    @action(methods=['POST', 'GET', 'DELETE', 'PUT'], detail=False, authentication_classes=[], permission_classes=[])
     def return_url(self, request, *args, **kwargs):
         logger.info('return url method: %s', request.stream.method)
         """payment return url"""
