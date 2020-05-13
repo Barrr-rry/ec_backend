@@ -339,7 +339,6 @@ class TestPermission(DefaultTestMixin, APITestCase):
 
 
 class TestManager(DefaultTestMixin, APITestCase):
-    # todo 報錯 AssertionError: The field 'validate' was included on serializer ManagerSerializer in the 'exclude' option, but does not match any model field.
     response_keys = ['id', 'permission_name', 'permission_description', 'permission_role_manage',
                      'permission_member_manage',
                      'permission_order_manage', 'permission_banner_manage', 'permission_catalog_manage',
@@ -438,7 +437,6 @@ class TestManager(DefaultTestMixin, APITestCase):
         url = f'/api/manager/{instance.id}/'
         r = self.super_manager.delete(url)
         # status 400
-        # todo
         self.assertEqual(r.status_code, 204)
         manager = self.init_manager_apiclient(name='123', role_manage=1)
         r = manager.delete(url)
@@ -668,7 +666,6 @@ class TestMember(DefaultTestMixin, APITestCase):
 
 
 class TestCategory(DefaultTestMixin, APITestCase):
-    response_keys = ['id', 'sub_categories', 'has_product', 'name', 'image_url', 'main_category']
 
     def test_category_list(self):
         url = '/api/category/'
@@ -677,11 +674,6 @@ class TestCategory(DefaultTestMixin, APITestCase):
         self.assertEqual(r.status_code, 200)
         # response type
         self.assertIsInstance(r.data, list)
-        # request = reqponse
-        # todo
-        # item = r.data[0]
-        # self.assertEqual(list(item.keys()),
-        #                  self.response_keys)
 
     def test_category_list_noauth(self):
         url = '/api/category/'
@@ -690,11 +682,6 @@ class TestCategory(DefaultTestMixin, APITestCase):
         self.assertEqual(r.status_code, 200)
         # response type
         self.assertIsInstance(r.data, list)
-        # request = reqponse
-        # todo
-        # item = r.data[0]
-        # self.assertEqual(list(item.keys()),
-        #                  self.response_keys)
 
     def test_category_reed(self):
         instance = Category.objects.first()
@@ -702,10 +689,6 @@ class TestCategory(DefaultTestMixin, APITestCase):
         r = self.super_manager.get(url)
         # status 200
         self.assertEqual(r.status_code, 200)
-        # check response list
-        # todo
-        # self.assertEqual(list(r.data),
-        #                  self.response_keys)
 
     def test_category_post(self):
         url = '/api/category/'
@@ -753,11 +736,6 @@ class TestCategory(DefaultTestMixin, APITestCase):
         self.assertEqual(r.status_code, 200)
         # response type
         self.assertIsInstance(r.data, list)
-        # todo
-        # # request = reqponse
-        # item = r.data[0]
-        # self.assertEqual(list(item.keys()),
-        #                  self.response_keys)
 
 
 class TestTag(DefaultTestMixin, APITestCase):
@@ -775,11 +753,6 @@ class TestTag(DefaultTestMixin, APITestCase):
         self.assertEqual(r.status_code, 200)
         # response type
         self.assertIsInstance(r.data, list)
-        # request = reqponse
-        # todo
-        # item = r.data[0]
-        # self.assertEqual(list(item.keys()),
-        #                  self.response_keys)
 
     def test_tag_reed(self):
         instance = Tag.objects.first()
@@ -787,10 +760,6 @@ class TestTag(DefaultTestMixin, APITestCase):
         r = self.super_manager.get(url)
         # status 200
         self.assertEqual(r.status_code, 200)
-        # check response list
-        # todo
-        # self.assertEqual(list(r.data),
-        #                  self.response_keys)
 
     def test_tag_post(self):
         # create product_ids
@@ -846,11 +815,6 @@ class TestTag(DefaultTestMixin, APITestCase):
         self.assertEqual(r.status_code, 200)
         # response type
         self.assertIsInstance(r.data, list)
-        # request = reqponse
-        # todo
-        # item = r.data[0]
-        # self.assertEqual(list(item.keys()),
-        #                  self.response_keys)
 
     def test_tag_delete(self):
         instance = Tag.objects.filter(product__in=Product.objects.filter(deleted_status=False)).last()
@@ -1109,8 +1073,6 @@ class TestCart(DefaultTestMixin, APITestCase):
         self.assertIsInstance(r.data, list)
         item = r.data
         # todo 別的user 可否可以看到該cart
-        # todo
-        # self.assertEqual(set(item.keys()), set(self.response_keys))
 
     def test_cart_list_with_params(self):
         # todo 未登入顯示購物車資料
@@ -1131,8 +1093,6 @@ class TestCart(DefaultTestMixin, APITestCase):
         self.assertIsInstance(r.data, dict)
 
         item = r.data
-        # todo
-        # self.assertEqual(set(item.keys()), set(self.response_keys))
 
     def test_cart_update(self):
         instance = Cart.objects.last()
@@ -1148,8 +1108,6 @@ class TestCart(DefaultTestMixin, APITestCase):
         # type dict
         self.assertIsInstance(r.data, dict)
         item = r.data
-        # todo
-        # self.assertEqual(set(item.keys()), set(self.response_keys))
 
     def test_cart_delete(self):
         instance = Cart.objects.first()
@@ -1469,10 +1427,6 @@ class TestOrder(DefaultTestMixin, APITestCase):
         r = self.super_manager.get(url)
         # status 200
         self.assertEqual(r.status_code, 200)
-        # check response list
-        # todo
-        # self.assertEqual(list(r.data),
-        #                  self.response_keys)
 
     def test_order_post(self):
         pass
