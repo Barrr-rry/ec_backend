@@ -399,6 +399,15 @@ class Order(DefaultAbstract):
     shipping_status = models.IntegerField(help_text='shipping map', null=True)
     simple_status = models.IntegerField(help_text="簡單對status 做分類", null=True, default=0)
     simple_status_display = models.CharField(max_length=64, help_text="簡單對status 做分類", null=True, default='未付款')
+    # --- only 國外 ---
+    first_name = models.CharField(max_length=64, help_text="First Name(海外)", null=True)
+    last_name = models.CharField(max_length=64, help_text="Last Name(海外)", null=True)
+    country = models.CharField(max_length=64, help_text="Country", null=True)
+    building = models.CharField(max_length=64, help_text="大樓名字(海外)", null=True)
+    company_name = models.CharField(max_length=64, help_text="公司名字(海外)", null=True)
+    city = models.CharField(max_length=64, help_text="City(海外)", null=True)
+    postal_code = models.CharField(max_length=64, help_text="Postal (海外)", null=True)
+    # -----------------
 
     to_store = models.BooleanField(help_text="超商取貨: True 宅配: False", default=False)
     store_type = models.CharField(max_length=64, help_text='超商種類', null=True)

@@ -212,10 +212,10 @@ class EcpayViewSet(GenericViewSet):
             cart.product.save()
 
             obj = serializers.ProductSerializer(cart.product).data
-            product_price += cart.quantity * cart.product.price
-            obj['specification'] = serializers.SpecificationSerializer(cart.specification).data
+            product_price += cart.quantity * cart.specification_detail.price
+            obj['specification_detail'] = serializers.SpecificationDetailSerializer(cart.specification_detail).data
             obj['quantity'] = cart.quantity
-            total_weight += cart.product.weight * cart.quantity
+            total_weight += cart.specification_detail.weight * cart.quantity
             product_shot.append(obj)
         request.user.cart.all().delete()
 
