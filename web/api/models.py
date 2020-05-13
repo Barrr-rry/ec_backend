@@ -344,9 +344,10 @@ class ProductImage(DefaultAbstract):
 class MemberStore(DefaultAbstract):
     member = models.ForeignKey(Member, related_name='memberstore', on_delete=models.CASCADE,
                                help_text='會員編號')
-    sub_type = models.CharField(max_length=32, help_text="FAMI、UNIMART、HILIFE")
-    store_id = models.CharField(max_length=32, help_text="store id")
-    store_name = models.CharField(max_length=32, help_text="store name")
+    # ECPAY
+    sub_type = models.CharField(max_length=32, help_text="FAMI、UNIMART、HILIFE", null=True)
+    store_id = models.CharField(max_length=32, help_text="ECPAY:store id 非ECPAY:分店店號")
+    store_name = models.CharField(max_length=32, help_text="ECPAY:store name 非ECPAY:分店名稱")
     address = models.CharField(max_length=64, help_text="address")
     phone = models.CharField(max_length=32, help_text="phone", null=True)
 
