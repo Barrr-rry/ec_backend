@@ -375,7 +375,7 @@ class MemberAddress(DefaultAbstract):
 class Order(DefaultAbstract):
     member = models.ForeignKey(Member, related_name='order', on_delete=models.CASCADE,
                                help_text='會員編號')
-    shipping_name = models.CharField(max_length=64, help_text="收貨人姓名")
+    shipping_name = models.CharField(max_length=64, help_text="收貨人姓名", null=True)
     total_price = models.IntegerField(help_text='總計', default=0)
     freeshipping_price = models.IntegerField(help_text='運費', default=0)
     product_price = models.IntegerField(help_text='商品售價', default=0)
@@ -400,6 +400,7 @@ class Order(DefaultAbstract):
     simple_status = models.IntegerField(help_text="簡單對status 做分類", null=True, default=0)
     simple_status_display = models.CharField(max_length=64, help_text="簡單對status 做分類", null=True, default='未付款')
     # --- only 國外 ---
+    location = models.SmallIntegerField(help_text="地區: 1：國內 2: 國外", default=1)
     first_name = models.CharField(max_length=64, help_text="First Name(海外)", null=True)
     last_name = models.CharField(max_length=64, help_text="Last Name(海外)", null=True)
     country = models.CharField(max_length=64, help_text="Country", null=True)

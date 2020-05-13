@@ -649,7 +649,8 @@ class OrderSerializer(DefaultModelSerializer):
         total_weight = 0
         config = get_config()
         for i in range(len(product_shot)):
-            total_weight += product_shot[i]['specification_detail']['weight'] * product_shot[i]['quantity']
+            if config['weight']:
+                total_weight += product_shot[i]['specification_detail']['weight'] * product_shot[i]['quantity']
             # 如果 config 有完整庫存功能 訂單來了要自己減少
             specification_detail = SpecificationDetail.objects.get(pk=product_shot[i]['specification_detail']['id'])
             if config['product_stock_setting'] == 3 and specification_detail.quantity is not None:
