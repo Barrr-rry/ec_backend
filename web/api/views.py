@@ -1154,11 +1154,13 @@ class CartViewSet(MyMixin):
                 return Response(ret)
             for c in cart:
                 product = serializers.ProductForCartSerializer(instance=Product.objects.get(pk=c['product']))
-                specification = serializers.Specification.objects.get(pk=c['specification'])
+                specification_detail = serializers.SpecificationDetailSerializer(
+                    instance=SpecificationDetail.objects.get(pk=c['specification_detail']))
                 ret.append(dict(
-                    specification=c['specification'],
+                    specification_detail=specification_detail.data,
                     product=product.data,
-                    specification_name=specification.name,
+                    spec1_name=product.data['level1_title'],
+                    spec2_name=product.data['level2_title'],
                     quantity=c['quantity'],
                 ))
             return Response(ret)
