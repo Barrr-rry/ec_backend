@@ -562,7 +562,6 @@ class CartSerializer(DefaultModelSerializer):
     member = serializers.HiddenField(default=MemberHiddenField())
     spec1_name = serializers.SerializerMethodField()
     spec2_name = serializers.SerializerMethodField()
-    specification_detail = SpecificationDetailSerializer(read_only=True)
 
     class Meta(CommonMeta):
         model = Cart
@@ -587,11 +586,14 @@ class CartSerializer(DefaultModelSerializer):
 
 
 class ProductForCartSerializer(ProductListSerializer):
+    specifications_detail = SpecificationDetailSerializer(many=True, read_only=True)
     specifications = SpecificationSerializer(many=True, read_only=True)
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'product_number', 'productimages', 'specifications')
+        fields = ('id', 'name', 'product_number', 'productimages', 'specifications',
+                  'level1_title', 'level2_title',
+                  'specifications_detail')
 
 
 class MemberWishSerializer(DefaultModelSerializer):
@@ -605,8 +607,7 @@ class MemberWishSerializer(DefaultModelSerializer):
 
 class CartResposneSerializer(CartSerializer):
     product = ProductForCartSerializer(read_only=True)
-    # todo 不顯示這個了 但前端要顯示啥？
-    # specification_name = serializers.CharField(source='specification.name', read_only=True)
+    specification_detail = SpecificationDetailSerializer(read_only=True)
 
 
 class RewardSerializer(DefaultModelSerializer):
