@@ -477,3 +477,7 @@ class ConfigSetting(DefaultAbstract):
     # 會員回饋金
     feeback_money_setting = models.SmallIntegerField(help_text="會員回饋金 1: 沒有回饋金功能 2: 針對訂單 3: 針對會員")
     activity = models.BooleanField(default=False, help_text="活動： 買幾算幾")
+
+
+class Country(DefaultAbstract):
+    name = models.CharField(max_length=128, help_text="國家名字")

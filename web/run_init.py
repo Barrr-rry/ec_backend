@@ -8,7 +8,7 @@ from api import serializers
 from django.utils import timezone
 from api.models import Banner, BannerContent, Permission, AdminTokens, Manager, Member, Category, Brand, Product, \
     ProductImage, Tag, Specification, TagImage, MemberTokens, FreeShipping, Coupon, Reward, Order, RewardRecord, \
-    Cart, MemberAddress, MemberWish, ConfigSetting, SpecificationDetail
+    Cart, MemberAddress, MemberWish, ConfigSetting, SpecificationDetail, Country
 import datetime
 import random
 from fake_data import cn_name, en_name, get_random_letters, get_random_number, banner_args, categories, brands
@@ -121,6 +121,7 @@ def main(for_test=False, config_data=None):
     generate_reward()
     generate_orders()
     generate_cart()
+    genearete_country()
 
 
 def generate_super_admin():
@@ -524,17 +525,17 @@ def generate_products_ezgo(config_data):
 
 def generate_freeshipping():
     oversea = FreeShipping.objects.create(
-        title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='1', price=60,
+        title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='10', price=60,
         cash_on_delivery=False, frontend_name='DHL', backstage_name='海外（DHL）', location=2,
         use_ecpay_delivery=False,
     )
     oversea = FreeShipping.objects.create(
-        title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='1', price=60,
+        title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='5', price=60,
         cash_on_delivery=False, frontend_name='EMS', backstage_name='海外（EMS）', location=2,
         use_ecpay_delivery=False,
     )
     oversea = FreeShipping.objects.create(
-        title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='1', price=60,
+        title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='3', price=60,
         cash_on_delivery=False, frontend_name='郵寄', backstage_name='海外（郵寄）', location=2,
         use_ecpay_delivery=False,
     )
@@ -587,6 +588,12 @@ def generate_coupon(count):
             start_time=timezone.now(),
             end_time=timezone.now() + timezone.timedelta(days=random.randint(-20, 20)),
         )
+
+
+def genearete_country():
+    names = ['美國', '日本', '大陸']
+    for name in names:
+        Country.objects.create(name=name)
 
 
 if __name__ == '__main__':

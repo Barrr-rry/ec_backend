@@ -1592,3 +1592,14 @@ class TestConfigSetting(DefaultTestMixin, APITestCase):
         self.assertEqual(r.status_code, 200)
         # type dict
         self.assertIsInstance(r.data, dict)
+
+
+class TestCountry(DefaultTestMixin, APITestCase):
+
+    def test_country_list(self):
+        url = '/api/ountry/'
+        r = self.superauth_client.get(url)
+        # status 200
+        self.assertEqual(r.status_code, 200)
+        # response type
+        self.assertIsInstance(r.data, list)

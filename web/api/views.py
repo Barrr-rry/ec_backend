@@ -12,7 +12,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework_nested import routers
 from rest_framework.parsers import MultiPartParser, FormParser
 from .models import (BannerContent, Banner, File, Permission, Manager, AdminTokens, Member, Category, Tag, Brand,
-                     Product, ConfigSetting, SpecificationDetail,
+                     Product, ConfigSetting, SpecificationDetail, Country,
                      ProductImage, Cart, ProductQuitShot, TagImage, FreeShipping, Coupon, MemberStore)
 from .serializers import (BannerSerializer, FileSerializer, PermissionSerializer, ManagerSerializer,
                           ManagerLoginSerializer,
@@ -1372,3 +1372,18 @@ class ConfigSettingViewSet(UpdateCache, UpdateModelMixin, ListModelMixin, viewse
             f.write(json.dumps(config))
         subprocess.call('./init.sh')
         return ret
+
+
+@router_url('country')
+class ConfigSettingViewSet(ListModelMixin, viewsets.GenericViewSet):
+    queryset = serializers.Country.objects.all()
+    serializer_class = serializers.serializers
+    authentication_classes = []
+    permission_classes = []
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        ret = []
+        for el in queryset:
+            ret.append(el.name)
+        return Response(ret)

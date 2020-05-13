@@ -9,7 +9,7 @@ import os
 logger = logging.getLogger()
 host_url_map = dict(
     prod='http://172.105.194.178:2000/',
-    dev='https://d52a0893.ngrok.io/',
+    dev='https://bbb02c52.ngrok.io/',
     test='https://li1731-160.members.linode.com/'
 )
 ENV = os.environ.get('ENV')
