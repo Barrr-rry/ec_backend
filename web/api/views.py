@@ -367,8 +367,9 @@ class EcpayViewSet(GenericViewSet):
             point=point,
         )
 
-    @action(methods=['POST'], detail=False, authentication_classes=[], permission_classes=[])
+    @action(methods=['POST', 'GET', 'DELETE', 'PUT'], detail=False, authentication_classes=[], permission_classes=[])
     def return_url(self, request, *args, **kwargs):
+        logger.info('return url method: %s', request.stream.method)
         """payment return url"""
         logger.info('return url: %s', request.data['MerchantTradeNo'])
         instance = serializers.Order.objects.filter(order_number=request.data['MerchantTradeNo'][:-2]).first()
@@ -392,7 +393,9 @@ class EcpayViewSet(GenericViewSet):
     @action(methods=['POST'], detail=False, authentication_classes=[], permission_classes=[])
     def paynent_info_url(self, request, *args, **kwargs):
         """payment info return url"""
-        logger.info('return url: %s', request.data['MerchantTradeNo'])
+        logger.info('payment info url: %s', request.data['MerchantTradeNo'])
+        logger.info('PaymentType: %s', request.data['PaymentType'])
+        logger.info('RtnCode: %s', request.data['RtnCode'])
         instance = serializers.Order.objects.filter(order_number=request.data['MerchantTradeNo'][:-2]).first()
         if not instance:
             print('no return instance:', request.data['MerchantTradeNo'])

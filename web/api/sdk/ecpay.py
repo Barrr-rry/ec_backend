@@ -10,7 +10,7 @@ logger = logging.getLogger()
 host_url_map = dict(
     prod='http://172.105.194.178:2000/',
     dev='https://bbb02c52.ngrok.io/',
-    test='https://li1731-160.members.linode.com/'
+    test='http://li1858-106.members.linode.com/'
 )
 ENV = os.environ.get('ENV')
 host_url = host_url_map[ENV]
@@ -33,7 +33,7 @@ else:
         HashKey='1KNuJ3exSlgXEtrp',
         HashIV='YNOdMJKcofOCyC1x'
     )
-logging.info('ENV: %s', ENV)
+logging.info('ENV: %s %s', ENV, host_url)
 logger.info(f'ecpay_keys: %s', ecpay_keys)
 payment_type = dict(
     WebATM_TAISHIN='台新銀行 WebATM',
