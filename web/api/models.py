@@ -344,9 +344,10 @@ class ProductImage(DefaultAbstract):
 class MemberStore(DefaultAbstract):
     member = models.ForeignKey(Member, related_name='memberstore', on_delete=models.CASCADE,
                                help_text='會員編號')
-    sub_type = models.CharField(max_length=32, help_text="FAMI、UNIMART、HILIFE")
-    store_id = models.CharField(max_length=32, help_text="store id")
-    store_name = models.CharField(max_length=32, help_text="store name")
+    # ECPAY
+    sub_type = models.CharField(max_length=32, help_text="FAMI、UNIMART、HILIFE", null=True)
+    store_id = models.CharField(max_length=32, help_text="ECPAY:store id 非ECPAY:分店店號")
+    store_name = models.CharField(max_length=32, help_text="ECPAY:store name 非ECPAY:分店名稱")
     address = models.CharField(max_length=64, help_text="address")
     phone = models.CharField(max_length=32, help_text="phone", null=True)
 
@@ -375,7 +376,7 @@ class MemberAddress(DefaultAbstract):
 class Order(DefaultAbstract):
     member = models.ForeignKey(Member, related_name='order', on_delete=models.CASCADE,
                                help_text='會員編號')
-    shipping_name = models.CharField(max_length=64, help_text="收貨人姓名")
+    shipping_name = models.CharField(max_length=64, help_text="收貨人姓名", null=True)
     total_price = models.IntegerField(help_text='總計', default=0)
     freeshipping_price = models.IntegerField(help_text='運費', default=0)
     product_price = models.IntegerField(help_text='商品售價', default=0)
@@ -399,6 +400,16 @@ class Order(DefaultAbstract):
     shipping_status = models.IntegerField(help_text='shipping map', null=True)
     simple_status = models.IntegerField(help_text="簡單對status 做分類", null=True, default=0)
     simple_status_display = models.CharField(max_length=64, help_text="簡單對status 做分類", null=True, default='未付款')
+    # --- only 國外 ---
+    location = models.SmallIntegerField(help_text="地區: 1：國內 2: 國外", default=1)
+    first_name = models.CharField(max_length=64, help_text="First Name(海外)", null=True)
+    last_name = models.CharField(max_length=64, help_text="Last Name(海外)", null=True)
+    country = models.CharField(max_length=64, help_text="Country", null=True)
+    building = models.CharField(max_length=64, help_text="大樓名字(海外)", null=True)
+    company_name = models.CharField(max_length=64, help_text="公司名字(海外)", null=True)
+    city = models.CharField(max_length=64, help_text="City(海外)", null=True)
+    postal_code = models.CharField(max_length=64, help_text="Postal (海外)", null=True)
+    # -----------------
 
     to_store = models.BooleanField(help_text="超商取貨: True 宅配: False", default=False)
     store_type = models.CharField(max_length=64, help_text='超商種類', null=True)

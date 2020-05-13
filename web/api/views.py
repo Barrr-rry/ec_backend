@@ -212,10 +212,10 @@ class EcpayViewSet(GenericViewSet):
             cart.product.save()
 
             obj = serializers.ProductSerializer(cart.product).data
-            product_price += cart.quantity * cart.product.price
-            obj['specification'] = serializers.SpecificationSerializer(cart.specification).data
+            product_price += cart.quantity * cart.specification_detail.price
+            obj['specification_detail'] = serializers.SpecificationDetailSerializer(cart.specification_detail).data
             obj['quantity'] = cart.quantity
-            total_weight += cart.product.weight * cart.quantity
+            total_weight += cart.specification_detail.weight * cart.quantity
             product_shot.append(obj)
         request.user.cart.all().delete()
 
@@ -286,32 +286,40 @@ class EcpayViewSet(GenericViewSet):
 
     @action(methods=['POST'], detail=False)
     def payment(self, request, *args, **kwargs):
-        if request.data.get('check_address'):
+        data = request.data
+        if data.get('check_address'):
             user = request.user
-            instance = serializers.MemberAddress.objects.filter(
+            member_address_parmas = dict(
                 member=user,
-                shipping_name=request.data['shipping_name'],
-                phone=request.data['phone'],
-                shipping_address=request.data['shipping_address'],
-                shipping_area=request.data['shipping_area'],
+                shipping_name=data.get('shipping_name'),
+                phone=data.get('phone'),
+                shipping_address=data.get('shipping_address'),
+                shipping_area=data.get('shipping_area'),
+                location=data.get('location'),
+                first_name=data.get('first_name'),
+                last_name=data.get('last_name'),
+                country=data.get('country'),
+                building=data.get('building'),
+                company_name=data.get('company_name'),
+                city=data.get('city'),
+                postal_code=data.get('postal_code'),
+            )
+            instance = serializers.MemberAddress.objects.filter(
+                **member_address_parmas,
             )
             if instance.count() == 0:
                 instance = serializers.MemberAddress.objects.create(
-                    member=user,
-                    shipping_name=request.data['shipping_name'],
-                    phone=request.data['phone'],
-                    shipping_address=request.data['shipping_address'],
-                    shipping_area=request.data['shipping_area'],
+                    **member_address_parmas,
                 )
-        url = request.data['callback_url']
-        del request.data['callback_url']
+        url = data['callback_url']
+        del data['callback_url']
 
-        memberstore_id = request.data.get('memberstore_id')
+        memberstore_id = data.get('memberstore_id')
         if memberstore_id:
             memberstore = serializers.MemberStore.objects.get(pk=memberstore_id)
             store_id = memberstore.store_id
-            request.data['store_id'] = store_id
-            request.data['address'] = memberstore.address
+            data['store_id'] = store_id
+            data['address'] = memberstore.address
         with transaction.atomic():
             self.update_request(request)
             serializer = self.get_serializer(data=request.data)
@@ -1146,11 +1154,13 @@ class CartViewSet(MyMixin):
                 return Response(ret)
             for c in cart:
                 product = serializers.ProductForCartSerializer(instance=Product.objects.get(pk=c['product']))
-                specification = serializers.Specification.objects.get(pk=c['specification'])
+                specification_detail = serializers.SpecificationDetailSerializer(
+                    instance=SpecificationDetail.objects.get(pk=c['specification_detail']))
                 ret.append(dict(
-                    specification=c['specification'],
+                    specification_detail=specification_detail.data,
                     product=product.data,
-                    specification_name=specification.name,
+                    spec1_name=product.data['level1_title'],
+                    spec2_name=product.data['level2_title'],
                     quantity=c['quantity'],
                 ))
             return Response(ret)
