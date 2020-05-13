@@ -109,7 +109,10 @@ def main(for_test=False, config_data=None):
     generate_brands()
     generate_categories()
     generate_tags()
-    generate_products_for_test(2, config_data)
+    if for_test:
+        generate_products_for_test(20, config_data)
+    else:
+        generate_products_for_test(30, config_data)
     generate_members_with_token()
     generate_members(20)
     generate_banners(10)
@@ -388,14 +391,6 @@ def generate_products_for_test(count, config_data):
     category = Category.objects.all()
     now = timezone.now().strftime('%Y%m%d')
     for i in range(count):
-        # config data
-        number_count = random.choice(range(5, 10))
-        weight = 0.6 if config_data.weight else None
-        price = random.randint(100, 1000)
-        fake_price = 213
-        inventory_status = 0 if config_data.product_stock_setting != 2 else random.randint(1, 3)
-        quantity = None if config_data.product_stock_setting != 3 else random.randint(0, 10)
-        # ----
 
         dct = dict(
             product_number=f'P{now}{i}',
@@ -425,23 +420,40 @@ def generate_products_for_test(count, config_data):
         )
         # 規格細節
         if config_data.product_specifications_setting == 2:
+            # config data
+            number_count = random.choice(range(5, 10))
+            weight = 0.6 if config_data.weight else None
+            price = random.randint(100, 1000)
+            fake_price = 213
+            inventory_status = 0 if config_data.product_stock_setting != 2 else random.randint(1, 3)
+            quantity = None if config_data.product_stock_setting != 3 else random.randint(0, 10)
+
             pass
         # 只有規格名稱
         elif config_data.product_specifications_setting == 1:
-            spec1 = Specification.objects.create(
-                product=product,
-                name='一般',
-            )
-            SpecificationDetail.objects.create(
-                product=product,
-                level1_spec=spec1,
-                product_code=f'{get_random_number(10)}',
-                weight=weight,
-                price=price,
-                fake_price=fake_price,
-                quantity=quantity,
-                inventory_status=inventory_status,
-            )
+            for i in range(1, random.randint(2, 4)):
+                # config data
+                number_count = random.choice(range(5, 10))
+                weight = 0.6 if config_data.weight else None
+                price = random.randint(100, 1000)
+                fake_price = 213
+                inventory_status = 0 if config_data.product_stock_setting != 2 else random.randint(1, 3)
+                quantity = None if config_data.product_stock_setting != 3 else random.randint(0, 10)
+
+                spec1 = Specification.objects.create(
+                    product=product,
+                    name=f'一般{i if i != 1 else ""}',
+                )
+                SpecificationDetail.objects.create(
+                    product=product,
+                    level1_spec=spec1,
+                    product_code=f'{get_random_number(10)}',
+                    weight=weight,
+                    price=price,
+                    fake_price=fake_price,
+                    quantity=quantity,
+                    inventory_status=inventory_status,
+                )
 
 
 def generate_products_ezgo(config_data):
@@ -511,7 +523,6 @@ def generate_products_ezgo(config_data):
 
 
 def generate_freeshipping():
-    print('free.....')
     oversea = FreeShipping.objects.create(
         title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='1', price=60,
         cash_on_delivery=False, frontend_name='DHL', backstage_name='海外（DHL）', location=2,
