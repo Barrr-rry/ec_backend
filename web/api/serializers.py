@@ -387,7 +387,7 @@ class SpecificationDetailSerializer(DefaultModelSerializer):
 
 
 class ProductSerializer(DefaultModelSerializer):
-    product_number = serializers.CharField(max_length=256, help_text="商品編號 P+mmdd+流水號", read_only=True)
+    product_number = serializers.CharField(max_length=256, help_text="商品編號 P+mmdd+流水號")
     brand_en_name = serializers.CharField(source='brand.en_name', read_only=True)
     brand_cn_name = serializers.CharField(source='brand.cn_name', read_only=True)
     tag = serializers.PrimaryKeyRelatedField(many=True, required=False, help_text='標籤流水號', queryset=Tag.objects.all())
