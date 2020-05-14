@@ -421,16 +421,55 @@ def generate_products_for_test(count, config_data):
         )
         # 規格細節
         if config_data.product_specifications_setting == 2:
-            # config data
-            number_count = random.choice(range(5, 10))
-            weight = 0.6 if config_data.weight else None
-            price = random.randint(100, 1000)
-            fake_price = 213
-            inventory_status = 0 if config_data.product_stock_setting != 2 else random.randint(1, 3)
-            quantity = None if config_data.product_stock_setting != 3 else random.randint(0, 10)
+            # 規格1, 規格2
+            product.level1_title = '尺寸'
+            product.level2_title = '顏色'
+            product.save()
+            sizes = ['X', 'B', 'C', 'D', 'XL', 'S', 'L', 'LLL', 'XXXL']
+            colors = ['Blue', 'Red', 'Yello', 'White', 'RGB三原色']
+            random.shuffle(sizes)
+            random.shuffle(colors)
+            spec1_list = []
+            spec2_list = []
+            for size in sizes[:random.randint(1, len(sizes))]:
+                spec1_list.append(
+                    Specification.objects.create(
+                        product=product,
+                        name=size,
+                        level=1,
+                    )
+                )
+            for color in colors[:random.randint(1, len(colors))]:
+                spec2_list.append(
+                    Specification.objects.create(
+                        product=product,
+                        name=color,
+                        level=2,
+                    )
+                )
+            for spec1 in spec1_list:
+                for spec2 in spec2_list:
+                    # config data
+                    number_count = random.choice(range(5, 10))
+                    weight = 0.6 if config_data.weight else None
+                    price = random.randint(100, 1000)
+                    fake_price = 213
+                    inventory_status = 0 if config_data.product_stock_setting != 2 else random.randint(1, 3)
+                    quantity = None if config_data.product_stock_setting != 3 else random.randint(0, 10)
 
-            pass
-        # 只有規格名稱
+                    SpecificationDetail.objects.create(
+                        product=product,
+                        level1_spec=spec1,
+                        level2_spec=spec2,
+                        product_code=f'{get_random_number(10)}',
+                        weight=weight,
+                        price=price,
+                        fake_price=fake_price,
+                        quantity=quantity,
+                        inventory_status=inventory_status,
+                    )
+
+                    # 只有規格名稱
         elif config_data.product_specifications_setting == 1:
             for i in range(1, random.randint(2, 4)):
                 # config data
