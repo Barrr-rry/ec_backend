@@ -383,8 +383,18 @@ class SpecificationWriteSerializer(serializers.Serializer):
 
 
 class SpecificationDetailSerializer(DefaultModelSerializer):
+    spec1_name = serializers.SerializerMethodField()
+    spec2_name = serializers.SerializerMethodField()
+
     class Meta(CommonMeta):
         model = SpecificationDetail
+
+    def get_spec1_name(self, instance):
+        return instance.level1_spec.name
+
+    def get_spec2_name(self, instance):
+        level2_spec = instance.level2_spec
+        return level2_spec.name if level2_spec else None
 
 
 class ProductSerializer(DefaultModelSerializer):

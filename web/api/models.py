@@ -306,6 +306,9 @@ class SpecificationDetail(DefaultAbstract):
     quantity = models.IntegerField(help_text='庫存量', null=True)
     inventory_status = models.SmallIntegerField(help_text='庫存狀況 0: 無庫存功能，或者是庫存使用數量表示 1：有庫存；2：無庫存；3：預購品', default=0)
 
+    class Meta:
+        ordering = ['created_at']
+
 
 class Cart(DefaultAbstract):
     member = models.ForeignKey(Member, related_name='cart', on_delete=models.CASCADE,
