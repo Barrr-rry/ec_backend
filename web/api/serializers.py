@@ -468,24 +468,53 @@ class ProductSerializer(DefaultModelSerializer):
 
     def update(self, instance, validated_data):
         now = timezone.now().strftime('%m%d')
-        product_images = validated_data.get('productimages', [])
-        specifications = validated_data.get('specifications', [])
-        if 'productimages' in validated_data and 'specifications' in validated_data:
-            del validated_data['productimages'], validated_data['specifications']
-        elif 'productimages' in validated_data:
-            del validated_data['productimages']
-        elif 'specifications' in validated_data:
-            del validated_data['specifications']
+        product_images = self.pull_validate_data(validated_data, 'productimages', [])
+        specification_level1 = self.pull_validate_data(validated_data, 'specification_level1', [])
+        specification_level2 = self.pull_validate_data(validated_data, 'specification_level2', [])
+        specifications_detail_data = self.pull_validate_data(validated_data, 'specifications_detail_data', [])
+        category = self.pull_validate_data(validated_data, 'category', [])
+        tag = self.pull_validate_data(validated_data, 'tag')
         with transaction.atomic():
             instance = super().update(instance, validated_data)
-            if product_images:
-                instance.productimages.all().delete()
-                for args in product_images:
-                    ProductImage.objects.create(product=instance, **args)
-            if specifications:
-                instance.specifications.all().delete()
-                for args in specifications:
-                    Specification.objects.create(product=instance, **args)
+            # category and tag
+            instance.category.clear()
+            instance.tag.clear()
+            for cat in category:
+                instance.category.add(cat)
+            for t in tag:
+                instance.tag.add(t)
+            instance.save()
+
+            Specification.objects.filter(product=instance).delete()
+            for specification in specification_level1:
+                specification['product'] = instance
+                specification['level'] = 1
+                Specification.objects.create(**specification)
+
+            for specification in specification_level2:
+                specification['product'] = instance
+                specification['level'] = 2
+                Specification.objects.create(**specification)
+
+            ProductImage.objects.filter(product=instance).delete()
+            for product_image in product_images:
+                product_image['product'] = instance
+                if 'specification_name' in product_image:
+                    specification_name = product_image['specification_name']
+                    del product_image['specification_name']
+                    specification = Specification.objects.filter(product=instance, name=specification_name).first()
+                    product_image['specification'] = specification
+                ProductImage.objects.create(**product_image)
+
+            SpecificationDetail.objects.filter(product=instance).delete()
+            for spec_detail in specifications_detail_data:
+                for key in ['level1_spec', 'level2_spec']:
+                    if key in spec_detail:
+                        spec = Specification.objects.filter(product=instance, name=spec_detail[key]).first()
+                        spec_detail[key] = spec
+
+                spec_detail['product'] = instance
+                SpecificationDetail.objects.create(**spec_detail)
         return instance
 
 
