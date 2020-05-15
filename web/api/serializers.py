@@ -495,7 +495,7 @@ class ProductSerializer(DefaultModelSerializer):
                 instance.tag.add(t)
             instance.save()
 
-            Specification.objects.filter(product=instance).delete()
+            Specification.original_objects.filter(product=instance).delete()
             for specification in specification_level1:
                 specification['product'] = instance
                 specification['level'] = 1
@@ -506,7 +506,7 @@ class ProductSerializer(DefaultModelSerializer):
                 specification['level'] = 2
                 Specification.objects.create(**specification)
 
-            ProductImage.objects.filter(product=instance).delete()
+            ProductImage.original_objects.filter(product=instance).delete()
             for product_image in product_images:
                 product_image['product'] = instance
                 if 'specification_name' in product_image:
@@ -516,7 +516,7 @@ class ProductSerializer(DefaultModelSerializer):
                     product_image['specification'] = specification
                 ProductImage.objects.create(**product_image)
 
-            SpecificationDetail.objects.filter(product=instance).delete()
+            SpecificationDetail.original_objects.filter(product=instance).delete()
             for spec_detail in specifications_detail_data:
                 for key in ['level1_spec', 'level2_spec']:
                     if key in spec_detail:
@@ -525,6 +525,7 @@ class ProductSerializer(DefaultModelSerializer):
 
                 spec_detail['product'] = instance
                 SpecificationDetail.objects.create(**spec_detail)
+
         return instance
 
 
