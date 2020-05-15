@@ -355,7 +355,7 @@ class ProductImageSerializer(DefaultModelSerializer):
 
     class Meta:
         model = ProductImage
-        fields = ('main_image', 'image_url', 'specification_name')
+        fields = ('main_image', 'image_url', 'specification_name', 'specification')
 
 
 # todo
