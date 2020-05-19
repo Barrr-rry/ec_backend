@@ -101,6 +101,8 @@ def main(for_test=False, config_data=None):
 
     config_data = Munch(config_data)
     ConfigSetting.objects.create(**config_data)
+    from api.util import pickle_redis
+    pickle_redis.remove_data('configsetting')
 
     generate_super_admin()
     generate_permissions()
