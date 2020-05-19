@@ -1388,7 +1388,7 @@ class ConfigSettingViewSet(UpdateCache, UpdateModelMixin, ListModelMixin, viewse
 
 
 @router_url('country')
-class ConfigSettingViewSet(ListModelMixin, viewsets.GenericViewSet):
+class CountryViewSet(ListModelMixin, viewsets.GenericViewSet):
     queryset = serializers.Country.objects.all()
     serializer_class = serializers.serializers
     authentication_classes = []
