@@ -472,14 +472,19 @@ class RewardRecord(DefaultAbstract):
     member = models.ForeignKey(Member, related_name='reward', on_delete=models.CASCADE,
                                help_text='會員流水號')
     order = models.ForeignKey(Order, related_name='rewrad', on_delete=models.CASCADE,
-                              help_text='訂單流水號')
+                              null=True, help_text='訂單流水號|可能是手動或是系統產生')
+    desc = models.CharField(max_length=256, help_text="回饋金備註", default='購物回饋點數')
+    manual = models.BooleanField(default=0, help_text="手動新增")
     point = models.IntegerField(help_text='回饋點數')
-    start_date = models.DateField(help_text='期限')
-    end_date = models.DateField(help_text='期限')
-    use = models.BooleanField(default=False, help_text='已經使用')
+    total_point = models.IntegerField(help_text='回饋點數總共餘額')
+    end_date = models.DateField(help_text='期限｜根據config 決定是單筆還是統一更新')
 
-    class Meta:
-        ordering = ['-end_date']
+
+class RewardRecordTemp(RewardRecord):
+    """
+    存在RewardRecord 的是真的已經入帳的資料預計入帳的資料會顯示在這邊
+    """
+    start_date = models.DateField(help_text='期限｜根據config 決定是什麼時候更新到RewardRecord')
 
 
 class ConfigSetting(DefaultAbstract):
@@ -490,7 +495,7 @@ class ConfigSetting(DefaultAbstract):
     # 重量
     weight = models.BooleanField(help_text="是否顯示重量")
     # 會員回饋金
-    feeback_money_setting = models.SmallIntegerField(help_text="會員回饋金 1: 沒有回饋金功能 2: 針對訂單 3: 針對會員")
+    feeback_money_setting = models.SmallIntegerField(help_text="會員回饋金 1: 沒有回饋金功能 2: 回饋期限日期統一 3: 依造訂單設定回饋日期")
     activity = models.BooleanField(default=False, help_text="活動： 買幾算幾")
 
 

@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import (BannerContent, Banner, File, Permission, Manager, AdminTokens, Member, Brand, Product,
                      Specification, MemberTokens, Order, MemberStore, Reward, RewardRecord, MemberAddress,
                      ProductImage, Category, Tag, TagImage, Cart, ProductQuitShot, FreeShipping, Coupon,
-                     MemberWish, ConfigSetting, SpecificationDetail, Country
+                     MemberWish, ConfigSetting, SpecificationDetail, Country, RewardRecordTemp
                      )
 from django.db.models.fields.related import ForeignKey, ManyToManyField
 from django.db.models.fields.reverse_related import ManyToOneRel, ManyToManyRel
@@ -10,7 +10,7 @@ from django.db.models.fields.reverse_related import ManyToOneRel, ManyToManyRel
 modellist = (BannerContent, Banner, File, Permission, Manager, AdminTokens, Member, Brand, Product,
              Specification, MemberTokens, Order, MemberStore, Reward, RewardRecord, MemberAddress,
              ProductImage, Category, Tag, TagImage, Cart, ProductQuitShot, FreeShipping, Coupon,
-             MemberWish, ConfigSetting, SpecificationDetail, Country
+             MemberWish, ConfigSetting, SpecificationDetail, Country, RewardRecordTemp
              )
 
 for md in modellist:

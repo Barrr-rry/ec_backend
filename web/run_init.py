@@ -8,7 +8,7 @@ from api import serializers
 from django.utils import timezone
 from api.models import Banner, BannerContent, Permission, AdminTokens, Manager, Member, Category, Brand, Product, \
     ProductImage, Tag, Specification, TagImage, MemberTokens, FreeShipping, Coupon, Reward, Order, RewardRecord, \
-    Cart, MemberAddress, MemberWish, ConfigSetting, SpecificationDetail, Country
+    Cart, MemberAddress, MemberWish, ConfigSetting, SpecificationDetail, Country, RewardRecordTemp
 import datetime
 import random
 from fake_data import cn_name, en_name, get_random_letters, get_random_number, banner_args, categories, brands
@@ -185,11 +185,12 @@ def generate_orders():
     )
 
     rewardrecord = RewardRecord.objects.create(
-        start_date=timezone.now() - timezone.timedelta(days=10),
         end_date=timezone.now() + timezone.timedelta(days=10),
         order=order,
         member=member,
+        desc='購物回饋點數',
         point=100,
+        total_point=100,
     )
 
 
