@@ -374,6 +374,7 @@ class SpecificationSerializer(DefaultModelSerializer):
 
 class SpecificationWriteSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=128, help_text='規格名稱')
+    id = serializers.IntegerField(help_text='規格id', required=False)
 
     def create(self, validated_data):
         pass
@@ -477,6 +478,14 @@ class ProductSerializer(DefaultModelSerializer):
         return product
 
     def update(self, instance, validated_data):
+        def get_ids(items):
+            ret = []
+            for item in items:
+                _id = item.get('id')
+                if _id:
+                    ret.append(_id)
+            return ret
+
         now = timezone.now().strftime('%m%d')
         product_images = self.pull_validate_data(validated_data, 'productimages', [])
         specification_level1 = self.pull_validate_data(validated_data, 'specification_level1', [])
@@ -494,17 +503,31 @@ class ProductSerializer(DefaultModelSerializer):
             for t in tag:
                 instance.tag.add(t)
             instance.save()
-
-            Specification.original_objects.filter(product=instance).delete()
+            ids_level1 = get_ids(specification_level1)
+            ids_level2 = get_ids(specification_level2)
+            Specification.original_objects.filter(product=instance). \
+                exclude(id__in=ids_level1).exclude(id__in=ids_level2).delete()
             for specification in specification_level1:
-                specification['product'] = instance
-                specification['level'] = 1
-                Specification.objects.create(**specification)
+                # create or update
+                if specification.get('id'):
+                    target = Specification.objects.get(pk=specification.get('id'))
+                    target.name = specification['name']
+                    target.save()
+                else:
+                    specification['product'] = instance
+                    specification['level'] = 1
+                    Specification.objects.create(**specification)
 
             for specification in specification_level2:
-                specification['product'] = instance
-                specification['level'] = 2
-                Specification.objects.create(**specification)
+                # create or update
+                if specification.get('id'):
+                    target = Specification.objects.get(pk=specification.get('id'))
+                    target.name = specification['name']
+                    target.save()
+                else:
+                    specification['product'] = instance
+                    specification['level'] = 2
+                    Specification.objects.create(**specification)
 
             ProductImage.original_objects.filter(product=instance).delete()
             for product_image in product_images:
@@ -516,15 +539,22 @@ class ProductSerializer(DefaultModelSerializer):
                     product_image['specification'] = specification
                 ProductImage.objects.create(**product_image)
 
-            SpecificationDetail.original_objects.filter(product=instance).delete()
+            detail_ids = get_ids(specifications_detail_data)
+            SpecificationDetail.original_objects.filter(product=instance).exclude(id__in=detail_ids).delete()
             for spec_detail in specifications_detail_data:
                 for key in ['level1_spec', 'level2_spec']:
                     if key in spec_detail:
                         spec = Specification.objects.filter(product=instance, name=spec_detail[key]).first()
                         spec_detail[key] = spec
-
                 spec_detail['product'] = instance
-                SpecificationDetail.objects.create(**spec_detail)
+                # create or update
+                if spec_detail.get('id'):
+                    target = SpecificationDetail.objects.get(pk=spec_detail.get('id'))
+                    for key in spec_detail:
+                        setattr(target, key, spec_detail[key])
+                    target.save()
+                else:
+                    SpecificationDetail.objects.create(**spec_detail)
 
         return instance
 
