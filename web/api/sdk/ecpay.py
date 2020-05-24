@@ -3,10 +3,9 @@ from . import ecpay_logistic_sdk
 import json
 
 from datetime import datetime
-import logging
+from log import logger
 import os
 
-logger = logging.getLogger()
 host_url_map = dict(
     prod='http://172.105.194.178:2000/',
     dev='https://a7244c46.ngrok.io/',
@@ -33,8 +32,8 @@ else:
         HashKey='1KNuJ3exSlgXEtrp',
         HashIV='YNOdMJKcofOCyC1x'
     )
-logging.info('ENV: %s %s', ENV, host_url)
-logger.info(f'ecpay_keys: %s', ecpay_keys)
+logger.info(f'ENV: {ENV} {host_url}')
+logger.info(f'ecpay_keys: {ecpay_keys}')
 payment_type = dict(
     WebATM_TAISHIN='台新銀行 WebATM',
     WebATM_ESUN='玉山銀行 WebATM(暫不提供)',

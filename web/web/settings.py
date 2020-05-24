@@ -11,10 +11,7 @@ https://docs.djangoproject.com/en/2.2/ref/settings/
 """
 
 import os
-from log import initlog
-import logging
-
-LOGGING = initlog('django-log', debug=True)
+from log import logger
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -46,7 +43,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'corsheaders',
-    'api'
+    'api',
+    'django_crontab',
 ]
 MIDDLEWARE = [
     'api.middleware.defaultmiddleware',
@@ -70,6 +68,10 @@ CACHES = {
         }
     }
 }
+
+CRONJOBS = [
+    ('* * * * *', 'api.cron.demo')
+]
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
