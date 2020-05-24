@@ -1,6 +1,4 @@
-import logging
-
-logger = logging.getLogger()
+from log import logger
 
 
 def defaultmiddleware(get_response):

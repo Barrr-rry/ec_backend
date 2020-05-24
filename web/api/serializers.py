@@ -11,7 +11,7 @@ from django.http.request import QueryDict
 from .models import (BannerContent, Banner, File, Permission, Manager, AdminTokens, Member, Brand, Product,
                      Specification, MemberTokens, Order, MemberStore, Reward, RewardRecord, MemberAddress,
                      ProductImage, Category, Tag, TagImage, Cart, ProductQuitShot, FreeShipping, Coupon,
-                     MemberWish, ConfigSetting, SpecificationDetail, Country
+                     MemberWish, ConfigSetting, SpecificationDetail, Country, RewardRecordTemp
                      )
 from django.utils.functional import cached_property
 from rest_framework.utils.serializer_helpers import BindingDict
@@ -161,7 +161,6 @@ class MemberAddressSerializer(DefaultModelSerializer):
 
 class RewardRecordSerializer(DefaultModelSerializer):
     end_date = serializers.DateField(read_only=True, format="%Y-%m-%d")
-    start_date = serializers.DateField(read_only=True, format="%Y-%m-%d")
 
     class Meta(CommonMeta):
         model = RewardRecord

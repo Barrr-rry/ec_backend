@@ -12,7 +12,7 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework_nested import routers
 from rest_framework.parsers import MultiPartParser, FormParser
 from .models import (BannerContent, Banner, File, Permission, Manager, AdminTokens, Member, Category, Tag, Brand,
-                     Product, ConfigSetting, SpecificationDetail, Country,
+                     Product, ConfigSetting, SpecificationDetail, Country, RewardRecordTemp,
                      ProductImage, Cart, ProductQuitShot, TagImage, FreeShipping, Coupon, MemberStore)
 from .serializers import (BannerSerializer, FileSerializer, PermissionSerializer, ManagerSerializer,
                           ManagerLoginSerializer,
@@ -54,17 +54,13 @@ from django.contrib.auth.models import AnonymousUser
 import os
 from pyquery import PyQuery as pq
 import requests
-import logging
+from log import logger
 
 from django.utils.decorators import method_decorator
 from django.db.models import Q
 from .util import pickle_redis, get_config
 import uuid
 from django.db.models import Max, Min
-
-# init router url
-logger = logging.getLogger()
-logger.info('views init')
 
 router = routers.DefaultRouter()
 nested_routers = []
@@ -196,6 +192,7 @@ class EcpayViewSet(GenericViewSet):
         carts = request.user.cart.all()
         product_price = 0
         coupon_discount = 0
+        # todo reward_discount check!!!
         reward_discount = request.data.get('reward_discount', 0)
         if 'reward_discount' in request.data:
             del request.data['reward_discount']
@@ -339,6 +336,7 @@ class EcpayViewSet(GenericViewSet):
         return Response(ret, status=status.HTTP_201_CREATED)
 
     def total_price_to_reward_point(self, total_price):
+        # todo
         reward = serializers.Reward.objects.first()
         if reward.status == 1:
             point = (total_price // 100) * reward.discount
@@ -352,6 +350,7 @@ class EcpayViewSet(GenericViewSet):
 
     @action(methods=['GET'], detail=False, permission_classes=[])
     def calc_reward(self, request, *args, **kwargs):
+        # todo
         total_price = request.query_params.get('total_price')
         if total_price and isinstance(total_price, str):
             total_price = int(total_price)
@@ -361,6 +360,7 @@ class EcpayViewSet(GenericViewSet):
         return Response(ret)
 
     def to_reward(self, order):
+        # todo
         reward = serializers.Reward.objects.first()
         point = self.total_price_to_reward_point(order.total_price)
         if os.environ.get('ENV') == 'prod':
@@ -1234,12 +1234,14 @@ class CouponViewSet(MyMixin, UpdateCache):
 
 @router_url('rewardrecord')
 class RewardRecordViewSet(UpdateModelMixin, ListModelMixin, viewsets.GenericViewSet):
+    # todo 可以create 但要檢查權限
     queryset = serializers.RewardRecord.objects.all()
     serializer_class = serializers.RewardRecordSerializer
     authentication_classes = [MangerOrMemberAuthentication]
 
     permission_classes = [(permissions.ReadAuthenticated | permissions.CouponManagerEditPermission)]
 
+    # todo 有兩個 get_permission 並且檢查下面 todo
     def get_permissions(self):
         if self.action == 'list':
             permission_classes = [(permissions.ReadAuthenticated | permissions.CouponManagerEditPermission),
