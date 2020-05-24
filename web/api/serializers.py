@@ -637,6 +637,20 @@ class CartSerializer(DefaultModelSerializer):
     class Meta(CommonMeta):
         model = Cart
 
+    def validate(self, data):
+        """
+        Check that start is before finish.
+        """
+        quantity = data['quantity']
+        product = data['product']
+        specification_detail = data['specification_detail']
+        for specification in product.specifications_detail.all():
+            if specification == specification_detail and specification.quantity and specification.quantity < quantity:
+                raise serializers.ValidationError("大於商品數量")
+            elif specification == specification_detail and specification.inventory_status and specification.inventory_status == 0:
+                raise serializers.ValidationError("商品已無庫存")
+        return data
+
     def get_spec1_name(self, instance):
         return instance.specification_detail.level1_spec.name
 
