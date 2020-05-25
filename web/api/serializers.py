@@ -161,8 +161,9 @@ class MemberAddressSerializer(DefaultModelSerializer):
 
 class RewardRecordSerializer(DefaultModelSerializer):
     end_date = serializers.DateField(read_only=True, format="%Y-%m-%d")
+    created_at = serializers.DateTimeField(read_only=True, format="%Y-%m-%d")
 
-    class Meta(CommonMeta):
+    class Meta(CreateCommonMeta):
         model = RewardRecord
 
 

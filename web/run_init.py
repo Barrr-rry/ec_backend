@@ -160,7 +160,6 @@ def generate_reward(count):
         order=order,
         point=point,
         end_date=timezone.now() + timezone.timedelta(days=record.still_day),
-        total_point=point,
         start_date=timezone.now()
     )
     RewardRecord.objects.create(

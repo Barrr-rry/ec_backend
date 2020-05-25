@@ -12,7 +12,8 @@ from rest_framework.viewsets import GenericViewSet
 from rest_framework_nested import routers
 from rest_framework.parsers import MultiPartParser, FormParser
 from .models import (BannerContent, Banner, File, Permission, Manager, AdminTokens, Member, Category, Tag, Brand,
-                     Product, ConfigSetting, SpecificationDetail, Country, RewardRecordTemp,
+                     Product, ConfigSetting, SpecificationDetail, Country, RewardRecordTemp, Reward, RewardRecord,
+                     RewardRecordTemp,
                      ProductImage, Cart, ProductQuitShot, TagImage, FreeShipping, Coupon, MemberStore)
 from .serializers import (BannerSerializer, FileSerializer, PermissionSerializer, ManagerSerializer,
                           ManagerLoginSerializer,
@@ -725,11 +726,48 @@ class MemberViewSet(MyMixin):
             permission_classes=[],
             )
     def info(self, request, *args, **kwargs):
+        """
+        record_info:
+        目前獎勵金
+        目前獎勵金 最近一筆資訊(金額, 到期 year, month, day)
+        待生效獎勵金
+        待生效獎勵金 最近一筆資訊(金額, 到期 year, month, day)
+        生效日期 n 天
+        """
         user = request.user
         if isinstance(request.user, Member):
             serializer = self.get_serializer(user)
-            rewards = user.get_rewards()
-            return Response(dict(rewards=rewards, **serializer.data))
+            # 生效日期 n 天
+            still_day = Reward.objects.first().still_day
+
+            instance = RewardRecord.objects.filter(member=user).first()
+            total_point = 0 if not instance else instance.total_point
+            record = dict(
+                total_point=total_point,
+                last_point=0 if not instance else instance.point,
+                year=None if not instance else instance.end_date.year,
+                month=None if not instance else instance.end_date.month,
+                day=None if not instance else instance.end_date.day,
+            )
+
+            queryset = RewardRecordTemp.objects.filter(member=user).all()
+            instance = queryset.first()
+            total_point = 0
+            for el in queryset:
+                total_point += el.point
+            record_temp = dict(
+                total_point=total_point,
+                last_point=0 if not instance else instance.point,
+                year=None if not instance else instance.end_date.year,
+                month=None if not instance else instance.end_date.month,
+                day=None if not instance else instance.end_date.day,
+            )
+            record_info = dict(
+                record=record,
+                record_temp=record_temp
+            )
+
+            return Response(dict(record_info=record_info, **serializer.data))
         else:
             return Response(dict())
 

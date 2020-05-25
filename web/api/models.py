@@ -191,8 +191,8 @@ class Member(DefaultAbstract, AbstractBaseUser):
         self.expire_datetime = default_expire_datetime()
 
     def get_rewards(self):
-        instance = queryset = RewardRecord.objects.filter(member=self).first()
-        ret = 0 if not instance else instance.point
+        instance = RewardRecord.objects.filter(member=self).first()
+        ret = 0 if not instance else instance.total_point
         return ret
 
     def get_max_rewards(self, product_price):
@@ -476,11 +476,18 @@ class RewardRecord(DefaultAbstract):
     use_point = models.IntegerField(default=0, help_text='已使用回饋點數')
 
 
-class RewardRecordTemp(RewardRecord):
+class RewardRecordTemp(DefaultAbstract):
     """
     存在RewardRecord 的是真的已經入帳的資料預計入帳的資料會顯示在這邊
     """
     start_date = models.DateField(help_text='期限｜根據config 決定是什麼時候更新到RewardRecord')
+    end_date = models.DateField(help_text='期限｜根據config 決定是單筆還是統一更新')
+    member = models.ForeignKey(Member, related_name='reward_temp', on_delete=models.CASCADE,
+                               help_text='會員流水號')
+    order = models.ForeignKey(Order, related_name='rewrad_temp', on_delete=models.CASCADE,
+                              null=True, help_text='訂單流水號|可能是手動或是系統產生')
+    desc = models.CharField(max_length=256, help_text="回饋金備註", default='購物回饋點數')
+    point = models.IntegerField(help_text='回饋點數')
 
 
 class ConfigSetting(DefaultAbstract):
@@ -492,7 +499,7 @@ class ConfigSetting(DefaultAbstract):
     weight = models.BooleanField(help_text="是否顯示重量")
     # 會員回饋金
     feeback_money_setting = models.SmallIntegerField(help_text="會員回饋金 1: 沒有回饋金功能 2: 回饋期限日期統一 3: 依造訂單設定回饋日期")
-    activity = models.BooleanField(default=False, help_text="活動： 買幾算幾")
+    activity = models.BooleanField(default=False, help_text="活動： 買幾送幾")
 
 
 class Country(DefaultAbstract):
