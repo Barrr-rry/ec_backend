@@ -764,7 +764,8 @@ class MemberViewSet(MyMixin):
             )
             record_info = dict(
                 record=record,
-                record_temp=record_temp
+                record_temp=record_temp,
+                still_day=still_day,
             )
 
             return Response(dict(record_info=record_info, **serializer.data))
