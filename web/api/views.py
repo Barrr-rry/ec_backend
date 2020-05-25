@@ -1267,8 +1267,6 @@ class RewardRecordViewSet(UpdateModelMixin, ListModelMixin, viewsets.GenericView
         queryset = super().get_queryset()
         if self.action == 'list':
             queryset = queryset.filter(member=self.request.user,
-                                       use=False,
-                                       start_date__lte=timezone.now().date(),
                                        end_date__gte=timezone.now().date())
         return queryset
 

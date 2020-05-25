@@ -478,6 +478,7 @@ class RewardRecord(DefaultAbstract):
     point = models.IntegerField(help_text='回饋點數')
     total_point = models.IntegerField(help_text='回饋點數總共餘額')
     end_date = models.DateField(help_text='期限｜根據config 決定是單筆還是統一更新')
+    use_point = models.IntegerField(default=0, help_text='已使用回饋點數')
 
 
 class RewardRecordTemp(RewardRecord):
