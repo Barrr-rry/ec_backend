@@ -191,13 +191,8 @@ class Member(DefaultAbstract, AbstractBaseUser):
         self.expire_datetime = default_expire_datetime()
 
     def get_rewards(self):
-        queryset = RewardRecord.objects.filter(member=self,
-                                               point__gt=0,
-                                               start_date__lte=timezone.now().date(),
-                                               end_date__gte=timezone.now().date())
-        ret = 0
-        for el in queryset:
-            ret += el.point
+        instance = queryset = RewardRecord.objects.filter(member=self).first()
+        ret = 0 if not instance else instance.point
         return ret
 
     def get_max_rewards(self, product_price):

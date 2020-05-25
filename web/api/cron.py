@@ -4,7 +4,7 @@
 def demo():
     # logger.info('demo')
     msg = 'test'
-    token = 'TOKEN'
+    token = 'FtiyBzeoeH6OQ02pkgnh1A89LWW6SiCH04kqR0kV3nc'
     import requests
     url = "https://notify-api.line.me/api/notify"
     headers = {
@@ -13,4 +13,3 @@ def demo():
 
     payload = {'message': msg}
     r = requests.post(url, headers=headers, params=payload)
-    print('123123123213')
