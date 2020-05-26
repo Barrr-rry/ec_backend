@@ -281,9 +281,9 @@ class Product(DefaultAbstract):
     order = models.IntegerField(help_text='排序順序', default=1)
     activity = models.ForeignKey(Activity, related_name="product", on_delete=models.CASCADE, help_text="fk: activity",
                                  null=True)
+
     class Meta:
         ordering = ['order', '-updated_at', '-created_at']
-
 
 
 class MemberWish(DefaultAbstract):
