@@ -816,9 +816,15 @@ class FreeShippingSerializer(DefaultModelSerializer):
 class CouponSerializer(DefaultModelSerializer):
     type_text = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
+    member = serializers.PrimaryKeyRelatedField(many=True, required=False, help_text='Member流水號',
+                                                queryset=Member.objects.all())
+    member_detail = serializers.SerializerMethodField(read_only=True)
 
     class Meta(CommonMeta):
         model = Coupon
+
+    def get_member_detail(self, instance):
+        return MemberSerializer(many=True, instance=instance.member.all()).data
 
     def get_status(self, instance):
         now = timezone.now().date()
