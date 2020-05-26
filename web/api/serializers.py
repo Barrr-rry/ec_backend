@@ -828,10 +828,12 @@ class CouponSerializer(DefaultModelSerializer):
 
     def get_status(self, instance):
         now = timezone.now().date()
-        return instance.start_time <= now < instance.end_time
+        return instance.start_time <= now < instance.end_time if instance.has_period else True
 
     def get_type_text(self, instance):
         now = timezone.now().date()
+        if not instance.has_period:
+            return '啟用中'
         if instance.start_time <= now < instance.end_time:
             return '啟用中'
         else:
