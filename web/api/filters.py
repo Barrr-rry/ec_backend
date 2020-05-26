@@ -149,6 +149,7 @@ class ProductFilter(filters.BaseFilterBackend):
                 q = or_q(q, Q(product_number__contains=keyword))
                 q = or_q(q, Q(brand__en_name__contains=keyword))
                 q = or_q(q, Q(brand__cn_name__contains=keyword))
+                q = or_q(q, Q(specifications_detail__product_code__contains=keyword))
                 q = or_q(q, Q(name__contains=keyword))
 
         brand = request.query_params.get('brand')
@@ -181,16 +182,30 @@ class ProductFilter(filters.BaseFilterBackend):
         if only_tag is not None:
             q = and_q(q, Q(tag__isnull=False))
 
+        status = request.query_params.get('status')
+        if status is not None:
+            status = bool(int(status))
+            q = and_q(q, Q(status=status))
+
         inventory_status = request.query_params.get('inventory_status')
         if inventory_status is not None:
-            q = and_q(q, Q(inventory_status=inventory_status))
+            inventory_status = int(inventory_status)
+            if inventory_status == 1:
+                q = or_q(q, Q(specifications_detail__inventory_status=inventory_status))
+                q = or_q(q, Q(specifications_detail__quantity__gt=10))
+            if inventory_status == 2:
+                q = or_q(q, Q(specifications_detail__inventory_status=inventory_status))
+                q = or_q(q, Q(specifications_detail__quantity__lt=0))
+            elif inventory_status == 3:
+                q = and_q(q, Q(specifications_detail__quantity__gt=0))
+                q = and_q(q, Q(specifications_detail__quantity__lt=10))
 
         max_price = request.query_params.get('max_price')
         min_price = request.query_params.get('min_price')
         if max_price is not None:
             q = and_q(q, Q(specifications_detail__price__lte=max_price))
         if min_price is not None:
-            q = and_q(q, Q(specifications_detail__price__gte=max_price))
+            q = and_q(q, Q(specifications_detail__price__gte=min_price))
 
         ids = request.query_params.get('ids')
         if ids:
@@ -284,7 +299,7 @@ class ProductFilter(filters.BaseFilterBackend):
                 location='query',
                 schema=coreschema.Number(
                     title='inventory_status',
-                    description='int: 庫存狀況 1：有庫存；2：無庫存；3：預品'
+                    description='int: 庫存狀況 0：全部；1：庫存充足；2：庫存不足；3：無庫存'
                 )
             ),
             coreapi.Field(
@@ -312,6 +327,16 @@ class ProductFilter(filters.BaseFilterBackend):
                 schema=coreschema.String(
                     title='order_by',
                     description='str: 排序'
+                )
+            ),
+            coreapi.Field(
+                name='status',
+                required=False,
+                location='query',
+                schema=coreschema.String(
+                    title='status',
+                    description='bool: 上架狀態',
+                    format='bool',
                 )
             ),
         )

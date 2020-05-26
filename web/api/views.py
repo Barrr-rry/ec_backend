@@ -1100,7 +1100,9 @@ class ProductViewSet(MyMixin, UpdateCache):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-
+        user = request.user
+        if not isinstance(request.user, Manager):
+            queryset = self.filter_queryset(self.get_queryset()).filter(status=True).all()
         page = self.paginate_queryset(queryset)
         if page is not None:
             q = self.get_queryset()
@@ -1123,6 +1125,12 @@ class ProductListViewSet(NestedViewSetBase, ListModelMixin, viewsets.GenericView
     queryset = serializers.Product.objects.select_related('brand').select_related('category'). \
         select_related('tag'). \
         prefetch_related('productimages').prefetch_related('specifications').all()
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        user = request.user
+        if not isinstance(request.user, Manager):
+            queryset = self.filter_queryset(self.get_queryset()).filter(status=True).all()
 
 
 @router_url('cart')
@@ -1273,24 +1281,10 @@ class CouponViewSet(MyMixin, UpdateCache):
 
 @router_url('rewardrecord')
 class RewardRecordViewSet(UpdateModelMixin, ListModelMixin, viewsets.GenericViewSet):
-    # todo 可以create 但要檢查權限
     queryset = serializers.RewardRecord.objects.all()
     serializer_class = serializers.RewardRecordSerializer
     authentication_classes = [MangerOrMemberAuthentication]
-
     permission_classes = [(permissions.ReadAuthenticated | permissions.CouponManagerEditPermission)]
-
-    # todo 有兩個 get_permission 並且檢查下面 todo
-    def get_permissions(self):
-        if self.action == 'list':
-            permission_classes = [(permissions.ReadAuthenticated | permissions.CouponManagerEditPermission),
-                                  permissions.CouponReadAuthenticated]
-            return [permission() for permission in permission_classes]
-
-        return super().get_permissions()
-
-    # todo permission 未完成, admin沒辦法list
-    # testcase line 1157
 
     def get_permissions(self):
         if self.action == 'list':
@@ -1304,8 +1298,9 @@ class RewardRecordViewSet(UpdateModelMixin, ListModelMixin, viewsets.GenericView
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if self.action == 'list':
-            queryset = queryset.filter(member=self.request.user)
+        user = self.request.user
+        if isinstance(user, Member) and self.action == 'list':
+            queryset = queryset.filter(member=user)
         return queryset
 
 

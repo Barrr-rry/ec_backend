@@ -283,8 +283,14 @@ class Product(DefaultAbstract):
                                     null=True)
     level2_title = models.CharField(max_length=128, help_text="規則1 的主題 只有在config:product_specifications_setting",
                                     null=True)
+    status = models.BooleanField(help_text='上架狀態', default=True)
+    # todo 活動?
+    order = models.IntegerField(help_text='排序順序', default=1)
     activity = models.ForeignKey(Activity, related_name="product", on_delete=models.CASCADE, help_text="fk: activity",
                                  null=True)
+    class Meta:
+        ordering = ['order', '-updated_at', '-created_at']
+
 
 
 class MemberWish(DefaultAbstract):
