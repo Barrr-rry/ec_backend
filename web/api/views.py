@@ -1100,7 +1100,9 @@ class ProductViewSet(MyMixin, UpdateCache):
 
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
-
+        user = request.user
+        if not isinstance(request.user, Manager):
+            queryset = self.filter_queryset(self.get_queryset()).filter(status=True).all()
         page = self.paginate_queryset(queryset)
         if page is not None:
             q = self.get_queryset()
@@ -1123,6 +1125,12 @@ class ProductListViewSet(NestedViewSetBase, ListModelMixin, viewsets.GenericView
     queryset = serializers.Product.objects.select_related('brand').select_related('category'). \
         select_related('tag'). \
         prefetch_related('productimages').prefetch_related('specifications').all()
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        user = request.user
+        if not isinstance(request.user, Manager):
+            queryset = self.filter_queryset(self.get_queryset()).filter(status=True).all()
 
 
 @router_url('cart')

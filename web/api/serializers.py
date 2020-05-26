@@ -420,12 +420,29 @@ class ProductSerializer(DefaultModelSerializer):
     productimages = ProductImageSerializer(many=True, help_text='Product Images')
     specifications_detail = SpecificationDetailSerializer(many=True, read_only=True)
     specifications = SpecificationSerializer(many=True, read_only=True)
+    status_display = serializers.SerializerMethodField(read_only=True)
+    inventory_status_display = serializers.SerializerMethodField(read_only=True)
 
     class Meta(CommonMeta):
         model = Product
 
     def get_tag_detail(self, instance):
         return TagListSerializer(many=True, instance=instance.tag.all()).data
+
+    def get_inventory_status_display(self, instance):
+        specificationdetails = SpecificationDetail.objects.filter(product=instance.id).all()
+        for specificationdetail in specificationdetails:
+            if (specificationdetail.inventory_status == 1) or (specificationdetail.quantity > 10):
+                return '庫存充足'
+            elif (specificationdetail.inventory_status == 2) or (specificationdetail.quantity <= 0):
+                return '無庫存'
+            elif 0 < specificationdetail.quantity <= 10:
+                return '庫存不足'
+
+    def get_status_display(self, instance):
+        if instance.status:
+            return '上架中'
+        return '已下架'
 
     def create(self, validated_data):
         now = timezone.now().strftime('%m%d')
@@ -644,6 +661,8 @@ class CartSerializer(DefaultModelSerializer):
         quantity = data['quantity']
         product = data['product']
         specification_detail = data['specification_detail']
+        if not product.status:
+            raise serializers.ValidationError("商品已下架")
         for specification in product.specifications_detail.all():
             if specification == specification_detail and specification.quantity and specification.quantity < quantity:
                 raise serializers.ValidationError("大於商品數量")
@@ -729,6 +748,8 @@ class OrderSerializer(DefaultModelSerializer):
             product_id = product_detail['id']
             product = Product.objects.filter(pk=product_id).first()
             specification_detail = product_detail['specification_detail']
+            if not product.status:
+                raise serializers.ValidationError("商品已下架")
             for specification in product.specifications_detail.all():
                 if specification == specification_detail and specification.quantity and specification.quantity < quantity:
                     raise serializers.ValidationError("大於商品數量")
