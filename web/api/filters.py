@@ -168,6 +168,12 @@ class ProductFilter(filters.BaseFilterBackend):
         if category is not None:
             q = and_q(q, Q(category=category))
 
+        category_ids = request.query_params.get('category_ids')
+        if category_ids is not None:
+            category_ids = category_ids.split(',')
+            q = and_q(q, Q(id__in=category_ids))
+            q = and_q(q, Q(category=category))
+
         no_tag = request.query_params.get('no_tag')
         if no_tag is not None:
             q = and_q(q, Q(tag__isnull=True))
@@ -270,6 +276,15 @@ class ProductFilter(filters.BaseFilterBackend):
                 schema=coreschema.Number(
                     title='category',
                     description='int: 分類'
+                )
+            ),
+            coreapi.Field(
+                name='category_ids',
+                required=False,
+                location='query',
+                schema=coreschema.Array(
+                    title='category ids',
+                    description='array: 分類 ids'
                 )
             ),
             coreapi.Field(

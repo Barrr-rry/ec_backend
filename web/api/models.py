@@ -182,9 +182,16 @@ class Member(DefaultAbstract, AbstractBaseUser):
     validate = models.BooleanField(help_text='是否已經註冊驗證', default=False)
     validate_code = models.CharField(max_length=64, help_text='驗證碼', unique=True, null=True)
     expire_datetime = models.DateTimeField(help_text='validate_code 到期時間', null=True, default=default_expire_datetime)
+    in_blacklist = models.BooleanField(default=False, help_text="黑名單")
+    was_in_blacklist = models.BooleanField(default=False, help_text="曾經是黑名單")
 
     def __str__(self):
         return f'{self.name}({self.id})'
+
+    def save(self, *args, **kwargs):
+        if self.in_blacklist:
+            self.was_in_blacklist = True
+        return super().save(*args, **kwargs)
 
     def set_validate_code(self):
         self.validate_code = str(uuid.uuid4())
@@ -467,8 +474,15 @@ class Coupon(DefaultAbstract):
     title = models.CharField(max_length=128, help_text='標題')
     discount_code = models.CharField(max_length=32, help_text='折價券序號', unique=True)
     image_url = models.CharField(max_length=1024, help_text='圖片路徑')
-    start_time = models.DateField(help_text='啟用日期')
-    end_time = models.DateField(help_text='到期日期')
+    start_time = models.DateField(help_text='啟用日期', null=True)
+    end_time = models.DateField(help_text='到期日期', null=True)
+    has_period = models.BooleanField(default=False, help_text="有使用期限")
+    has_member_use_limit = models.BooleanField(default=False, help_text="會員使用限制次數限制")
+    member_use_limit = models.IntegerField(help_text="會員使用限制次數", null=True)
+    has_coupon_use_limit = models.BooleanField(default=False, help_text="優換券使用限制次數限制")
+    coupon_use_limit = models.IntegerField(help_text="優換券使用限制次數", null=True)
+    has_member_list = models.BooleanField(default=False, help_text="針對會員開放")
+    member = models.ManyToManyField(Member, related_name='coupon', help_text='會員流水號')
 
 
 class Reward(DefaultAbstract):

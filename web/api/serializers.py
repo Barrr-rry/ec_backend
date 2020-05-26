@@ -843,16 +843,24 @@ class FreeShippingSerializer(DefaultModelSerializer):
 class CouponSerializer(DefaultModelSerializer):
     type_text = serializers.SerializerMethodField()
     status = serializers.SerializerMethodField()
+    member = serializers.PrimaryKeyRelatedField(many=True, required=False, help_text='Member流水號',
+                                                queryset=Member.objects.all())
+    member_detail = serializers.SerializerMethodField(read_only=True)
 
     class Meta(CommonMeta):
         model = Coupon
 
+    def get_member_detail(self, instance):
+        return MemberSerializer(many=True, instance=instance.member.all()).data
+
     def get_status(self, instance):
         now = timezone.now().date()
-        return instance.start_time <= now < instance.end_time
+        return instance.start_time <= now < instance.end_time if instance.has_period else True
 
     def get_type_text(self, instance):
         now = timezone.now().date()
+        if not instance.has_period:
+            return '啟用中'
         if instance.start_time <= now < instance.end_time:
             return '啟用中'
         else:
@@ -860,8 +868,35 @@ class CouponSerializer(DefaultModelSerializer):
 
 
 class ActivitySerializer(DefaultModelSerializer):
+    product_ids = serializers.ListField(child=serializers.IntegerField(min_value=0), write_only=True)
+    products = ProductListSerializer(many=True, read_only=True, source='product')
+
     class Meta(CommonMeta):
         model = Activity
+
+    def create(self, validated_data):
+        product_ids = self.pull_validate_data(validated_data, 'product_ids')
+        with transaction.atomic():
+            instance = super(ActivitySerializer, self).create(validated_data)
+            products = Product.objects.filter(id__in=product_ids)
+            for product in products:
+                product.activity = instance
+                product.save()
+            return instance
+
+    def update(self, instance, validated_data):
+        product_ids = self.pull_validate_data(validated_data, 'product_ids')
+        with transaction.atomic():
+            instance = super(ActivitySerializer, self).update(instance, validated_data)
+            queryset = Product.objects.filter(activity=instance)
+            for pd in queryset:
+                pd.activity = None
+                pd.save()
+            products = Product.objects.filter(id__in=product_ids)
+            for product in products:
+                product.activity = instance
+                product.save()
+            return instance
 
 
 class ConfigSettingSerializer(DefaultModelSerializer):
