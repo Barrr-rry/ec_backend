@@ -721,6 +721,21 @@ class OrderSerializer(DefaultModelSerializer):
             'deleted_status',
         ]
 
+    def validate(self, data):
+        product_shot = data['product_shot']
+        product_shot = json.loads(product_shot)
+        for product_detail in product_shot:
+            quantity = product_detail['quantity']
+            product_id = product_detail['id']
+            product = Product.objects.filter(pk=product_id).first()
+            specification_detail = product_detail['specification_detail']
+            for specification in product.specifications_detail.all():
+                if specification == specification_detail and specification.quantity and specification.quantity < quantity:
+                    raise serializers.ValidationError("大於商品數量")
+                elif specification == specification_detail and specification.inventory_status and specification.inventory_status == 0:
+                    raise serializers.ValidationError("商品已無庫存")
+        return data
+
     def get_shipping_status_display(self, instance):
         return shipping_map.shipping_mapping.get(str(instance.shipping_status))
 
