@@ -11,7 +11,7 @@ from django.http.request import QueryDict
 from .models import (BannerContent, Banner, File, Permission, Manager, AdminTokens, Member, Brand, Product,
                      Specification, MemberTokens, Order, MemberStore, Reward, RewardRecord, MemberAddress,
                      ProductImage, Category, Tag, TagImage, Cart, ProductQuitShot, FreeShipping, Coupon,
-                     MemberWish, ConfigSetting, SpecificationDetail, Country, RewardRecordTemp
+                     MemberWish, ConfigSetting, SpecificationDetail, Country, RewardRecordTemp, Activity
                      )
 from django.utils.functional import cached_property
 from rest_framework.utils.serializer_helpers import BindingDict
@@ -794,6 +794,11 @@ class CouponSerializer(DefaultModelSerializer):
             return '啟用中'
         else:
             return '已過期'
+
+
+class ActivitySerializer(DefaultModelSerializer):
+    class Meta(CommonMeta):
+        model = Activity
 
 
 class ConfigSettingSerializer(DefaultModelSerializer):

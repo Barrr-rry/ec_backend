@@ -1551,9 +1551,70 @@ class TestConfigSetting(DefaultTestMixin, APITestCase):
 class TestCountry(DefaultTestMixin, APITestCase):
 
     def test_country_list(self):
-        url = '/api/ountry/'
-        r = self.superauth_client.get(url)
+        url = '/api/country/'
+        r = self.super_manager.get(url)
         # status 200
         self.assertEqual(r.status_code, 200)
         # response type
         self.assertIsInstance(r.data, list)
+
+
+class TestActivity(DefaultTestMixin, APITestCase):
+    response_keys = []
+
+    def test_activity_list(self):
+        instance = ConfigSetting.objects.first()
+        if not instance.activity:
+            return
+        url = '/api/activity/'
+        r = self.super_manager.get(url)
+        # status 200
+        self.assertEqual(r.status_code, 200)
+        # response type
+        self.assertIsInstance(r.data, list)
+        item = r.data[0]
+
+    def test_activity_post(self):
+        instance = ConfigSetting.objects.first()
+        if not instance.activity:
+            return
+        url = '/api/activity/'
+        data = dict(
+            ch_name='買二送一',
+            en_name='buy 2 give 1',
+            buy_count=2,
+            give_count=1,
+        )
+        r = self.super_manager.post(url, data)
+        # status 201
+        self.assertEqual(r.status_code, 201)
+        # response type
+        self.assertIsInstance(r.data, dict)
+
+        item = r.data
+
+    def test_activity_update(self):
+        instance = ConfigSetting.objects.first()
+        if not instance.activity:
+            return
+        instance = Activity.objects.first()
+        url = f'/api/activity/{instance.id}/'
+        data = dict(
+            ch_name='買三送一',
+        )
+        r = self.super_manager.put(url, data)
+        # status 200
+        self.assertEqual(r.status_code, 200)
+        # type dict
+        self.assertIsInstance(r.data, dict)
+        item = r.data
+
+    def test_activity_delete(self):
+        instance = ConfigSetting.objects.first()
+        if not instance.activity:
+            return
+        instance = Activity.objects.first()
+        url = f'/api/activity/{instance.id}/'
+        r = self.super_manager.delete(url)
+        # stauts 200
+        self.assertEqual(r.status_code, 204)

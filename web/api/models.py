@@ -250,6 +250,13 @@ class Brand(DefaultAbstract):
     fake_id = models.IntegerField(help_text='fake_zid', null=True)
 
 
+class Activity(DefaultAbstract):
+    ch_name = models.CharField(max_length=256, help_text="活動中文名稱")
+    en_name = models.CharField(max_length=256, help_text="活動英文名稱")
+    buy_count = models.IntegerField(help_text="買多少？")
+    give_count = models.IntegerField(help_text="送多少？")
+
+
 class Product(DefaultAbstract):
     product_number = models.CharField(max_length=64, help_text="產品編號 P201912190000", unique=True, null=True)
     brand = models.ForeignKey(Brand, related_name='product', on_delete=models.CASCADE,
@@ -269,7 +276,8 @@ class Product(DefaultAbstract):
                                     null=True)
     level2_title = models.CharField(max_length=128, help_text="規則1 的主題 只有在config:product_specifications_setting",
                                     null=True)
-    # todo 活動?
+    activity = models.ForeignKey(Activity, related_name="product", on_delete=models.CASCADE, help_text="fk: activity",
+                                 null=True)
 
 
 class MemberWish(DefaultAbstract):
