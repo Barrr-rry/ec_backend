@@ -812,8 +812,35 @@ class CouponSerializer(DefaultModelSerializer):
 
 
 class ActivitySerializer(DefaultModelSerializer):
+    product_ids = serializers.ListField(child=serializers.IntegerField(min_value=0), write_only=True)
+    products = ProductListSerializer(many=True, read_only=True, source='product')
+
     class Meta(CommonMeta):
         model = Activity
+
+    def create(self, validated_data):
+        product_ids = self.pull_validate_data(validated_data, 'product_ids')
+        with transaction.atomic():
+            instance = super(ActivitySerializer, self).create(validated_data)
+            products = Product.objects.filter(id__in=product_ids)
+            for product in products:
+                product.activity = instance
+                product.save()
+            return instance
+
+    def update(self, instance, validated_data):
+        product_ids = self.pull_validate_data(validated_data, 'product_ids')
+        with transaction.atomic():
+            instance = super(ActivitySerializer, self).update(instance, validated_data)
+            queryset = Product.objects.filter(activity=instance)
+            for pd in queryset:
+                pd.activity = None
+                pd.save()
+            products = Product.objects.filter(id__in=product_ids)
+            for product in products:
+                product.activity = instance
+                product.save()
+            return instance
 
 
 class ConfigSettingSerializer(DefaultModelSerializer):
