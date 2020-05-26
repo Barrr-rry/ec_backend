@@ -13,7 +13,7 @@ from rest_framework_nested import routers
 from rest_framework.parsers import MultiPartParser, FormParser
 from .models import (BannerContent, Banner, File, Permission, Manager, AdminTokens, Member, Category, Tag, Brand,
                      Product, ConfigSetting, SpecificationDetail, Country, RewardRecordTemp, Reward, RewardRecord,
-                     RewardRecordTemp,
+                     RewardRecordTemp, Activity,
                      ProductImage, Cart, ProductQuitShot, TagImage, FreeShipping, Coupon, MemberStore)
 from .serializers import (BannerSerializer, FileSerializer, PermissionSerializer, ManagerSerializer,
                           ManagerLoginSerializer,
@@ -1344,9 +1344,6 @@ class RewardViewSet(CreateModelMixin, ListModelMixin, UpdateModelMixin, viewsets
         return Response(serializer.data)
 
 
-from rest_framework.authentication import BasicAuthentication
-
-
 @router_url('membertoken')
 class MemberTokenViewSet(MyMixin):
     queryset = serializers.MemberTokens.objects.all()
@@ -1446,3 +1443,11 @@ class CountryViewSet(ListModelMixin, viewsets.GenericViewSet):
         for el in queryset:
             ret.append(el.name)
         return Response(ret)
+
+
+@router_url('activity')
+class ActivityViewSet(MyMixin):
+    queryset = serializers.Activity.objects.all()
+    serializer_class = serializers.ActivitySerializer
+    authentication_classes = [TokenCheckAuthentication]
+    permission_classes = [(permissions.ReadAuthenticated | permissions.CouponManagerEditPermission)]

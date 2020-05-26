@@ -8,7 +8,7 @@ from api import serializers
 from django.utils import timezone
 from api.models import Banner, BannerContent, Permission, AdminTokens, Manager, Member, Category, Brand, Product, \
     ProductImage, Tag, Specification, TagImage, MemberTokens, FreeShipping, Coupon, Reward, Order, RewardRecord, \
-    Cart, MemberAddress, MemberWish, ConfigSetting, SpecificationDetail, Country, RewardRecordTemp
+    Cart, MemberAddress, MemberWish, ConfigSetting, SpecificationDetail, Country, RewardRecordTemp, Activity
 import datetime
 import random
 from fake_data import cn_name, en_name, get_random_letters, get_random_number, banner_args, categories, brands
@@ -124,6 +124,24 @@ def main(for_test=False, config_data=None):
     generate_reward(10)
     generate_cart()
     genearete_country()
+    generate_activity(config_data)
+
+
+def generate_activity(config_data):
+    if not config_data.activity:
+        return
+
+    instance = Activity.objects.create(
+        ch_name='買二送一',
+        en_name='buy 2 give 1',
+        buy_count=2,
+        give_count=1,
+    )
+    queryset = Product.objects.all()
+    for i in range(5):
+        pd = random.choice(queryset)
+        pd.activity = instance
+        pd.save()
 
 
 def generate_super_admin():
