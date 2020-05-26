@@ -13,6 +13,7 @@ import datetime
 import random
 from fake_data import cn_name, en_name, get_random_letters, get_random_number, banner_args, categories, brands
 import json
+from django.utils.timezone import make_aware
 from munch import Munch
 
 fmt = '%Y-%m-%d %H:%M:%S'
@@ -204,31 +205,36 @@ def generate_orders():
     member = Member.objects.filter(account=test_email).first()
     if not member:
         return
-    order = Order.objects.create(
-        shipping_name='maxwang',
-        order_number='M202002100604091',
-        total_price=200,
-        freeshipping_price=200,
-        product_price=200,
-        coupon_price=200,
-        reward_price=200,
-        total_weight=200,
-        phone='0922111333',
-        product_shot='[{"id": 96, "product_number": "P2020021095", "brand_en_name": "Balanceuticals", "brand_cn_name": "\u9673\u80e4\u798e", "category_name": "\u5b55\u5a66\u8207\u5bf6\u5bf6", "name": "\u9280\u5bf6\u5584\u5b5895", "title": "title", "sub_title": "sub_title", "weight": 2312.0, "price": 123.0, "fake_price": 213.0, "inventory_status": 2, "description": null, "description_2": null, "brand": 19, "tag": null, "category": 26, "productimages": [{"id": 191, "image_url": "default-banner-smallimage.png", "main_image": true, "product": 96}, {"id": 192, "image_url": "default-banner-bigimage.png", "main_image": false, "product": 96}], "specifications": [{"id": 192, "name": "201", "product": 96}, {"id": 191, "name": "200", "product": 96}], "specification": {"id": 192, "name": "201", "product": 96}, "quantity": 1}]',
-        address='台北市中正區中山南路７號１樓',
-        shipping_address='台北市中正區中山南路７號１樓',
-        pay_status=1,
-        pay_type=1,
-        shipping_status='300',
-        simple_status=1,
-        simple_status_display='待出貨',
-        to_store=True,
-        store_type='FAMI',
-        store_id='006598',
-        store_name='假的店名',
-        member=member,
-        shipping_area='888'
-    )
+    now = datetime.datetime.now()
+    for i in range(50 + 1):
+        order = Order.objects.create(
+            shipping_name='maxwang',
+            order_number=f'M{get_random_number(8)}',
+            total_price=random.choice(range(1, 10000)),
+            freeshipping_price=random.choice(range(1, 10000)),
+            product_price=random.choice(range(1, 10000)),
+            coupon_price=random.choice(range(1, 10000)),
+            reward_price=random.choice(range(1, 10000)),
+            total_weight=random.choice(range(1, 10000)),
+            phone='0922111333',
+            product_shot='[{"id": 96, "product_number": "P2020021095", "brand_en_name": "Balanceuticals", "brand_cn_name": "\u9673\u80e4\u798e", "category_name": "\u5b55\u5a66\u8207\u5bf6\u5bf6", "name": "\u9280\u5bf6\u5584\u5b5895", "title": "title", "sub_title": "sub_title", "weight": 2312.0, "price": 123.0, "fake_price": 213.0, "inventory_status": 2, "description": null, "description_2": null, "brand": 19, "tag": null, "category": 26, "productimages": [{"id": 191, "image_url": "default-banner-smallimage.png", "main_image": true, "product": 96}, {"id": 192, "image_url": "default-banner-bigimage.png", "main_image": false, "product": 96}], "specifications": [{"id": 192, "name": "201", "product": 96}, {"id": 191, "name": "200", "product": 96}], "specification": {"id": 192, "name": "201", "product": 96}, "quantity": 1}]',
+            address='台北市中正區中山南路７號１樓',
+            shipping_address='台北市中正區中山南路７號１樓',
+            pay_status=1,
+            pay_type=1,
+            shipping_status='300',
+            simple_status=1,
+            simple_status_display='待出貨',
+            to_store=True,
+            store_type='FAMI',
+            store_id='006598',
+            store_name='假的店名',
+            member=member,
+            shipping_area='888'
+        )
+        # 不同時間為了測試時間區間
+        order.created_at = make_aware(now + datetime.timedelta(days=random.choice(range(-20, 20))))
+        order.save()
 
     rewardrecord = RewardRecord.objects.create(
         end_date=timezone.now() + timezone.timedelta(days=10),
