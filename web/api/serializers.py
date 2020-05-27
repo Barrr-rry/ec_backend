@@ -853,6 +853,17 @@ class CouponSerializer(DefaultModelSerializer):
             ret = 2
             return ret
 
+        in_member_use_limit = instance.order.filter(
+            member=self.context['request'].user).count() < instance.member_use_limit \
+            if instance.has_member_use_limit else True
+        if not in_member_use_limit:
+            ret = 3
+            return ret
+        in_coupont_use_limit = instance.order.count() < instance.coupon_use_limit \
+            if instance.has_coupon_use_limit else True
+        if not in_coupont_use_limit:
+            ret = 4
+            return ret
         return ret
 
     def get_type_text(self, instance):

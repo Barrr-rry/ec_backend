@@ -1251,17 +1251,51 @@ class TestCoupon(DefaultTestMixin, APITestCase):
                 shipping_area='888',
                 coupon=coupon
             )
-            # 不同時間為了測試時間區間
-            order.created_at = make_aware(now + datetime.timedelta(days=random.choice(range(-20, 20))))
-            order.save()
 
     """
     todo
     超過單一會員使用限制
     超過全部使用限制
+    status
     """
 
-    def generate_coupon(self, member=None):
+    def test_coupon_member_over_limit(self):
+        """
+        測試會員使用限制次數限制正常運作
+        """
+        instance = self.generate_coupon(has_member_use_limit=True, member_use_limit=4)
+        member = Member.objects.get(account=test_email)
+        self.generate_order(member, instance, order_count=2)
+        url = f'/api/coupon/{instance.discount_code}/'
+        # 未超過前
+        r = self.member_user.get(url)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.data['status'], 1)
+        self.generate_order(member, instance, order_count=2)
+        # 超過後
+        r = self.member_user.get(url)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.data['status'], 3)
+
+    def test_coupon_count_over_limit(self):
+        """
+        優換券使用限制次數限制
+        """
+        instance = self.generate_coupon(has_coupon_use_limit=True, coupon_use_limit=4)
+        member = Member.objects.get(account=test_email)
+        self.generate_order(member, instance, order_count=2)
+        url = f'/api/coupon/{instance.discount_code}/'
+        # 未超過前
+        r = self.member_user.get(url)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.data['status'], 1)
+        self.generate_order(member, instance, order_count=2)
+        # 超過後
+        r = self.member_user.get(url)
+        self.assertEqual(r.status_code, 200)
+        self.assertEqual(r.data['status'], 4)
+
+    def generate_coupon(self, member=None, **kwargs):
         instance = Coupon.objects.create(
             role=random.randint(0, 100),
             method=random.choice([1, 2]),
@@ -1271,6 +1305,7 @@ class TestCoupon(DefaultTestMixin, APITestCase):
             image_url='11697.jpg',
             start_time=timezone.now(),
             end_time=timezone.now() + timezone.timedelta(days=random.randint(-20, 20)),
+            **kwargs
         )
         if member:
             instance.member.add(member)
