@@ -484,6 +484,23 @@ class Coupon(DefaultAbstract):
     has_member_list = models.BooleanField(default=False, help_text="針對會員開放")
     member = models.ManyToManyField(Member, related_name='coupon', help_text='會員流水號')
 
+    def save(self, force_insert=False, force_update=False, using=None,
+             update_fields=None):
+        """
+        Trigger 如果哪邊有資料就算沒有改狀態也要自動幫他改
+        """
+        if not self.id:
+            return super().save(force_insert, force_update, using, update_fields)
+        if self.member.count():
+            self.has_member_list = True
+        if self.start_time or self.end_time:
+            self.has_period = True
+        if self.member_use_limit is not None:
+            self.has_member_use_limit = True
+        if self.coupon_use_limit is not None:
+            self.has_coupon_use_limit = True
+        return super().save(force_insert, force_update, using, update_fields)
+
 
 class Reward(DefaultAbstract):
     status = models.SmallIntegerField(help_text='回饋方式 1: 元 2: 百分比')

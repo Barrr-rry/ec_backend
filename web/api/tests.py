@@ -9,12 +9,12 @@ import json
 from django.db.models import Q
 import random
 from fake_data import cn_name, en_name, get_random_letters, get_random_number, banner_args, categories, brands
+from run_init import main, test_email
 
 
 class DefaultTestMixin:
     @classmethod
     def setUpTestData(cls):
-        from run_init import main, test_email
         main(for_test=True)
         cls.anonymous_user = APIClient()
         cls.super_manager = cls.init_manager_apiclient(
@@ -1204,8 +1204,6 @@ class TestToken(DefaultTestMixin, APITestCase):
 
 
 class TestCoupon(DefaultTestMixin, APITestCase):
-    response_keys = ['id', 'type_text', 'status', 'role', 'method', 'discount', 'title', 'discount_code', 'image_url',
-                     'start_time', 'end_time']
 
     def test_coupon_list(self):
         url = '/api/coupon/'
@@ -1215,7 +1213,6 @@ class TestCoupon(DefaultTestMixin, APITestCase):
         # response type
         self.assertIsInstance(r.data, list)
         item = r.data[0]
-        self.assertEqual(set(item.keys()), set(self.response_keys))
 
     def test_coupon_reed(self):
         instance = Coupon.objects.first()
@@ -1223,9 +1220,103 @@ class TestCoupon(DefaultTestMixin, APITestCase):
         r = self.super_manager.get(url)
         # status 200
         self.assertEqual(r.status_code, 200)
+        self.assertTrue(r.data.get('id'))
         # check response list
-        self.assertEqual(list(r.data),
-                         self.response_keys)
+
+    def generate_order(self, member, coupon, order_count):
+        for i in range(order_count + 1):
+            order = Order.objects.create(
+                shipping_name='maxwang',
+                order_number=f'M{get_random_number(8)}',
+                total_price=random.choice(range(1, 10000)),
+                freeshipping_price=random.choice(range(1, 10000)),
+                product_price=random.choice(range(1, 10000)),
+                coupon_price=random.choice(range(1, 10000)),
+                reward_price=random.choice(range(1, 10000)),
+                total_weight=random.choice(range(1, 10000)),
+                phone='0922111333',
+                product_shot='[{"id": 96, "product_number": "P2020021095", "brand_en_name": "Balanceuticals", "brand_cn_name": "\u9673\u80e4\u798e", "category_name": "\u5b55\u5a66\u8207\u5bf6\u5bf6", "name": "\u9280\u5bf6\u5584\u5b5895", "title": "title", "sub_title": "sub_title", "weight": 2312.0, "price": 123.0, "fake_price": 213.0, "inventory_status": 2, "description": null, "description_2": null, "brand": 19, "tag": null, "category": 26, "productimages": [{"id": 191, "image_url": "default-banner-smallimage.png", "main_image": true, "product": 96}, {"id": 192, "image_url": "default-banner-bigimage.png", "main_image": false, "product": 96}], "specifications": [{"id": 192, "name": "201", "product": 96}, {"id": 191, "name": "200", "product": 96}], "specification": {"id": 192, "name": "201", "product": 96}, "quantity": 1}]',
+                address='台北市中正區中山南路７號１樓',
+                shipping_address='台北市中正區中山南路７號１樓',
+                pay_status=1,
+                pay_type=1,
+                shipping_status='300',
+                simple_status=1,
+                simple_status_display='待出貨',
+                to_store=True,
+                store_type='FAMI',
+                store_id='006598',
+                store_name='假的店名',
+                member=member,
+                shipping_area='888',
+                coupon=coupon
+            )
+            # 不同時間為了測試時間區間
+            order.created_at = make_aware(now + datetime.timedelta(days=random.choice(range(-20, 20))))
+            order.save()
+
+    """
+    todo
+    超過單一會員使用限制
+    超過全部使用限制
+    """
+
+    def generate_coupon(self, member=None):
+        instance = Coupon.objects.create(
+            role=random.randint(0, 100),
+            method=random.choice([1, 2]),
+            discount=random.randint(0, 100),
+            title=f'折價券XXXX',
+            discount_code=f'DC{get_random_number(7)}',
+            image_url='11697.jpg',
+            start_time=timezone.now(),
+            end_time=timezone.now() + timezone.timedelta(days=random.randint(-20, 20)),
+        )
+        if member:
+            instance.member.add(member)
+            instance.save()
+        return instance
+
+    def test_coupon_reed_wrong_code(self):
+        """
+        沒有找到該coupon
+        """
+        url = f'/api/coupon/oooops/'
+        r = self.super_manager.get(url)
+        # status 200
+        self.assertEqual(r.status_code, 200)
+        self.assertIsNone(r.data)
+
+    def test_coupon_not_member_read(self):
+        """
+        判斷不是該使用者 不能使用該優惠券
+        """
+        member = Member.objects.first()
+        instance = self.generate_coupon(member)
+        url = f'/api/coupon/{instance.discount_code}/'
+        r = self.member_user.get(url)
+        self.assertIsNone(r.data)
+
+    def test_coupon_count(self):
+        """
+        如果給某會員的優惠券不會顯示在list
+        """
+        member = Member.objects.get(account=test_email)
+        instance = self.generate_coupon(member)
+        url = '/api/coupon/'
+        r = self.member_user.get(url)
+        self.assertEqual(r.status_code, 200)
+        self.assertNotEqual(len(r.data), Coupon.objects.count())
+
+    def test_coupon_member_read(self):
+        """
+        判斷是該使用者 能使用該優惠券
+        """
+        member = Member.objects.get(account=test_email)
+        instance = self.generate_coupon(member)
+        url = f'/api/coupon/{instance.discount_code}/'
+        r = self.member_user.get(url)
+        self.assertTrue(r.data.get('id'))
 
     def test_coupon_post(self):
         number = random.choices(range(9), k=9)
@@ -1248,7 +1339,6 @@ class TestCoupon(DefaultTestMixin, APITestCase):
         self.assertIsInstance(r.data, dict)
 
         item = r.data
-        self.assertEqual(set(item.keys()), set(self.response_keys))
 
     def test_coupon_update(self):
         instance = Coupon.objects.first()
@@ -1262,7 +1352,6 @@ class TestCoupon(DefaultTestMixin, APITestCase):
         # type dict
         self.assertIsInstance(r.data, dict)
         item = r.data
-        self.assertEqual(set(item.keys()), set(self.response_keys))
 
     def test_coupon_delete(self):
         instance = Coupon.objects.first()
@@ -1283,8 +1372,6 @@ class TestCoupon(DefaultTestMixin, APITestCase):
         self.assertIsInstance(r.data, list)
         # request = reqponse
         item = r.data[0]
-        self.assertEqual(list(item.keys()),
-                         self.response_keys)
 
 
 class TestFreeShipping(DefaultTestMixin, APITestCase):

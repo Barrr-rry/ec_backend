@@ -815,6 +815,18 @@ class FreeShippingSerializer(DefaultModelSerializer):
 
 class CouponSerializer(DefaultModelSerializer):
     type_text = serializers.SerializerMethodField()
+    """
+    正常
+    過期
+    超過個人使用限制
+    超過全體使用限制
+    
+    過期：此張優惠券已過期
+    找不到：查無此張優惠券
+    超過全體使用次數限制：此張優惠券名額已滿
+    超過個人使用次數限制：此張優惠券使用次數已達上限
+    不符合優惠：您尚未達到此張優惠券門檻
+    """
     status = serializers.SerializerMethodField()
     member = serializers.PrimaryKeyRelatedField(many=True, required=False, help_text='Member流水號',
                                                 queryset=Member.objects.all())
@@ -827,8 +839,21 @@ class CouponSerializer(DefaultModelSerializer):
         return MemberSerializer(many=True, instance=instance.member.all()).data
 
     def get_status(self, instance):
+        """
+        1: 正常
+        2: 過期
+        3: 超過個人使用限制
+        4: 超過全體使用限制
+        """
+        # todo 未完成
         now = timezone.now().date()
-        return instance.start_time <= now < instance.end_time if instance.has_period else True
+        ret = 1
+        period_status = instance.start_time <= now < instance.end_time if instance.has_period else True
+        if not period_status:
+            ret = 2
+            return ret
+
+        return ret
 
     def get_type_text(self, instance):
         now = timezone.now().date()

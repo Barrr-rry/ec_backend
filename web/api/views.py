@@ -1261,9 +1261,20 @@ class CouponViewSet(MyMixin, UpdateCache):
     queryset = serializers.Coupon.objects.all()
     serializer_class = serializers.CouponSerializer
     filter_backends = (filters.CouponFilter,)
-    authentication_classes = [TokenCheckAuthentication]
+    authentication_classes = [MangerOrMemberAuthentication]
     permission_classes = [(permissions.ReadAuthenticated | permissions.CouponManagerEditPermission)]
     prefix_key = 'coupon'
+
+    def get_queryset(self):
+        """
+        找沒有限定會員的或者是你本身是屬於該限定會員的coupon
+        """
+        queryset = super().get_queryset()
+        if self.action == 'retrieve' and not isinstance(self.request.user, Manager):
+            queryset = queryset.filter(Q(has_member_list=False) | Q(has_member_list=True, member=self.request.user))
+        if self.action == 'list' and not isinstance(self.request.user, Manager):
+            queryset = queryset.filter(has_member_list=False)
+        return queryset
 
     def get_permissions(self):
         if self.action == 'list':
@@ -1274,7 +1285,10 @@ class CouponViewSet(MyMixin, UpdateCache):
         return super().get_permissions()
 
     def retrieve(self, request, *args, **kwargs):
-        instance = serializers.Coupon.objects.filter(discount_code=self.kwargs.get('pk')).first()
+        queryset = self.filter_queryset(self.get_queryset())
+        instance = queryset.filter(discount_code=self.kwargs.get('pk')).first()
+        if not instance:
+            return Response()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
 
