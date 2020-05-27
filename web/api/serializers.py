@@ -547,6 +547,10 @@ class ProductSerializer(DefaultModelSerializer):
                     ret.append(_id)
             return ret
 
+        if len(validated_data.keys()) == 1 and 'status' in validated_data:
+            instance.status = validated_data['status']
+            instance.save()
+            return instance
         now = timezone.now().strftime('%m%d')
         product_images = self.pull_validate_data(validated_data, 'productimages', [])
         specification_level1 = self.pull_validate_data(validated_data, 'specification_level1', [])
@@ -740,7 +744,7 @@ class ProductForCartSerializer(ProductListSerializer):
     class Meta:
         model = Product
         fields = ('id', 'name', 'product_number', 'productimages', 'specifications',
-                  'level1_title', 'level2_title',
+                  'level1_title', 'level2_title', 'status',
                   'specifications_detail')
 
 

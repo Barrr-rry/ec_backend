@@ -1081,6 +1081,12 @@ class ProductViewSet(MyMixin, UpdateCache):
 
         return super().get_permissions()
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        if self.action == 'list' or self.action == 'index_page' and not isinstance(self.request.user, Manager):
+            queryset = queryset.filter(status=True)
+        return queryset
+
     @action(methods=['GET'], detail=False, permission_classes=[], authentication_classes=[])
     def index_page(self, request, *args, **kwargs):
         # new product 4
@@ -1117,8 +1123,6 @@ class ProductViewSet(MyMixin, UpdateCache):
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         user = request.user
-        if not isinstance(user, Manager):
-            queryset = self.filter_queryset(self.get_queryset()).filter(status=True).all()
         page = self.paginate_queryset(queryset)
         if page is not None:
             q = self.get_queryset()
