@@ -204,12 +204,24 @@ class MemberSerializer(DefaultModelSerializer):
     join_at = serializers.DateTimeField(source='created_at', read_only=True, format="%Y-%m-%d %H:%M:%S")
     memberaddress = MemberAddressSerializer(many=True, read_only=True)
     order = OrderForMemberSerializer(many=True, read_only=True)
+    order_count = serializers.SerializerMethodField(read_only=True)
+    pay_total = serializers.SerializerMethodField(read_only=True)
 
     class Meta(UserCommonMeta):
         model = Member
 
     def get_returns(self, obj):
         return obj.get_rewards()
+
+    def get_order_count(self, instance):
+        order = instance.order
+        return order.count()
+
+    def get_pay_total(self, instance):
+        pay_total = 0
+        for order in instance.order.all():
+            pay_total += order.total_price
+        return pay_total
 
     def validate(self, data):
         """
