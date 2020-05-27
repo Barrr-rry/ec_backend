@@ -1314,6 +1314,7 @@ class CouponViewSet(MyMixin, UpdateCache):
 class RewardRecordViewSet(CreateModelMixin, ListModelMixin, viewsets.GenericViewSet):
     queryset = serializers.RewardRecord.objects.all()
     serializer_class = serializers.RewardRecordSerializer
+    pagination_class = LimitOffsetPagination
     authentication_classes = [MangerOrMemberAuthentication]
     permission_classes = [(permissions.ReadAuthenticated | permissions.CouponManagerEditPermission)]
 

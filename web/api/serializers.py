@@ -195,6 +195,7 @@ class MemberSerializer(DefaultModelSerializer):
         )]
                                           )
     returns = serializers.SerializerMethodField()
+    reward_end_date = serializers.SerializerMethodField()
     account = serializers.EmailField(validators=[
         UniqueValidator(
             queryset=Member.objects.all(),
@@ -206,12 +207,16 @@ class MemberSerializer(DefaultModelSerializer):
     order = OrderForMemberSerializer(many=True, read_only=True)
     order_count = serializers.SerializerMethodField(read_only=True)
     pay_total = serializers.SerializerMethodField(read_only=True)
+    reward = RewardRecordSerializer(many=True, read_only=True)
 
     class Meta(UserCommonMeta):
         model = Member
 
     def get_returns(self, obj):
         return obj.get_rewards()
+
+    def get_reward_end_date(self, obj):
+        return obj.get_rewards_end_date()
 
     def get_order_count(self, instance):
         order = instance.order

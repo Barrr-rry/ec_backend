@@ -23,6 +23,15 @@ class MemberFilter(filters.BaseFilterBackend):
         if status is not None:
             q = and_q(q, Q(status=status))
 
+        # todo filter related field 第一筆資料
+        reward_upper = request.query_params.get('reward_upper')
+        if reward_upper is not None:
+            q = and_q(q, Q(reward__total_point__lte=reward_upper))
+        # todo filter related field 第一筆資料
+        reward_lower = request.query_params.get('reward_lower')
+        if reward_lower is not None:
+            q = and_q(q, Q(reward__total_point__gte=reward_lower))
+
         order_by = request.query_params.get('order_by')
         if order_by:
             order_by = order_by.replace('join_at', 'created_at')
@@ -62,6 +71,24 @@ class MemberFilter(filters.BaseFilterBackend):
                     title='status',
                     description='bool: 帳號狀態',
                     format='bool',
+                )
+            ),
+            coreapi.Field(
+                name='reward_upper',
+                required=False,
+                location='query',
+                schema=coreschema.Number(
+                    title='reward_upper',
+                    description='int: 回饋金點數上限'
+                )
+            ),
+            coreapi.Field(
+                name='reward_lower',
+                required=False,
+                location='query',
+                schema=coreschema.Number(
+                    title='reward_lower',
+                    description='int: 回饋金點數下限'
                 )
             ),
         )

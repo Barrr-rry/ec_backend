@@ -203,6 +203,12 @@ class Member(DefaultAbstract, AbstractBaseUser):
         ret = 0 if not instance else instance.total_point
         return ret
 
+    def get_rewards_end_date(self):
+        instance = RewardRecord.objects.filter(member=self).order_by('end_date').first()
+        if instance is None:
+            return None
+        return instance.end_date
+
     def get_max_rewards(self, product_price):
         queryset = RewardRecord.objects.filter(member=self,
                                                use=False,
