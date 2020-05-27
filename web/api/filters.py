@@ -201,7 +201,7 @@ class ProductFilter(filters.BaseFilterBackend):
         inventory_status_2 = request.query_params.get('inventory_status_2')
         if inventory_status_2 is not None:
             inventory_status_2 = int(inventory_status_2)
-            q = or_q(q, Q(specifications_detail__inventory_status=inventory_status_2))
+            q = and_q(q, Q(specifications_detail__inventory_status=inventory_status_2))
 
         max_price = request.query_params.get('max_price')
         min_price = request.query_params.get('min_price')

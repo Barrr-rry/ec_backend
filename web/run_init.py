@@ -299,6 +299,7 @@ def generate_members_with_token():
         password='1111',
         remarks='HI',
         validate=True,
+        local='台灣'
     )
     member.set_password('1111')
     member.save()
@@ -334,6 +335,7 @@ def generate_members(count):
             remarks='HI',
             status=random.choice([True, False]),
             validate=True,
+            local='台灣'
         )
         member.set_password('abc123')
         member.save()
