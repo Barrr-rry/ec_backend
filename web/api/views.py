@@ -58,7 +58,7 @@ import requests
 from log import logger
 
 from django.utils.decorators import method_decorator
-from django.db.models import Q
+from django.db.models import Q, F
 from .util import pickle_redis, get_config
 import uuid
 from django.db.models import Max, Min
@@ -227,16 +227,22 @@ class EcpayViewSet(GenericViewSet):
                 coupon_discount = coupon.discount * product_price / 100
             coupon_discount = int(coupon_discount)
         # reward price discount
-        rewards = serializers.RewardRecord.objects.filter(
-            member=request.user,
-            start_date__lte=now.date(),
-            end_date__gte=now.date(),
-            point__gt=0
-        )
         if reward_discount > request.user.get_rewards():
             raise serializers.serializers.ValidationError('忠誠獎勵不符')
-        if rewards.count():
-            new_price = product_price - coupon_discount
+
+        """
+        取得這個會員的點數
+        取得最新一筆
+        order_by end_date point小到大
+        point 
+        """
+        queryset = RewardRecord.objects.filter(member=request.user)
+        rewardrecord = queryset.first()
+        queryset = queryset.filter(~Q(point=F('use_point')) & Q(point__gte=0)).order_by('end_date').order_by('point')
+        if rewardrecord and rewardrecord.total_point < reward_discount:
+            raise serializers.serializers.ValidationError('超出忠誠獎勵')
+
+        if rewardrecord and reward_discount and rewardrecord.total_point >= reward_discount:
             temp_reward_discount = reward_discount
             for reward in rewards:
                 point = reward.point
@@ -246,7 +252,7 @@ class EcpayViewSet(GenericViewSet):
                     point = point - temp_reward_discount
                 temp_reward_discount -= point
 
-                reward.point = point
+                reward.use_point = point
                 reward.save()
                 if not temp_reward_discount:
                     break
@@ -333,7 +339,7 @@ class EcpayViewSet(GenericViewSet):
                 serializer.instance.simple_status_display = '已付款'
                 serializer.instance.save()
 
-            self.to_reward(serializer.instance)
+            self.reward_process(serializer.instance)
         return Response(ret, status=status.HTTP_201_CREATED)
 
     def total_price_to_reward_point(self, total_price):
@@ -360,20 +366,30 @@ class EcpayViewSet(GenericViewSet):
             ret = dict(reward=0)
         return Response(ret)
 
+    def reward_process(self, order):
+        # 減少
+        instance = RewardRecord.objects.filter(member=order.member).first()
+        rewardrecord = RewardRecord.objects.create(
+            member=order.member,
+            order=order,
+            point=-order.reward_price,
+            total_point=instance.total_point - order.reward_price,
+            desc=f'購物獎勵金折抵\n（ 訂單編號 : {order.order_number} ）'
+        )
+        # 新增
+        self.to_reward(order)
+
     def to_reward(self, order):
-        # todo
         reward = serializers.Reward.objects.first()
         point = self.total_price_to_reward_point(order.total_price)
-        if os.environ.get('ENV') == 'prod':
-            start_date = datetime.datetime.now() + datetime.timedelta(days=7)
-        else:
-            start_date = datetime.datetime.now() + datetime.timedelta(seconds=30)
-        rewardrecord = serializers.RewardRecord.objects.create(
+        start_date = datetime.datetime.now() + datetime.timedelta(days=reward.start_day)
+        rewardrecord = RewardRecordTemp.objects.create(
             member=order.member,
             order=order,
             start_date=start_date,
             end_date=start_date + datetime.timedelta(days=reward.still_day),
             point=point,
+            desc=f'購物獎勵金'
         )
 
     @action(methods=['POST', 'GET', 'DELETE', 'PUT'], detail=False, authentication_classes=[], permission_classes=[])
@@ -434,7 +450,7 @@ class EcpayViewSet(GenericViewSet):
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
-            self.to_reward(serializer.instance)
+            self.reward_process(serializer.instance)
         ecpay.shipping(sub_type, store_id, serializer.instance)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
@@ -1295,7 +1311,7 @@ class CouponViewSet(MyMixin, UpdateCache):
 
 
 @router_url('rewardrecord')
-class RewardRecordViewSet(UpdateModelMixin, ListModelMixin, viewsets.GenericViewSet):
+class RewardRecordViewSet(CreateModelMixin, ListModelMixin, viewsets.GenericViewSet):
     queryset = serializers.RewardRecord.objects.all()
     serializer_class = serializers.RewardRecordSerializer
     authentication_classes = [MangerOrMemberAuthentication]
@@ -1310,6 +1326,18 @@ class RewardRecordViewSet(UpdateModelMixin, ListModelMixin, viewsets.GenericView
         if isinstance(request.user, AnonymousUser):
             return Response([])
         return super().list(request, *args, **kwargs)
+
+    def create(self, request, *args, **kwargs):
+        """
+        確認是不是統一要改變日期
+        """
+        with transaction.atomic():
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            serializer.instance.check_config()
+            headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def get_queryset(self):
         queryset = super().get_queryset()

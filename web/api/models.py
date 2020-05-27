@@ -506,6 +506,7 @@ class Reward(DefaultAbstract):
     status = models.SmallIntegerField(help_text='回饋方式 1: 元 2: 百分比')
     discount = models.IntegerField(help_text='回饋金額, 回饋百分比')
     still_day = models.IntegerField(help_text='期限')
+    start_day = models.IntegerField(help_text='忠誠獎勵發放天數 發送時間 n day 之後')
 
 
 class RewardRecord(DefaultAbstract):
@@ -514,11 +515,23 @@ class RewardRecord(DefaultAbstract):
     order = models.ForeignKey(Order, related_name='rewrad', on_delete=models.CASCADE,
                               null=True, help_text='訂單流水號|可能是手動或是系統產生')
     desc = models.CharField(max_length=256, help_text="回饋金備註", default='購物回饋點數')
-    manual = models.BooleanField(default=0, help_text="手動新增")
+    manual = models.BooleanField(default=False, help_text="手動新增")
     point = models.IntegerField(help_text='回饋點數')
     total_point = models.IntegerField(help_text='回饋點數總共餘額')
-    end_date = models.DateField(help_text='期限｜根據config 決定是單筆還是統一更新')
+    end_date = models.DateField(help_text='期限｜根據config 決定是單筆還是統一更新', null=True)
     use_point = models.IntegerField(default=0, help_text='已使用回饋點數')
+
+    def check_config(self):
+        """
+        feeback_money_setting: 會員回饋金 1: 沒有回饋金功能 2: 回饋期限日期統一 3: 依造訂單設定回饋日期
+        """
+        from .util import get_config
+        config = get_config()
+        # 統一就要把所有的一起改成一樣
+        if config['feeback_money_setting'] == 2:
+            for instance in RewardRecord.objects.all():
+                instance.end_date = self.end_date
+                instance.save()
 
 
 class RewardRecordTemp(DefaultAbstract):
