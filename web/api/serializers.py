@@ -422,6 +422,7 @@ class ProductSerializer(DefaultModelSerializer):
     specifications = SpecificationSerializer(many=True, read_only=True)
     status_display = serializers.SerializerMethodField(read_only=True)
     inventory_status_display = serializers.SerializerMethodField(read_only=True)
+    specifications_quantity = serializers.SerializerMethodField(read_only=True)
 
     class Meta(CommonMeta):
         model = Product
@@ -429,15 +430,41 @@ class ProductSerializer(DefaultModelSerializer):
     def get_tag_detail(self, instance):
         return TagListSerializer(many=True, instance=instance.tag.all()).data
 
+    def get_specifications_quantity(self, instance):
+        specificationdetails = SpecificationDetail.objects.filter(product=instance.id).all()
+        if specificationdetails.count():
+            max_quantity = 0
+            min_quantity = specificationdetails.first().quantity
+            for specificationdetail in specificationdetails:
+                if specificationdetail.quantity is None:
+                    return ''
+                if specificationdetail.quantity > max_quantity:
+                    max_quantity = specificationdetail.quantity
+                if specificationdetail.quantity < min_quantity:
+                    min_quantity = specificationdetail.quantity
+            return f'{min_quantity}~{max_quantity}'
+        return ''
+
     def get_inventory_status_display(self, instance):
         specificationdetails = SpecificationDetail.objects.filter(product=instance.id).all()
-        for specificationdetail in specificationdetails:
-            if (specificationdetail.inventory_status == 1) or (specificationdetail.quantity > 10):
-                return '庫存充足'
-            elif (specificationdetail.inventory_status == 2) or (specificationdetail.quantity <= 0):
-                return '無庫存'
-            elif 0 < specificationdetail.quantity <= 10:
-                return '庫存不足'
+        ret = ''
+        if specificationdetails.count():
+            for specificationdetail in specificationdetails:
+                if specificationdetail.quantity is None:
+                    if specificationdetail.inventory_status == 1:
+                        ret = '有庫存'
+                    elif specificationdetail.inventory_status == 2:
+                        ret = '無庫存'
+                    elif specificationdetail.inventory_status == 3:
+                        ret = '預購品'
+                else:
+                    if specificationdetail.quantity <= 0:
+                        ret = '無庫存'
+                    elif (0 < specificationdetail.quantity <= 10) and (ret not in ['無庫存']):
+                        ret = '庫存不足'
+                    elif (specificationdetail.quantity > 10) and (ret not in ['無庫存', '庫存不足']):
+                        ret = '庫存充足'
+        return ret
 
     def get_status_display(self, instance):
         if instance.status:

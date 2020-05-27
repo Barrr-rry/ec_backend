@@ -1101,7 +1101,7 @@ class ProductViewSet(MyMixin, UpdateCache):
     def list(self, request, *args, **kwargs):
         queryset = self.filter_queryset(self.get_queryset())
         user = request.user
-        if not isinstance(request.user, Manager):
+        if not isinstance(user, Manager):
             queryset = self.filter_queryset(self.get_queryset()).filter(status=True).all()
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -1126,11 +1126,12 @@ class ProductListViewSet(NestedViewSetBase, ListModelMixin, viewsets.GenericView
         select_related('tag'). \
         prefetch_related('productimages').prefetch_related('specifications').all()
 
-    def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+    def get_queryset(self):
+        queryset = super().get_queryset()
         user = request.user
-        if not isinstance(request.user, Manager):
-            queryset = self.filter_queryset(self.get_queryset()).filter(status=True).all()
+        if self.action == 'list' and not isinstance(user, Manager):
+            queryset = queryset.filter(status=True).all()
+        return queryset
 
 
 @router_url('cart')

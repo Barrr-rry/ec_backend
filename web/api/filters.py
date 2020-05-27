@@ -191,14 +191,17 @@ class ProductFilter(filters.BaseFilterBackend):
         if inventory_status is not None:
             inventory_status = int(inventory_status)
             if inventory_status == 1:
-                q = or_q(q, Q(specifications_detail__inventory_status=inventory_status))
-                q = or_q(q, Q(specifications_detail__quantity__gt=10))
+                q = and_q(q, Q(specifications_detail__quantity__gt=10))
             if inventory_status == 2:
-                q = or_q(q, Q(specifications_detail__inventory_status=inventory_status))
-                q = or_q(q, Q(specifications_detail__quantity__lt=0))
+                q = and_q(q, Q(specifications_detail__quantity__lte=0))
             elif inventory_status == 3:
                 q = and_q(q, Q(specifications_detail__quantity__gt=0))
-                q = and_q(q, Q(specifications_detail__quantity__lt=10))
+                q = and_q(q, Q(specifications_detail__quantity__lte=10))
+
+        inventory_status_2 = request.query_params.get('inventory_status_2')
+        if inventory_status_2 is not None:
+            inventory_status_2 = int(inventory_status_2)
+            q = or_q(q, Q(specifications_detail__inventory_status=inventory_status_2))
 
         max_price = request.query_params.get('max_price')
         min_price = request.query_params.get('min_price')
@@ -299,6 +302,15 @@ class ProductFilter(filters.BaseFilterBackend):
                 location='query',
                 schema=coreschema.Number(
                     title='inventory_status',
+                    description='int: 庫存狀況 0：全部；1：庫存充足；2：庫存不足；3：無庫存'
+                )
+            ),
+            coreapi.Field(
+                name='inventory_status_2',
+                required=False,
+                location='query',
+                schema=coreschema.Number(
+                    title='inventory_status_2',
                     description='int: 庫存狀況 0：全部；1：庫存充足；2：庫存不足；3：無庫存'
                 )
             ),
