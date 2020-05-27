@@ -158,9 +158,19 @@ def generate_super_admin():
 
 def generate_cart():
     member = Member.objects.filter(account=test_email).first()
-    product = Product.objects.first()
+    queryset = Product.objects.all()
+    product = queryset[0]
     if not member or not product:
         return
+    Cart.objects.create(
+        member=member,
+        product=product,
+        specification_detail=product.specifications_detail.first(),
+        quantity=1
+    )
+    product = queryset.last()
+    product.status = False
+    product.save()
     Cart.objects.create(
         member=member,
         product=product,
