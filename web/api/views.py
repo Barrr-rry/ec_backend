@@ -62,6 +62,7 @@ from django.db.models import Q, F
 from .util import pickle_redis, get_config
 import uuid
 from django.db.models import Max, Min
+from collections import defaultdict
 
 router = routers.DefaultRouter()
 nested_routers = []
@@ -244,7 +245,7 @@ class EcpayViewSet(GenericViewSet):
 
         if rewardrecord and reward_discount and rewardrecord.total_point >= reward_discount:
             temp_reward_discount = reward_discount
-            for reward in rewards:
+            for reward in queryset:
                 point = reward.point
                 if temp_reward_discount - point > 0:
                     point = 0
@@ -267,16 +268,47 @@ class EcpayViewSet(GenericViewSet):
                 freeshipping_price = 0
         else:
             raise Exception('超出重量')
-
-        total_price = product_price + freeshipping_price - coupon_discount - reward_discount
+        activity_price = self.get_activity_price(carts)
+        total_price = product_price + freeshipping_price - activity_price - coupon_discount - reward_discount
         request.data['product_shot'] = json.dumps(product_shot)
         request.data['total_price'] = total_price
+        request.data['activity_price'] = activity_price
         request.data['freeshipping_price'] = freeshipping_price
         request.data['product_price'] = product_price
         request.data['coupon_price'] = coupon_discount
         request.data['reward_price'] = reward_discount
-        request.user.change_rewards_to_use(product_price)
-        return product_shot, product_price + freeshipping_price - coupon_discount - reward_discount
+        return product_shot, total_price
+
+    def get_activity_price(self, carts):
+        ret = 0
+        in_activity_obj = dict()
+        for cart in carts:
+            if not cart.product.activity:
+                continue
+            activity_id = cart.product.activity.id
+            activity = cart.product.activity
+            if activity_id not in in_activity_obj:
+                in_activity_obj[activity_id] = dict(
+                    activity=activity,
+                    save_count=0,
+                    product_count=0,
+                    limit_count=activity.buy_count + activity.give_count,
+                    price_list=[]
+                )
+            obj = in_activity_obj[activity_id]
+            for i in range(cart.quantity):
+                obj['price_list'].append(cart.specification_detail.price)
+                obj['product_count'] += 1
+            obj['save_count'] = (int(obj['product_count'] / obj['limit_count'])) * activity.give_count
+            obj['price_list'] = sorted(obj['price_list'])
+        a = [2, 3]
+        for key, el in in_activity_obj.items():
+            save_count = el['save_count']
+            while save_count:
+                save_count -= 1
+                ret += el['price_list'].pop(0)
+
+        return ret
 
     @action(methods=['POST'], detail=False)
     def repayment(self, request, *args, **kwargs):

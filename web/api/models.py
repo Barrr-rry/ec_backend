@@ -220,19 +220,6 @@ class Member(DefaultAbstract, AbstractBaseUser):
                 ret += el.point
         return ret
 
-    def change_rewards_to_use(self, product_price):
-        queryset = RewardRecord.objects.filter(member=self,
-                                               use=False,
-                                               start_date__lte=timezone.now().date(),
-                                               end_date__gte=timezone.now().date())
-        ret = 0
-        for el in queryset:
-            if ret + el.point < product_price:
-                ret += el.point
-                el.use = True
-                el.save()
-        return ret
-
 
 class Category(DefaultAbstract):
     main_category = models.ForeignKey('Category', related_name='sub_categories', on_delete=models.CASCADE,
@@ -409,6 +396,7 @@ class Order(DefaultAbstract):
     product_price = models.IntegerField(help_text='商品售價', default=0)
     coupon_price = models.IntegerField(help_text='折價費用', default=0)
     reward_price = models.IntegerField(help_text='忠誠獎勵', default=0)
+    activity_price = models.IntegerField(help_text='活動折抵', default=0)
     total_weight = models.FloatField(help_text='總重量', default=0)
     coupon = models.ForeignKey('Coupon', related_name='order', on_delete=models.CASCADE, help_text='使用的Coupon',
                                null=True)
