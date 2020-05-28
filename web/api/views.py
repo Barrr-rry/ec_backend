@@ -62,6 +62,8 @@ from django.db.models import Q, F
 from .util import pickle_redis, get_config
 import uuid
 from django.db.models import Max, Min
+import pandas as pd
+import uuid
 
 router = routers.DefaultRouter()
 nested_routers = []
@@ -416,14 +418,14 @@ class EcpayViewSet(GenericViewSet):
         return Response('ok')
 
     @action(methods=['POST'], detail=False, authentication_classes=[], permission_classes=[])
-    def paynent_info_url(self, request, *args, **kwargs):
+    def payment_info_url(self, request, *args, **kwargs):
         """payment info return url"""
         logger.info('payment info url: %s', request.data['MerchantTradeNo'])
         logger.info('PaymentType: %s', request.data['PaymentType'])
         logger.info('RtnCode: %s', request.data['RtnCode'])
         instance = serializers.Order.objects.filter(order_number=request.data['MerchantTradeNo'][:-2]).first()
         if not instance:
-            print('no return instance:', request.data['MerchantTradeNo'])
+            logger.error('not found instance: %s', request.data['MerchantTradeNo'])
         if int(request.data['RtnCode']) == 2 or int(request.data['RtnCode']) == 10100073:
             instance.take_number = 1
             instance.simple_status_display = '取號成功'
@@ -431,6 +433,8 @@ class EcpayViewSet(GenericViewSet):
         else:
             instance.simple_status_display = '取號失敗'
             instance.simple_status = 4
+            instance.take_number = 0
+            logger.warning('取號失敗: %s', request.data['RtnCode'])
         instance.ecpay_data = json.dumps(request.data)
         instance.payment_type = request.data.get('PaymentType')
         instance.save()
@@ -458,6 +462,7 @@ class EcpayViewSet(GenericViewSet):
     def shipping_return_url(self, request, *args, **kwargs):
         instance = serializers.Order.objects.filter(order_number=request.data['MerchantTradeNo']).first()
         instance.shipping_status = request.data['RtnCode']
+        instance.all_pay_logistics_id = request.data['AllPayLogisticsID']
         display = shipping_map.shipping_mapping.get(str(instance.shipping_status))
         if display:
             instance.simple_status_display = display
@@ -1486,3 +1491,57 @@ class ActivityViewSet(MyMixin):
     serializer_class = serializers.ActivitySerializer
     authentication_classes = [TokenCheckAuthentication]
     permission_classes = [(permissions.ReadAuthenticated | permissions.CouponManagerEditPermission)]
+
+
+@router_url('exportorder')
+class ExportOrderViewSet(ListModelMixin, viewsets.GenericViewSet):
+    queryset = serializers.Order.objects.all()
+    serializer_class = serializers.OrderSerializer
+    pagination_class = LimitOffsetPagination
+    filter_backends = (filters.OrderFilter,)
+    authentication_classes = [MangerOrMemberAuthentication]
+    permission_classes = [(
+            permissions.OrderAuthenticated | permissions.OrderManagerEditPermission & permissions.OrderManagerReadPermission)]
+
+    def list(self, request, *args, **kwargs):
+        def get_store(el):
+            if not el['to_store']:
+                return '宅配'
+            mapping = {
+                'FAMI': '全家',
+                'UNIMART': '7-11',
+                'HILIFE': '萊爾富',
+                'FAMIC2C': '全家',
+                'UNIMARTC2C': '7-11',
+                'HILIFEC2C': '萊爾富',
+            }
+            return f'超商( {mapping[el["store_type"]]} )'
+
+        queryset = self.filter_queryset(self.get_queryset())
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        ret = []
+        for el in serializer.data:
+            dct = {
+                '訂單編號': el['order_number'],
+                '收件人': el['shipping_name'],
+                '訂單金額': el['total_price'],
+                '物流方式': get_store(el),
+                '店名': el['store_name'],
+                '訂單日期': el['created_at'],
+                '訂單狀態': el['simple_status_display'],
+                '當前貨態': el['shipping_status_display'],
+            }
+            ret.append(dct)
+        df = pd.DataFrame(data=ret)
+        # file_name = f'{str(uuid.uuid4())[:10]}.csv'
+        file_name = f'訂單資訊.csv'
+        df.to_csv(f'./media/{file_name}')
+        return Response(data=dict(
+            file_name=file_name,
+        ))

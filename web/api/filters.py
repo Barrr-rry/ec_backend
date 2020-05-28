@@ -112,6 +112,11 @@ class OrderFilter(filters.BaseFilterBackend):
         if simple_status is not None:
             q = and_q(q, Q(simple_status=simple_status))
 
+        ids = request.query_params.get('ids')
+        if ids:
+            ids = ids.split(',')
+            q = and_q(q, Q(id__in=ids))
+
         order_by = request.query_params.get('order_by')
         if order_by:
             queryset = queryset.order_by(order_by)
@@ -160,6 +165,15 @@ class OrderFilter(filters.BaseFilterBackend):
                 schema=coreschema.Number(
                     title='simple_status',
                     description='str: 訂單狀態',
+                )
+            ),
+            coreapi.Field(
+                name='ids',
+                required=False,
+                location='query',
+                schema=coreschema.Array(
+                    title='ids',
+                    description='array: ids'
                 )
             ),
 
