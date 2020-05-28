@@ -1221,6 +1221,9 @@ class CartViewSet(MyMixin):
             if not cart:
                 return Response(ret)
             for c in cart:
+                # 防呆前端傳 None
+                if not c['specification_detail']:
+                    continue
                 product = serializers.ProductForCartSerializer(instance=Product.objects.get(pk=c['product']))
                 specification_detail = serializers.SpecificationDetailSerializer(
                     instance=SpecificationDetail.objects.get(pk=c['specification_detail']))
