@@ -86,7 +86,7 @@ class MemberFilter(filters.BaseFilterBackend):
             coreapi.Field(
                 name='order_by',
                 required=False,
-                location='query',
+                # location='query',
                 schema=coreschema.String(
                     title='order_by',
                     description='str: 排序'

@@ -835,7 +835,10 @@ class OrderSerializer(DefaultModelSerializer):
         ]
 
     def validate(self, data):
-        product_shot = data['product_shot']
+        if 'product_shot' in data:
+            product_shot = data['product_shot']
+        else:
+            product_shot = self.instance.product_shot
         product_shot = json.loads(product_shot)
         for product_detail in product_shot:
             quantity = product_detail['quantity']
@@ -873,6 +876,26 @@ class OrderSerializer(DefaultModelSerializer):
         instance.total_weight = total_weight
         instance.save()
         return instance
+
+    def update(self, instance, validated_data):
+        shipping_status = validated_data['shipping_status']
+        reward_temp = RewardRecordTemp.objects.filter(order=instance.pk).first()
+        reward = RewardRecord.objects.filter(order=instance.pk).first()
+        if shipping_status == 400:
+            if reward_temp:
+                reward_temp.delete()
+                reward_temp.save()
+            elif reward:
+                reward_point = reward.point * -1
+                reward_total_point = reward.total_point + reward_point
+                RewardRecord.objects.create(
+                    member=instance.member,
+                    order=instance.pk,
+                    dosc='已取消訂單',
+                    print=reward_point
+                )
+        ret = super().update(instance, validated_data)
+        return ret
 
 
 class MemberStoreSerializer(DefaultModelSerializer):

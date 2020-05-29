@@ -798,8 +798,8 @@ class MemberViewSet(MyMixin):
             record = dict(
                 total_point=total_point,
                 last_point=0 if not instance else instance.point,
-                year=None if not instance else instance.end_date.year,
-                month=None if not instance else instance.end_date.month,
+                year=None if not instance else instance.end_date.year if instance.end_date else None,
+                month=None if not instance else instance.end_date.month if instance.end_date else None,
                 day=None if not instance else instance.end_date.day,
             )
 
