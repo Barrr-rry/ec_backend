@@ -182,15 +182,16 @@ def generate_cart():
 
 def generate_reward(member, count):
     record = Reward.objects.create(status=1, discount=100, still_day=30, start_day=7)
-    order = Order.objects.filter(member=member).first()
-    point = random.randint(1, 100)
-    RewardRecordTemp.objects.create(
-        member=member,
-        order=order,
-        point=point,
-        end_date=timezone.now() + timezone.timedelta(days=record.still_day),
-        start_date=timezone.now()
-    )
+    orders = Order.objects.filter(member=member).all()
+    for order in orders:
+        point = random.randint(1, 100)
+        RewardRecordTemp.objects.create(
+            member=member,
+            order=order,
+            point=point,
+            end_date=timezone.now() + timezone.timedelta(days=record.still_day),
+            start_date=timezone.now()
+        )
     for i in range(count):
         point = random.randint(1, 100)
         temp = RewardRecord.objects.filter(member=member).first()
