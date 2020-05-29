@@ -7,7 +7,7 @@ from log import logger
 import os
 
 host_url_map = dict(
-    prod='http://172.105.194.178:2000/',
+    prod='https://ezgo-buy.com/',
     dev='https://a7244c46.ngrok.io/',
     test='http://li1858-106.members.linode.com/'
 )
@@ -73,7 +73,7 @@ def create_html(callback_url, order, lang=''):
     product_name = "#".join(names)
     trader_no = order.order_number + ''.join(random.choices(string.digits, k=2))
     return_url = f'{host_url}api/ecpay/return_url/'
-    paynent_info_url = f'{host_url}api/ecpay/paynent_info_url/'
+    payment_info_url = f'{host_url}api/ecpay/payment_info_url/'
     logger.info('ecpay create html: %s %s', trader_no, return_url)
     order_params = {
         'MerchantTradeNo': trader_no,
@@ -111,7 +111,7 @@ def create_html(callback_url, order, lang=''):
         'Desc_2': '',
         'Desc_3': '',
         'Desc_4': '',
-        'PaymentInfoURL': paynent_info_url,
+        'PaymentInfoURL': payment_info_url,
         'ClientRedirectURL': '',
     }
 
@@ -174,6 +174,8 @@ def create_shipping_map(sub_type, member_id, callback_url):
     instance = ecpay_logistic_sdk.ECPayLogisticSdk(
         **ecpay_keys
     )
+    logger.info('shipping keys: %s', ecpay_keys)
+    logger.info('sub_type: %s', sub_type)
 
     try:
         # 產生綠界物流訂單所需參數
@@ -192,6 +194,9 @@ def create_shipping_map(sub_type, member_id, callback_url):
 
 def shipping(sub_type, store_id, order):
     import re
+    if check_env(ENV) is False and 'C2C' not in sub_type:
+        logger.info('原來是這邊沒有加入C2C: %s', sub_type)
+        sub_type += 'C2C'
     product_shot = json.loads(order.product_shot)
     names = [f'{el["name"]} X {el["quantity"]}' for el in product_shot]
     product_name = " ".join(names)
@@ -213,6 +218,7 @@ def shipping(sub_type, store_id, order):
         'ReceiverCellPhone': order.phone,
         'TradeDesc': '177',
         'ServerReplyURL': service_replay_url,
+        'LogisticsC2CReplyURL': service_replay_url,
         'ClientReplyURL': '',
         'Remark': '' if not order.remark else order.remark,
         'PlatformID': '',
@@ -237,7 +243,8 @@ def shipping(sub_type, store_id, order):
             action_url = 'https://logistics-stage.ecpay.com.tw/Express/Create'  # 測試環境
         else:
             action_url = 'https://logistics.ecpay.com.tw/Express/Create'  # 正式環境
-
+        logger.info('shiiping url: %s', action_url)
+        logger.info('order params: %s', create_shipping_order_params)
         # 建立物流訂單並接收回應訊息
         reply_result = instance.create_shipping_order(
             action_url=action_url,
