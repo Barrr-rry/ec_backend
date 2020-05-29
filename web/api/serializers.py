@@ -949,26 +949,8 @@ class CouponSerializer(DefaultModelSerializer):
         3: 超過個人使用限制
         4: 超過全體使用限制
         """
-        # todo 未完成
-        now = timezone.now().date()
-        ret = 1
-        period_status = instance.start_time <= now < instance.end_time if instance.has_period else True
-        if not period_status:
-            ret = 2
-            return ret
-
-        in_member_use_limit = instance.order.filter(
-            member=self.context['request'].user).count() < instance.member_use_limit \
-            if instance.has_member_use_limit else True
-        if not in_member_use_limit:
-            ret = 3
-            return ret
-        in_coupont_use_limit = instance.order.count() < instance.coupon_use_limit \
-            if instance.has_coupon_use_limit else True
-        if not in_coupont_use_limit:
-            ret = 4
-            return ret
-        return ret
+        user = self.context['request'].user
+        return instance.get_status(user)
 
     def get_type_text(self, instance):
         now = timezone.now().date()
