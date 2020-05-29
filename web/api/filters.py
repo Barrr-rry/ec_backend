@@ -2,6 +2,7 @@ from django.db.models import Q, Sum, Count
 from rest_framework import filters
 from rest_framework.compat import coreapi, coreschema
 from django.utils import timezone
+from django.utils.timezone import make_aware
 
 or_q = lambda q, other_fn: other_fn if q is None else q | other_fn
 and_q = lambda q, other_fn: other_fn if q is None else q & other_fn
@@ -31,6 +32,33 @@ class MemberFilter(filters.BaseFilterBackend):
             q = and_q(q, Q(reward__point__sum__lte=reward_upper))
         if reward_lower is not None:
             q = and_q(q, Q(reward__point__sum__gte=reward_lower))
+
+        start_date = request.query_params.get('start_date')
+        if start_date:
+            start_date = make_aware(datetime.datetime.strptime(start_date, '%Y-%m-%d'))
+            q = and_q(q, Q(order__created_at__gte=start_date))
+        end_date = request.query_params.get('end_date')
+        if end_date:
+            end_date = make_aware(datetime.datetime.strptime(end_date, '%Y-%m-%d'))
+            q = and_q(q, Q(order__created_at__gte=end_date))
+
+        money_upper = request.query_params.get('money_upper')
+        money_lower = request.query_params.get('money_lower')
+        order_count_upper = request.query_params.get('order_count_upper')
+        order_count_lower = request.query_params.get('order_count_lower')
+        if money_lower or money_upper:
+            queryset = queryset.annotate(Sum('order__total_price'))
+        if order_count_upper or order_count_lower:
+            queryset = queryset.annotate(Count('order'))
+        if money_lower:
+            q = and_q(q, Q(order__total_price__sum__gte=money_lower))
+        if money_upper:
+            q = and_q(q, Q(order__total_price__sum__lte=money_upper))
+
+        if order_count_upper:
+            q = and_q(q, Q(order__count__lte=order_count_upper))
+        if order_count_lower:
+            q = and_q(q, Q(order__count__lte=order_count_lower))
 
         order_by = request.query_params.get('order_by')
         if order_by:
