@@ -435,6 +435,7 @@ class Order(DefaultAbstract):
     remark_date = models.DateTimeField(help_text="內部備註時間", null=True)
     ecpay_data = models.TextField(help_text='ECPAY RETURN DATA', null=True)
     store_name = models.CharField(max_length=32, help_text="store name", null=True)
+    all_pay_logistics_id = models.CharField(max_length=64, help_text='物流交易編號', null=True)
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):

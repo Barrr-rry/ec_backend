@@ -167,9 +167,19 @@ class RewardRecordSerializer(DefaultModelSerializer):
         model = RewardRecord
 
 
+class RewardRecordTempSerializer(DefaultModelSerializer):
+    start_date = serializers.DateField(read_only=True, format="%Y-%m-%d")
+    end_date = serializers.DateField(read_only=True, format="%Y-%m-%d")
+    created_at = serializers.DateTimeField(read_only=True, format="%Y-%m-%d")
+
+    class Meta(CreateCommonMeta):
+        model = RewardRecordTemp
+
+
 class OrderForMemberSerializer(DefaultModelSerializer):
     created_at = serializers.DateTimeField(read_only=True, format="%Y-%m-%d")
-    rewrad = RewardRecordSerializer(many=True, read_only=True)
+    rewrad = RewardRecordSerializer(many=True, read_only=True, allow_null=True)
+    rewrad_temp = RewardRecordTempSerializer(many=True, read_only=True, allow_null=True)
 
     class Meta(CreateCommonMeta):
         model = Order
@@ -812,7 +822,8 @@ class OrderSerializer(DefaultModelSerializer):
     display_remark_date = serializers.DateTimeField(format="%Y-%m-%d", read_only=True, source='remark_date')
     coupon_discount_code = serializers.CharField(source='coupon.discount_code', read_only=True)
     shipping_status_display = serializers.SerializerMethodField()
-    rewrad = RewardRecordSerializer(many=True, read_only=True)
+    rewrad = RewardRecordSerializer(many=True, read_only=True, allow_null=True)
+    rewrad_temp = RewardRecordTempSerializer(many=True, read_only=True, allow_null=True)
     coupon_id = serializers.IntegerField(write_only=True, required=False, help_text='coupon id')
 
     class Meta:
