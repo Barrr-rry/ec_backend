@@ -223,7 +223,11 @@ class EcpayViewSet(GenericViewSet):
         # coupon price discount
         coupon_id = request.data.get('coupon_id')
         coupon = Coupon.objects.get(pk=coupon_id) if coupon_id else None
-        if coupon and (coupon.start_time <= now.date() <= coupon.end_time) and coupon.role <= product_price:
+        check_time = coupon and (coupon.start_time <= now.date() <= coupon.end_time or coupon.start_time is None and (
+                coupon.end_time is None))
+        if coupon and coupon.get_status(self.request.user) != 1:
+            raise serializers.serializers.ValidationError('Coupon不正常')
+        if coupon and check_time and coupon.role <= product_price:
             if coupon.method == 1:
                 coupon_discount = coupon.discount
             else:
@@ -1173,6 +1177,14 @@ class ProductViewSet(MyMixin, UpdateCache):
 
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+
+@router_url('specificationdetail')
+class ProductViewSet(UpdateModelMixin, viewsets.GenericViewSet):
+    queryset = serializers.SpecificationDetail.objects.all()
+    serializer_class = serializers.SpecificationDetailSerializer
+    authentication_classes = [TokenCheckAuthentication]
+    permission_classes = [(permissions.ReadAuthenticated | permissions.ProductManagerEditPermission)]
 
 
 @router_url('product', prefix='tag')

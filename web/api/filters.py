@@ -285,7 +285,7 @@ class ProductFilter(filters.BaseFilterBackend):
             q = and_q(q, Q(id__in=ids))
 
         if q:
-            return queryset.filter(q)
+            return queryset.filter(q).distinct()
         else:
             return queryset
 
