@@ -1175,6 +1175,14 @@ class ProductViewSet(MyMixin, UpdateCache):
         return Response(serializer.data)
 
 
+@router_url('specificationdetail')
+class ProductViewSet(UpdateModelMixin, viewsets.GenericViewSet):
+    queryset = serializers.SpecificationDetail.objects.all()
+    serializer_class = serializers.SpecificationDetailSerializer
+    authentication_classes = [TokenCheckAuthentication]
+    permission_classes = [(permissions.ReadAuthenticated | permissions.ProductManagerEditPermission)]
+
+
 @router_url('product', prefix='tag')
 class ProductListViewSet(NestedViewSetBase, ListModelMixin, viewsets.GenericViewSet):
     parent_model = 'tag'
