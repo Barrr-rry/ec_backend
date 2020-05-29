@@ -162,9 +162,16 @@ class MemberAddressSerializer(DefaultModelSerializer):
 class RewardRecordSerializer(DefaultModelSerializer):
     end_date = serializers.DateField(read_only=True, format="%Y-%m-%d")
     created_at = serializers.DateTimeField(read_only=True, format="%Y-%m-%d")
+    total_point = serializers.IntegerField(help_text='回饋點數總共餘額', read_only=True)
 
     class Meta(CreateCommonMeta):
         model = RewardRecord
+
+    def create(self, validated_data):
+        instance = RewardRecord.objects.filter(member=validated_data['member']).first()
+        total_point = 0 if not instance else instance.total_point
+        validated_data['total_point'] = total_point
+        return super().create(validated_data)
 
 
 class RewardRecordTempSerializer(DefaultModelSerializer):
@@ -217,10 +224,13 @@ class MemberSerializer(DefaultModelSerializer):
     order = OrderForMemberSerializer(many=True, read_only=True)
     order_count = serializers.SerializerMethodField(read_only=True)
     pay_total = serializers.SerializerMethodField(read_only=True)
-    reward = RewardRecordSerializer(many=True, read_only=True)
+    reward = serializers.SerializerMethodField()
 
     class Meta(UserCommonMeta):
         model = Member
+
+    def get_reward(self, obj):
+        return RewardRecordSerializer(instance=obj.reward.all()[:10], many=True).data
 
     def get_returns(self, obj):
         return obj.get_rewards()
