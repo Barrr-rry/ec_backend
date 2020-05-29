@@ -34,8 +34,4 @@ sqlparse==0.3.0
 uritemplate==3.0.0
 urllib3==1.25.6
 uWSGI==2.0.18
-numpy==1.18.4
 pandas==1.0.3
-python-dateutil==2.8.1
-six==1.15.0
-

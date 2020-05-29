@@ -122,7 +122,7 @@ def main(for_test=False, config_data=None):
     generate_freeshipping()
     generate_coupon(10)
     generate_orders()
-    generate_reward(10)
+    generate_reward()
     generate_cart()
     genearete_country()
     generate_activity(config_data)
@@ -179,29 +179,25 @@ def generate_cart():
     )
 
 
-def generate_reward(count):
+def generate_reward():
     record = Reward.objects.create(status=1, discount=100, still_day=30, start_day=7)
     member = Member.objects.filter(account=test_email).first()
     order = Order.objects.filter(member=member).first()
     point = random.randint(1, 100)
-    RewardRecordTemp.objects.create(
-        member=member,
-        order=order,
-        point=point,
-        end_date=timezone.now() + timezone.timedelta(days=record.still_day),
-        start_date=timezone.now()
-    )
-    RewardRecord.objects.create(
-        member=member,
-        order=order,
-        point=point,
-        end_date=timezone.now() + timezone.timedelta(days=record.still_day),
-        total_point=point,
-    )
-    for i in range(count):
+    orders = Order.objects.filter(member=member).all()
+    for order in orders:
         point = random.randint(1, 100)
         temp = RewardRecord.objects.filter(member=member).first()
+        RewardRecordTemp.objects.create(
+            order=order,
+            member=member,
+            desc='手動新增回饋點數',
+            point=point,
+            end_date=timezone.now() + timezone.timedelta(days=record.still_day),
+            start_date=timezone.now()
+        )
         RewardRecord.objects.create(
+            order=order,
             member=member,
             desc='手動新增回饋點數',
             manual=1,

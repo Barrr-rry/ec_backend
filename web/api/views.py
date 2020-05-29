@@ -1120,7 +1120,7 @@ class ProductViewSet(MyMixin, UpdateCache):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        if self.action == 'list' or self.action == 'index_page' and not isinstance(self.request.user, Manager):
+        if (self.action == 'list' or self.action == 'index_page') and not isinstance(self.request.user, Manager):
             queryset = queryset.filter(status=True)
         return queryset
 
