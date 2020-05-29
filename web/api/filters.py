@@ -1,4 +1,4 @@
-from django.db.models import Q
+from django.db.models import Q, Sum, Count
 from rest_framework import filters
 from rest_framework.compat import coreapi, coreschema
 from django.utils import timezone
@@ -23,14 +23,14 @@ class MemberFilter(filters.BaseFilterBackend):
         if status is not None:
             q = and_q(q, Q(status=status))
 
-        # todo filter related field 第一筆資料
         reward_upper = request.query_params.get('reward_upper')
-        if reward_upper is not None:
-            q = and_q(q, Q(reward__total_point__lte=reward_upper))
-        # todo filter related field 第一筆資料
         reward_lower = request.query_params.get('reward_lower')
+        if reward_lower is not None or reward_upper is not None:
+            queryset = queryset.annotate(Sum('reward__point'))
+        if reward_upper is not None:
+            q = and_q(q, Q(reward__point__sum__lte=reward_upper))
         if reward_lower is not None:
-            q = and_q(q, Q(reward__total_point__gte=reward_lower))
+            q = and_q(q, Q(reward__point__sum__gte=reward_lower))
 
         order_by = request.query_params.get('order_by')
         if order_by:
@@ -50,6 +50,7 @@ class MemberFilter(filters.BaseFilterBackend):
                 required=False,
                 location='query',
                 schema=coreschema.String(
+                    location='query',
                     title='keywords',
                     description='str: 請輸入Keywords'
                 )
@@ -66,7 +67,6 @@ class MemberFilter(filters.BaseFilterBackend):
             coreapi.Field(
                 name='status',
                 required=False,
-                location='query',
                 schema=coreschema.String(
                     title='status',
                     description='bool: 帳號狀態',

@@ -122,7 +122,8 @@ def main(for_test=False, config_data=None):
     generate_freeshipping()
     generate_coupon(10)
     generate_orders()
-    generate_reward(10)
+    for member in Member.objects.all():
+        generate_reward(member, 3)
     generate_cart()
     genearete_country()
     generate_activity(config_data)
@@ -179,9 +180,8 @@ def generate_cart():
     )
 
 
-def generate_reward(count):
+def generate_reward(member, count):
     record = Reward.objects.create(status=1, discount=100, still_day=30, start_day=7)
-    member = Member.objects.filter(account=test_email).first()
     order = Order.objects.filter(member=member).first()
     point = random.randint(1, 100)
     RewardRecordTemp.objects.create(
@@ -190,13 +190,6 @@ def generate_reward(count):
         point=point,
         end_date=timezone.now() + timezone.timedelta(days=record.still_day),
         start_date=timezone.now()
-    )
-    RewardRecord.objects.create(
-        member=member,
-        order=order,
-        point=point,
-        end_date=timezone.now() + timezone.timedelta(days=record.still_day),
-        total_point=point,
     )
     for i in range(count):
         point = random.randint(1, 100)
@@ -207,7 +200,7 @@ def generate_reward(count):
             manual=1,
             point=point,
             end_date=timezone.now() + timezone.timedelta(days=record.still_day),
-            total_point=temp.total_point + point,
+            total_point=temp.total_point + point if temp else point,
         )
 
 
