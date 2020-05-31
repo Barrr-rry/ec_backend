@@ -855,7 +855,7 @@ class OrderSerializer(DefaultModelSerializer):
             product_id = product_detail['id']
             product = Product.objects.filter(pk=product_id).first()
             specification_detail = product_detail['specification_detail']
-            if not product.status:
+            if not product_detail['status']:
                 raise serializers.ValidationError("商品已下架")
             for specification in product.specifications_detail.all():
                 if specification == specification_detail and specification.quantity and specification.quantity < quantity:
@@ -892,7 +892,7 @@ class OrderSerializer(DefaultModelSerializer):
         reward_temp = RewardRecordTemp.objects.filter(order=instance.pk).first()
         reward = RewardRecord.objects.filter(order=instance.pk).first()
         if shipping_status == 400:
-            if reward_temp:
+            if reward_temp and not reward:
                 reward_temp.delete()
                 reward_temp.save()
             elif reward:

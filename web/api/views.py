@@ -804,7 +804,7 @@ class MemberViewSet(MyMixin):
                 last_point=0 if not instance else instance.point,
                 year=None if not instance else instance.end_date.year if instance.end_date else None,
                 month=None if not instance else instance.end_date.month if instance.end_date else None,
-                day=None if not instance else instance.end_date.day,
+                day=None if not instance else instance.end_date.day if instance.end_date else None,
             )
 
             queryset = RewardRecordTemp.objects.filter(member=user).all()
