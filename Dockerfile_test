@@ -11,6 +11,6 @@ COPY ./django-cron /etc/cron.d/django-cron
 # Give execution rights on the cron job
 RUN chmod 0644 /etc/cron.d/django-cron
 # Apply cron job
-RUN crontab /etc/cron.d/django-cron
+#RUN crontab /etc/cron.d/django-cron
 #RUN ./init.sh
 #CMD python manage.py runserver 0.0.0.0:2000
