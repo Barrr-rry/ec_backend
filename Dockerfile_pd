@@ -7,7 +7,7 @@ RUN pip install -r requirements.txt
 RUN apt-get update && apt-get install -y cron
 RUN service cron start
 # Copy hello-cron file to the cron.d directory
-COPY django-cron /etc/cron.d/django-cron
+COPY ./django-cron /etc/cron.d/django-cron
 # Give execution rights on the cron job
 RUN chmod 0644 /etc/cron.d/django-cron
 # Apply cron job
