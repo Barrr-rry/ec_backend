@@ -233,7 +233,13 @@ class MemberSerializer(DefaultModelSerializer):
         return RewardRecordSerializer(instance=obj.reward.all()[:10], many=True).data
 
     def get_returns(self, obj):
-        return obj.get_rewards()
+        ret = obj.get_rewards()
+        # todo 有機會reward 不同步?
+        # from django.db.models import Q, Sum, Count
+        # queryset = Member.objects.filter(id=obj.id).annotate(returns=Sum('reward__point'))
+        # if ret != queryset.first().returns:
+        #     raise Exception('oops....get_returns')
+        return ret
 
     def get_reward_end_date(self, obj):
         return obj.get_rewards_end_date()

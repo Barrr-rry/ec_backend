@@ -63,6 +63,8 @@ class MemberFilter(filters.BaseFilterBackend):
         order_by = request.query_params.get('order_by')
         if order_by:
             order_by = order_by.replace('join_at', 'created_at')
+            if 'returns' in order_by:
+                queryset = queryset.annotate(returns=Sum('reward__point'))
             queryset = queryset.order_by(order_by)
         if q:
             return queryset.filter(q)
