@@ -104,7 +104,7 @@ class MemberFilter(filters.BaseFilterBackend):
             coreapi.Field(
                 name='reward_upper',
                 required=False,
-                location='query',
+                # location='query',
                 schema=coreschema.Number(
                     title='reward_upper',
                     description='int: 回饋金點數上限'
@@ -113,7 +113,7 @@ class MemberFilter(filters.BaseFilterBackend):
             coreapi.Field(
                 name='reward_lower',
                 required=False,
-                location='query',
+                # location='query',
                 schema=coreschema.Number(
                     title='reward_lower',
                     description='int: 回饋金點數下限'
