@@ -3,6 +3,6 @@ COPY ./web /app
 ENV ENV test
 WORKDIR /app
 RUN pip install -r requirements.txt
-RUN apt-get update && apt-get install -y cron
+#RUN apt-get update && apt-get install -y cron
 #RUN ./init.sh
 #CMD python manage.py runserver 0.0.0.0:2000
