@@ -1593,3 +1593,43 @@ class ExportOrderViewSet(ListModelMixin, viewsets.GenericViewSet):
         return Response(data=dict(
             file_name=file_name,
         ))
+
+
+@router_url('exportmember')
+class ExportMemberViewSet(ListModelMixin, viewsets.GenericViewSet):
+    queryset = serializers.Member.objects.all()
+    serializer_class = serializers.MemberSerializer
+    pagination_class = LimitOffsetPagination
+    filter_backends = (filters.MemberFilter,)
+    authentication_classes = [MangerOrMemberAuthentication]
+    permission_classes = [(
+            permissions.MemberAuthenticated | permissions.MemberManagerEditPermission & permissions.MemberManagerReadPermission)]
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset())
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+        ret = []
+        for el in serializer.data:
+            dct = {
+                '會員編號': el['member_number'],
+                '姓名': el['name'],
+                '會員帳號': el['account'],
+                '註冊時間': el['join_at'],
+                '回饋點數': el['returns'],
+                '消費次數': el['order_count'],
+                '消費金額': el['pay_total'],
+                '狀態': '啟用中' if el['status'] else '停用中',
+            }
+            ret.append(dct)
+        df = pd.DataFrame(data=ret)
+        # file_name = f'{str(uuid.uuid4())[:10]}.csv'
+        file_name = f'會員資訊.csv'
+        df.to_csv(f'./media/{file_name}')
+        return Response(data=dict(
+            file_name=file_name,
+        ))
