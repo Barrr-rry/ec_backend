@@ -888,22 +888,23 @@ class OrderSerializer(DefaultModelSerializer):
         return instance
 
     def update(self, instance, validated_data):
-        shipping_status = validated_data['shipping_status']
-        reward_temp = RewardRecordTemp.objects.filter(order=instance.pk).first()
-        reward = RewardRecord.objects.filter(order=instance.pk).first()
-        if shipping_status == 400:
-            if reward_temp and not reward:
-                reward_temp.delete()
-                reward_temp.save()
-            elif reward:
-                reward_point = reward.point * -1
-                reward_total_point = reward.total_point + reward_point
-                RewardRecord.objects.create(
-                    member=instance.member,
-                    order=instance.pk,
-                    dosc='已取消訂單',
-                    print=reward_point
-                )
+        if 'shipping_status' in validated_data:
+            shipping_status = validated_data['shipping_status']
+            reward_temp = RewardRecordTemp.objects.filter(order=instance.pk).first()
+            reward = RewardRecord.objects.filter(order=instance.pk).first()
+            if shipping_status == 400:
+                if reward_temp and not reward:
+                    reward_temp.delete()
+                    reward_temp.save()
+                elif reward:
+                    reward_point = reward.point * -1
+                    reward_total_point = reward.total_point + reward_point
+                    RewardRecord.objects.create(
+                        member=instance.member,
+                        order=instance.pk,
+                        dosc='已取消訂單',
+                        print=reward_point
+                    )
         ret = super().update(instance, validated_data)
         return ret
 
