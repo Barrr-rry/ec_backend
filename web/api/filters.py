@@ -447,3 +447,31 @@ class CouponFilter(filters.BaseFilterBackend):
                 )
             ),
         )
+
+
+class ActivityFilter(filters.BaseFilterBackend):
+
+    def filter_queryset(self, request, queryset, view):
+        q = None
+        keywords = request.query_params.get('keywords')
+        if keywords is not None:
+            for keyword in keywords.strip().split():
+                q = or_q(q, Q(cn_name__contains=keyword))
+                q = or_q(q, Q(en_name__contains=keyword))
+
+        return queryset
+
+    def get_schema_fields(self, view):
+        if view.action != 'list':
+            return []
+        return (
+            coreapi.Field(
+                name='keywords',
+                required=False,
+                location='query',
+                schema=coreschema.String(
+                    title='keywords',
+                    description='str: 請輸入Keywords'
+                )
+            ),
+        )

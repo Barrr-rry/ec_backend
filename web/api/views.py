@@ -1536,6 +1536,7 @@ class CountryViewSet(ListModelMixin, viewsets.GenericViewSet):
 class ActivityViewSet(MyMixin):
     queryset = serializers.Activity.objects.all()
     serializer_class = serializers.ActivitySerializer
+    filter_backends = (filters.ActivityFilter,)
     authentication_classes = [TokenCheckAuthentication]
     permission_classes = [(permissions.ReadAuthenticated | permissions.CouponManagerEditPermission)]
 
