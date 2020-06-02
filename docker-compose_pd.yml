@@ -33,6 +33,7 @@ services:
     volumes:
       - ./web:/app
       - ./log:/root/var/log
+      - rest_framework:/usr/local/lib/python3.7/site-packages/rest_framework/static/rest_framework
   public-redis:
     image: redis:alpine
     restart: always
@@ -52,5 +53,8 @@ services:
     volumes:
       - ./web:/app
       - ./log:/var/log/nginx
+      - rest_framework:/usr/share/nginx/html/static/rest_framework
     depends_on:
       - public-ec-web
+volumes:
+  rest_framework:
