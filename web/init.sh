@@ -1,4 +1,7 @@
 #!/bin/sh
+service cron start
+python manage.py crontab remove
+python manage.py crontab add
 rm api/migrations/00*.py
 rm test.db
 python clear_mysql.py
