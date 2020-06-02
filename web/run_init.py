@@ -679,6 +679,7 @@ def generate_freeshipping():
 
 def generate_coupon(count):
     for i in range(count):
+        day = random.randint(-20, 20)
         Coupon.objects.create(
             role=random.randint(0, 100),
             method=random.choice([1, 2]),
@@ -686,8 +687,8 @@ def generate_coupon(count):
             title=f'折價券{i}',
             discount_code=f'DC{get_random_number(7)}',
             image_url='11697.jpg',
-            start_time=timezone.now(),
-            end_time=timezone.now() + timezone.timedelta(days=random.randint(20)),
+            start_time=timezone.now() + timezone.timedelta(days=day-10),
+            end_time=timezone.now() + timezone.timedelta(days=day),
         )
 
 
