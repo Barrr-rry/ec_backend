@@ -160,7 +160,7 @@ class MemberAddressSerializer(DefaultModelSerializer):
 
 
 class RewardRecordSerializer(DefaultModelSerializer):
-    end_date = serializers.DateField(read_only=True, format="%Y-%m-%d")
+    end_date = serializers.DateField(format="%Y-%m-%d")
     created_at = serializers.DateTimeField(read_only=True, format="%Y-%m-%d")
     total_point = serializers.IntegerField(help_text='回饋點數總共餘額', read_only=True)
 
@@ -170,7 +170,7 @@ class RewardRecordSerializer(DefaultModelSerializer):
     def create(self, validated_data):
         instance = RewardRecord.objects.filter(member=validated_data['member']).first()
         total_point = 0 if not instance else instance.total_point
-        validated_data['total_point'] = total_point
+        validated_data['total_point'] = total_point + validated_data['point']
         return super().create(validated_data)
 
 
