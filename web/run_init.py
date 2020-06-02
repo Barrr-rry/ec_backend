@@ -687,7 +687,7 @@ def generate_coupon(count):
             discount_code=f'DC{get_random_number(7)}',
             image_url='11697.jpg',
             start_time=timezone.now(),
-            end_time=timezone.now() + timezone.timedelta(days=random.randint(-20, 20)),
+            end_time=timezone.now() + timezone.timedelta(days=random.randint(20)),
         )
 
 
