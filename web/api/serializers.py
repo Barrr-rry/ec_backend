@@ -516,24 +516,31 @@ class ProductSerializer(DefaultModelSerializer):
         return ''
 
     def get_inventory_status_display(self, instance):
-        specificationdetails = SpecificationDetail.objects.filter(product=instance.id).all()
+        config = get_config()
         ret = ''
-        if specificationdetails.count():
-            for specificationdetail in specificationdetails:
-                if specificationdetail.quantity is None:
-                    if specificationdetail.inventory_status == 1:
-                        ret = '有庫存'
-                    elif specificationdetail.inventory_status == 2:
-                        ret = '無庫存'
-                    elif specificationdetail.inventory_status == 3:
-                        ret = '預購品'
-                else:
-                    if specificationdetail.quantity <= 0:
-                        ret = '無庫存'
-                    elif (0 < specificationdetail.quantity <= 10) and (ret not in ['無庫存']):
-                        ret = '庫存不足'
-                    elif (specificationdetail.quantity > 10) and (ret not in ['無庫存', '庫存不足']):
-                        ret = '庫存充足'
+        # 只顯示文案
+        if config['product_stock_setting'] == 2:
+            queryset = instance.specifications_detail.filter(inventory_status=2)
+            if queryset.count():
+                ret = '無庫存'
+                return ret
+            queryset = instance.specifications_detail.filter(inventory_status=3)
+            if queryset.count():
+                ret = '預購品'
+                return ret
+            ret = '有庫存'
+
+        # 顯示完整庫存
+        if config['product_stock_setting'] == 3:
+            queryset = instance.specifications_detail.filter(quantity__lte=0)
+            if queryset.count():
+                ret = '無庫存'
+                return ret
+            queryset = instance.specifications_detail.filter(quantity__lte=10)
+            if queryset.count():
+                ret = '庫存不足'
+                return ret
+            ret = '庫存充足'
         return ret
 
     def get_status_display(self, instance):
