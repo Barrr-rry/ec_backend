@@ -260,11 +260,11 @@ class ProductFilter(filters.BaseFilterBackend):
         if inventory_status is not None:
             inventory_status = int(inventory_status)
             if inventory_status == 1:
-                q = and_q(q, Q(specifications_detail__quantity__gt=10))
+                q = and_q(q, ~Q(specifications_detail__quantity__lte=10))
             if inventory_status == 2:
                 q = and_q(q, Q(specifications_detail__quantity__lte=0))
             elif inventory_status == 3:
-                q = and_q(q, Q(specifications_detail__quantity__gt=0))
+                q = and_q(q, ~Q(specifications_detail__quantity__lte=0))
                 q = and_q(q, Q(specifications_detail__quantity__lte=10))
 
         inventory_status_2 = request.query_params.get('inventory_status_2')
