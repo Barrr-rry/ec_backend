@@ -52,10 +52,29 @@ def response_time(self, instance, key):
 
 
 class BannerSerializer(NestedModelSerializer):
+    display_status = serializers.SerializerMethodField()
+    display_text = serializers.SerializerMethodField()
+
     class Meta(CommonMeta):
         model = Banner
         nested_fields = {'content': 'banner'}  # {related_name: field_name}
         update_fields = {'content': ['title', 'subtitle', 'description', 'button']}
+
+    def get_display_status(self, instance):
+        now = timezone.now().date()
+        if not instance.status:
+            return False
+        if instance.end_time:
+            return now <= instance.end_time
+        return True
+
+    def get_display_text(self, instance):
+        now = timezone.now().date()
+        if not instance.status:
+            return '停用中'
+        if instance.end_time and now > instance.end_time:
+            return '已過期'
+        return '啟用中'
 
 
 class FileSerializer(serializers.ModelSerializer):
