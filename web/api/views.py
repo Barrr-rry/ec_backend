@@ -1404,6 +1404,22 @@ class RewardRecordViewSet(CreateModelMixin, ListModelMixin, viewsets.GenericView
         return queryset
 
 
+@router_url('rewardrecordtemp')
+class RewardRecordTempViewSet(UpdateModelMixin, viewsets.GenericViewSet):
+    queryset = serializers.RewardRecordTemp.objects.all()
+    serializer_class = serializers.RewardRecordTempSerializer
+    pagination_class = LimitOffsetPagination
+    authentication_classes = [MangerOrMemberAuthentication]
+    permission_classes = [(permissions.ReadAuthenticated | permissions.CouponManagerEditPermission)]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        user = self.request.user
+        if isinstance(user, Member) and self.action == 'list':
+            queryset = queryset.filter(member=user)
+        return queryset
+
+
 @router_url('reward')
 class RewardViewSet(CreateModelMixin, ListModelMixin, UpdateModelMixin, viewsets.GenericViewSet):
     queryset = serializers.Reward.objects.all()
