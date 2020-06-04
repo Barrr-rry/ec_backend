@@ -413,8 +413,9 @@ class Order(DefaultAbstract):
     pay_type = models.SmallIntegerField(help_text='1: 貨到付款 0: 線上付款', default=0)
     take_number = models.SmallIntegerField(help_text='1: 取號成功 0: 取號失敗', default=0)
     shipping_status = models.IntegerField(help_text='shipping map', null=True)
-    simple_status = models.IntegerField(help_text="簡單對status 做分類", null=True, default=0)
-    simple_status_display = models.CharField(max_length=64, help_text="簡單對status 做分類", null=True, default='未付款')
+    simple_status = models.IntegerField(help_text="簡單對status 做分類", null=True, default=1)
+    simple_status_display = models.CharField(max_length=64, help_text="簡單對status 做分類: 1: 待出貨; 2: 付款失敗; 3: 取號成功; 4: 取號失敗; 5: 已取消",
+                                             null=True, default='未付款')
     # --- only 國外 ---
     location = models.SmallIntegerField(help_text="地區: 1：國內 2: 國外", default=1)
     first_name = models.CharField(max_length=64, help_text="First Name(海外)", null=True)
@@ -440,9 +441,11 @@ class Order(DefaultAbstract):
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
         from api.sdk.ecpay import payment_type
-        shipping_status = shipping_map.simple_display_mapping.get(str(self.shipping_status))
-        if shipping_status:
-            self.simple_status_display = shipping_status
+        simple_status_display = shipping_map.simple_display_mapping.get(str(self.shipping_status))
+        if simple_status_display == '已取消':
+            self.simple_status = 5
+        if simple_status_display:
+            self.simple_status_display = simple_status_display
         if self.payment_type in payment_type.keys():
             self.payment_type = payment_type[self.payment_type]
         return super().save()
