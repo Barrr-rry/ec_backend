@@ -157,7 +157,8 @@ class OrderViewSet(MyMixin):
     filter_backends = (filters.OrderFilter,)
     authentication_classes = [MangerOrMemberAuthentication]
     permission_classes = [(
-            permissions.OrderAuthenticated | permissions.OrderManagerEditPermission & permissions.OrderManagerReadPermission)]
+            (permissions.OrderAuthenticated | permissions.OrderManagerEditPermission) & (
+            permissions.OrderManagerReadPermission | permissions.OrderOwnaerPermission))]
 
     def get_queryset(self):
         queryset = super().get_queryset()

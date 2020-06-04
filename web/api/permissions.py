@@ -2,7 +2,7 @@ from rest_framework.permissions import BasePermission
 from functools import partial
 from rest_framework.authentication import TokenAuthentication as BaseTokenAuthentication
 from rest_framework.authentication import get_authorization_header, exceptions
-from .models import AdminTokens, Manager, Permission, Category, Tag, Brand, Member
+from .models import AdminTokens, Manager, Permission, Category, Tag, Brand, Member, Order
 from django.contrib.auth.models import AnonymousUser
 
 
@@ -23,6 +23,15 @@ class IsHightestPermission(BasePermission):
     def has_permission(self, request, view):
         user = request.user
         return user.permission.highest_permission
+
+
+class OrderOwnaerPermission(BasePermission):
+    def has_permission(self, request, view):
+        user = request.user
+        if view.action in ['create']:
+            return True
+        instance = Order.objects.get(pk=view.kwargs['pk'])
+        return instance.member == user
 
 
 def factory_permission(target_method_list=None, field=None, validate_values=None):
@@ -269,7 +278,8 @@ class OrderAuthenticated(BasePermission):
     def has_permission(self, request, view):
         user = request.user
         token = request.auth
-        if (isinstance(user, Member) and token and not token.expired()) and view.action in ['list', 'retrieve', 'create']:
+        if (isinstance(user, Member) and token and not token.expired()) and view.action in ['list', 'retrieve',
+                                                                                            'create', 'update']:
             return True
 
 

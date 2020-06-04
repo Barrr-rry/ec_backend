@@ -923,8 +923,8 @@ class OrderSerializer(DefaultModelSerializer):
         with transaction.atomic():
             if 'shipping_status' in validated_data:
                 shipping_status = validated_data['shipping_status']
-                reward_temp = RewardRecordTemp.objects.filter(order=instance.pk).first()
-                reward = RewardRecord.objects.filter(order=instance.pk).first()
+                reward_temp = RewardRecordTemp.objects.filter(order=instance).first()
+                reward = RewardRecord.objects.filter(order=instance).first()
                 if shipping_status == 400:
                     if reward_temp and not reward:
                         reward_temp.delete()
@@ -934,9 +934,10 @@ class OrderSerializer(DefaultModelSerializer):
                         reward_total_point = reward.total_point + reward_point
                         RewardRecord.objects.create(
                             member=instance.member,
-                            order=instance.pk,
-                            dosc='已取消訂單',
-                            print=reward_point
+                            order=instance,
+                            desc='已取消訂單',
+                            point=reward_point,
+                            total_point=reward_total_point,
                         )
             ret = super().update(instance, validated_data)
         return ret
