@@ -399,12 +399,8 @@ def generate_categories():
 
 def generate_tags():
     tag_image_1 = TagImage.objects.create(name='一般-綠', image_url='label-green')
-    tag_image_2 = TagImage.objects.create(name='一般-橘', image_url='label-yellow')
-    tag_image_3 = TagImage.objects.create(name='一般-粉', image_url='label-pink')
-    tag_image_4 = TagImage.objects.create(name='緞帶-橘', image_url='ribbon-orange')
-    tag_image_5 = TagImage.objects.create(name='緞帶-綠', image_url='ribbon-green')
-    tag_image_6 = TagImage.objects.create(name='緞帶-黃', image_url='ribbon-yellow')
-    tag_image_7 = TagImage.objects.create(name='緞帶-粉', image_url='ribbon-pink')
+    tag_image_2 = TagImage.objects.create(name='一般-紅', image_url='label-red')
+    tag_image_3 = TagImage.objects.create(name='一般-藍', image_url='label-blue')
     Tag.objects.create(name='熱銷商品', tag_image=tag_image_1, queue=1)
     Tag.objects.create(name='新品上市', tag_image=tag_image_2, queue=2)
     Tag.objects.create(name='好評不斷', tag_image=tag_image_3, queue=3)
@@ -687,7 +683,7 @@ def generate_coupon(count):
             title=f'折價券{i}',
             discount_code=f'DC{get_random_number(7)}',
             image_url='11697.jpg',
-            start_time=timezone.now() + timezone.timedelta(days=day-10),
+            start_time=timezone.now() + timezone.timedelta(days=day - 10),
             end_time=timezone.now() + timezone.timedelta(days=day),
         )
 
