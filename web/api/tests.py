@@ -916,12 +916,6 @@ class TestBrand(DefaultTestMixin, APITestCase):
 
 class TestProductConfig1(DefaultTestMixin, APITestCase):
     # {"id": 1, "product_stock_setting": 2, "product_specifications_setting": 1, "weight": true, "feeback_money_setting": 2, "activity": false}
-    response_keys = ['id', 'product_number', 'brand_en_name', 'brand_cn_name', 'tag_name', 'name',
-                     'order_count', 'categories',
-                     'title', 'sub_title', 'weight', 'price', 'fake_price', 'inventory_status',
-                     'description',
-                     'description_2', 'detail_info', 'product_info',
-                     'brand', 'tag', 'tag_detail', 'category', 'productimages', 'specifications']
 
     def test_product_list(self):
         url = '/api/product/'
@@ -960,16 +954,19 @@ class TestProductConfig1(DefaultTestMixin, APITestCase):
         data = dict(
             product_number=222,
             brand=Brand.objects.first().id,
-            name=222,
-            title=222,
-            sub_title=222,
+            cn_name=222,
+            cn_title=222,
+            cn_sub_title=222,
+            en_name=222,
+            en_title=222,
+            en_sub_title=222,
             description=222,
             description_2=222,
             tag=[Tag.objects.first().id],
             category=[Category.objects.first().id, Category.objects.last().id],
             specification_level1=[
                 {
-                    "name": "213"
+                    "cn_name": "213"
                 }
             ],
             specification_level2=[],
@@ -986,7 +983,7 @@ class TestProductConfig1(DefaultTestMixin, APITestCase):
                 {
                     "main_image": True,
                     "image_url": "23132222",
-                    "specification_name": '213'
+                    "specification_cn_name": '213'
                 }
             ]
         )
@@ -1036,7 +1033,8 @@ class TestProductConfig1(DefaultTestMixin, APITestCase):
         # response type
         self.assertIsInstance(r.data, list)
         for el in r.data:
-            self.assertTrue(max_price >= el['price'] >= min_prcie)
+            for ell in el['specifications_detail']:
+                self.assertTrue(max_price >= ell['price'] >= min_prcie)
 
     def test_product_list_pagination(self):
         url = f'/api/product/?offset=0&limit=1?keywords=存'
@@ -1300,7 +1298,8 @@ class TestCoupon(DefaultTestMixin, APITestCase):
             role=random.randint(0, 100),
             method=random.choice([1, 2]),
             discount=random.randint(0, 100),
-            title=f'折價券XXXX',
+            cn_title=f'折價券XXXX',
+            en_title=f'折價券XXXX',
             discount_code=f'DC{get_random_number(7)}',
             image_url='11697.jpg',
             start_time=timezone.now(),
@@ -1361,7 +1360,8 @@ class TestCoupon(DefaultTestMixin, APITestCase):
             role=random.randint(0, 100),
             method=random.choice([1, 2]),
             discount=random.randint(0, 100),
-            title='折價券',
+            cn_title='折價券',
+            en_title='折價券',
             discount_code=f'DC{number}',
             image_url='11697.jpg',
             start_time='2019-06-20',
@@ -1379,7 +1379,7 @@ class TestCoupon(DefaultTestMixin, APITestCase):
         instance = Coupon.objects.first()
         url = f'/api/coupon/{instance.id}/'
         data = dict(
-            title='折價券2',
+            cn_title='折價券2',
         )
         r = self.super_manager.put(url, data)
         # status 200
@@ -1410,7 +1410,6 @@ class TestCoupon(DefaultTestMixin, APITestCase):
 
 
 class TestFreeShipping(DefaultTestMixin, APITestCase):
-    response_keys = ['id', 'logistics_type_text', 'logistics_type', 'title', 'role', 'weight', 'price']
 
     def test_freeshipping_list(self):
         url = '/api/freeshipping/'
@@ -1436,7 +1435,7 @@ class TestFreeShipping(DefaultTestMixin, APITestCase):
         instance = FreeShipping.objects.first()
         url = f'/api/freeshipping/{instance.id}/'
         data = dict(
-            title='折價券2',
+            cn_title='折價券2',
         )
         r = self.super_manager.put(url, data)
         # status 200

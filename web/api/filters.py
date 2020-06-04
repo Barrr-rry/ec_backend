@@ -81,7 +81,7 @@ class MemberFilter(filters.BaseFilterBackend):
                 required=False,
                 location='query',
                 schema=coreschema.String(
-                    location='query',
+                    # location='query',
                     title='keywords',
                     description='str: 請輸入Keywords'
                 )
@@ -222,7 +222,8 @@ class ProductFilter(filters.BaseFilterBackend):
                 q = or_q(q, Q(brand__en_name__contains=keyword))
                 q = or_q(q, Q(brand__cn_name__contains=keyword))
                 q = or_q(q, Q(specifications_detail__product_code__contains=keyword))
-                q = or_q(q, Q(name__contains=keyword))
+                q = or_q(q, Q(en_name__contains=keyword))
+                q = or_q(q, Q(cn_name__contains=keyword))
 
         brand = request.query_params.get('brand')
         if brand is not None:
