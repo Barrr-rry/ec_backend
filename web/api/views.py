@@ -1549,6 +1549,27 @@ class CountryViewSet(ListModelMixin, viewsets.GenericViewSet):
         return Response(ret)
 
 
+def get_category_ids_mapping():
+    queryset = Category.objects.all()
+    ret = defaultdict(list)
+    for el in queryset:
+        if el.main_category:
+            ret[el.main_category.id].append(el.id)
+    delete_ids = []
+    keys = ret.keys()
+    for main_category_id in ret:
+        target_list = ret[main_category_id]
+        a = [1, 2, ]
+        delete_ids = []
+        for _id in target_list:
+            if _id in keys:
+                delete_ids.append(_id)
+                target_list.extend(ret[_id])
+        for _id in delete_ids:
+            target_list.remove(_id)
+    return ret
+
+
 @router_url('activity')
 class ActivityViewSet(MyMixin):
     queryset = serializers.Activity.objects.all()
@@ -1556,6 +1577,24 @@ class ActivityViewSet(MyMixin):
     filter_backends = (filters.ActivityFilter,)
     authentication_classes = [TokenCheckAuthentication]
     permission_classes = [(permissions.ReadAuthenticated | permissions.CouponManagerEditPermission)]
+
+    @action(methods=['POST'], detail=False)
+    def category(self, request, *args, **kwargs):
+        # todo 如國要做好 rest api 那邊應該要顯示 接收什麼參數.... etc
+        ids = request.data['ids']
+        activity_id = request.data['activity']
+        category_ids_mapping = get_category_ids_mapping()
+        new_ids = []
+        for _id in ids:
+            if _id in category_ids_mapping:
+                new_ids.extend(category_ids_mapping[_id])
+            else:
+                new_ids.append(_id)
+        products = Product.objects.filter(category__in=new_ids)
+        with transaction.atomic():
+            for product in products:
+                product.activity_id = activity_id
+        return Response(dict(msg='ok'), status=status.HTTP_201_CREATED)
 
 
 @router_url('exportorder')
