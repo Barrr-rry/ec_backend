@@ -79,9 +79,9 @@ class MemberFilter(filters.BaseFilterBackend):
             coreapi.Field(
                 name='keywords',
                 required=False,
-                location='query',
+                # location='query',
                 schema=coreschema.String(
-                    location='query',
+                    # location='query',
                     title='keywords',
                     description='str: 請輸入Keywords'
                 )
@@ -459,10 +459,13 @@ class ActivityFilter(filters.BaseFilterBackend):
         keywords = request.query_params.get('keywords')
         if keywords is not None:
             for keyword in keywords.strip().split():
-                q = or_q(q, Q(cn_name__contains=keyword))
+                q = or_q(q, Q(ch_name__contains=keyword))
                 q = or_q(q, Q(en_name__contains=keyword))
 
-        return queryset
+        if q:
+            return queryset.filter(q).distinct()
+        else:
+            return queryset
 
     def get_schema_fields(self, view):
         if view.action != 'list':
