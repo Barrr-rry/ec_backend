@@ -442,7 +442,7 @@ def generate_brands():
 
 
 def generate_product_image():
-    return f'product{random.randint(1, 3 + 1)}.png'
+    return f'product{random.randint(1, 3)}.png'
 
 
 def generate_products_for_test(count, config_data):
