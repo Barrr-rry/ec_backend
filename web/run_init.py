@@ -348,16 +348,15 @@ def generate_members(count):
 
 def generate_banners(count):
     index = 0
-    generate_content = lambda language: dict(title=f'{language}_title',
-                                             subtitle=f'{language}_subtitle',
-                                             description=f'{language}_description',
+    generate_content = lambda language: dict(title=None,
+                                             subtitle=None,
+                                             description=None,
                                              language_type=1 if language == 'CH' else 2,
-                                             button=f'{language}_button')
+                                             button=None)
     for i in range(1, count + 1):
         banner_arg = random.choice(banner_args)
         banner = Banner.objects.create(
-            bigimage='default-banner-bigimage.png',
-            smallimage='default-banner-smallimage.png',
+            bigimage='banner.png',
             link='http://ezgo-buy.com/',
             queue=i,
             status=True,
@@ -442,6 +441,10 @@ def generate_brands():
         fake_id += 1
 
 
+def generate_product_image():
+    return f'product{random.randint(1, 3 + 1)}.png'
+
+
 def generate_products_for_test(count, config_data):
     spec_level1 = ['S', 'SM', 'M', 'L', 'XL', 'XX']
     spec_level2 = ['紅色', '藍色', '黃色', '綠色', '白色', '黑色']
@@ -469,12 +472,12 @@ def generate_products_for_test(count, config_data):
         product.save()
         ProductImage.objects.create(
             product=product,
-            image_url='default-banner-smallimage.png',
+            image_url=generate_product_image(),
             main_image=True,
         )
         ProductImage.objects.create(
             product=product,
-            image_url='default-banner-smallimage.png',
+            image_url=generate_product_image(),
             main_image=False,
         )
         # 規格細節
