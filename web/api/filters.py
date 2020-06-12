@@ -15,11 +15,11 @@ class MemberFilter(filters.BaseFilterBackend):
         q = None
         keywords = request.query_params.get('keywords')
         if keywords is not None:
-            q = or_q(q, Q(member_number__contains=keywords))
+            q = or_q(q, Q(member_number__iexact=keywords))
             q = or_q(q, Q(phone__contains=keywords))
             q = or_q(q, Q(cellphone__contains=keywords))
-            q = or_q(q, Q(account__contains=keywords))
-            q = or_q(q, Q(name__contains=keywords))
+            q = or_q(q, Q(account__iexact=keywords))
+            q = or_q(q, Q(name__iexact=keywords))
 
         status = request.query_params.get('status')
         if status is not None:
@@ -81,7 +81,7 @@ class MemberFilter(filters.BaseFilterBackend):
                 required=False,
                 location='query',
                 schema=coreschema.String(
-                    location='query',
+                    # location='query',
                     title='keywords',
                     description='str: 請輸入Keywords'
                 )
@@ -131,7 +131,7 @@ class OrderFilter(filters.BaseFilterBackend):
         q = None
         keywords = request.query_params.get('keywords')
         if keywords is not None:
-            q = or_q(q, Q(shipping_name__contains=keywords))
+            q = or_q(q, Q(shipping_name__iexact=keywords))
             q = or_q(q, Q(phone__contains=keywords))
             q = or_q(q, Q(order_number__contains=keywords))
 
@@ -218,11 +218,11 @@ class ProductFilter(filters.BaseFilterBackend):
         keywords = request.query_params.get('keywords')
         if keywords is not None:
             for keyword in keywords.strip().split():
-                q = or_q(q, Q(product_number__contains=keyword))
-                q = or_q(q, Q(brand__en_name__contains=keyword))
-                q = or_q(q, Q(brand__cn_name__contains=keyword))
-                q = or_q(q, Q(specifications_detail__product_code__contains=keyword))
-                q = or_q(q, Q(name__contains=keyword))
+                q = or_q(q, Q(product_number__iexact=keyword))
+                q = or_q(q, Q(brand__en_name__iexact=keyword))
+                q = or_q(q, Q(brand__cn_name__iexact=keyword))
+                q = or_q(q, Q(specifications_detail__product_code__iexact=keyword))
+                q = or_q(q, Q(name__iexact=keyword))
 
         brand = request.query_params.get('brand')
         if brand is not None:
@@ -459,8 +459,8 @@ class ActivityFilter(filters.BaseFilterBackend):
         keywords = request.query_params.get('keywords')
         if keywords is not None:
             for keyword in keywords.strip().split():
-                q = or_q(q, Q(cn_name__contains=keyword))
-                q = or_q(q, Q(en_name__contains=keyword))
+                q = or_q(q, Q(cn_name__iexact=keyword))
+                q = or_q(q, Q(en_name__iexact=keyword))
 
         return queryset
 
