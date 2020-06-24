@@ -182,17 +182,10 @@ class Member(DefaultAbstract, AbstractBaseUser):
     validate = models.BooleanField(help_text='是否已經註冊驗證', default=False)
     validate_code = models.CharField(max_length=64, help_text='驗證碼', unique=True, null=True)
     expire_datetime = models.DateTimeField(help_text='validate_code 到期時間', null=True, default=default_expire_datetime)
-    in_blacklist = models.BooleanField(default=False, help_text="黑名單")
-    was_in_blacklist = models.BooleanField(default=False, help_text="曾經是黑名單")
     local = models.CharField(max_length=128, help_text="會員所在地")
 
     def __str__(self):
         return f'{self.name}({self.id})'
-
-    def save(self, *args, **kwargs):
-        if self.in_blacklist:
-            self.was_in_blacklist = True
-        return super().save(*args, **kwargs)
 
     def set_validate_code(self):
         self.validate_code = str(uuid.uuid4())
@@ -219,6 +212,13 @@ class Member(DefaultAbstract, AbstractBaseUser):
             if ret + el.point < product_price:
                 ret += el.point
         return ret
+
+
+class BlacklistRecord(DefaultAbstract):
+    member = models.ForeignKey(Member, related_name='blacklist_record', on_delete=models.CASCADE,
+                               help_text='會員流水號')
+    status = models.BooleanField(help_text="是否為黑名單")
+    description = models.CharField(max_length=1024, help_text='標記備註', null=True)
 
 
 class Category(DefaultAbstract):
