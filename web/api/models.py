@@ -21,8 +21,7 @@ class MemberTokens(DefaultToken):
     user = models.ForeignKey('Member', related_name='auth_token', on_delete=models.CASCADE, )
 
     def expired(self):
-        now = datetime.datetime.now(datetime.timezone.utc)
-        return now > self.created + datetime.timedelta(days=7)
+        return False
 
 
 class ParanoidQuerySet(models.QuerySet):
@@ -179,7 +178,7 @@ class Member(DefaultAbstract, AbstractBaseUser):
     status = models.BooleanField(help_text="啟用狀態 True：啟用；False：停用", default=True)
     default_memberaddress = models.OneToOneField('MemberAddress', default=None, null=True, help_text='預設地址',
                                                  on_delete=models.CASCADE, related_name='+')
-    validate = models.BooleanField(help_text='是否已經註冊驗證', default=False)
+    validate = models.BooleanField(help_text='是否已經註冊驗證', default=True)
     validate_code = models.CharField(max_length=64, help_text='驗證碼', unique=True, null=True)
     expire_datetime = models.DateTimeField(help_text='validate_code 到期時間', null=True, default=default_expire_datetime)
     local = models.CharField(max_length=128, help_text="會員所在地")

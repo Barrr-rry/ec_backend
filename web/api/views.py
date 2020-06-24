@@ -689,34 +689,8 @@ class MemberViewSet(MyMixin):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-        send_mail(
-            subject='【 會員驗證 】EZGO - 汴利購會員驗證信',
-            tomail=serializer.instance.account,
-            part_content='請點擊下列網址進行信箱驗證',
-            tourl=f'{host}/register-validate/{serializer.instance.validate_code}'
-        )
 
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
-
-    @action(methods=['POST'], detail=False, authentication_classes=[], permission_classes=[])
-    def register_resend(self, request, *args, **kwargs):
-        """
-        如果註冊超過時間 太晚收信
-        則用該validate_code 去重新寄信一次
-        """
-        host = request.data.get('host')
-        validate_code = request.data.get('validate_code')
-        instance = get_object_or_404(serializers.Member.objects.filter(validate_code=validate_code))
-        instance.set_validate_code()
-        instance.save()
-        send_mail(
-            subject='【 會員驗證 】EZGO - 汴利購會員驗證信',
-            tomail=instance.account,
-            part_content='請點擊下列網址進行信箱驗證',
-            tourl=f'{host}/register-validate/{instance.validate_code}'
-        )
-
-        return Response(dict(msg='ok'))
 
     @action(methods=['POST'], detail=False, authentication_classes=[], permission_classes=[])
     def register_validate(self, request, *args, **kwargs):
@@ -924,12 +898,6 @@ class MemberViewSet(MyMixin):
             instance.validate = False
             instance.set_validate_code()
             instance.save()
-            send_mail(
-                subject='【 會員驗證 】EZGO - 汴利購會員驗證信',
-                tomail=account,
-                part_content='請點擊下列網址進行信箱驗證',
-                tourl=f'{host}/register-validate/{instance.validate_code}'
-            )
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
         self.perform_update(serializer)
