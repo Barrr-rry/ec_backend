@@ -1109,7 +1109,7 @@ class ProductViewSet(MyMixin, UpdateCache):
     def index_page(self, request, *args, **kwargs):
         # new product 4
         queryset = self.filter_queryset(self.get_queryset())
-        new_products = self.get_data(queryset[:4])
+        new_products = self.get_data(queryset[:28])
         # hot product 8
         queryset = self.filter_queryset(self.get_queryset())
         queryset.order_by('-order_count')
