@@ -168,10 +168,10 @@ def default_expire_datetime():
 
 class Member(DefaultAbstract, AbstractBaseUser):
     member_number = models.CharField(max_length=64, help_text="會員編號 ezgo201912190000", unique=True, null=True)
-    name = models.CharField(max_length=64, help_text="會員姓名")
+    name = models.CharField(max_length=64, help_text="會員姓名", null=True)
     line_id = models.CharField(max_length=64, help_text="LINE ID", null=True)
     phone = models.CharField(max_length=64, help_text="會員電話 電話", null=True, blank=True)
-    cellphone = models.CharField(max_length=64, help_text="會員手機 手機", unique=True)
+    cellphone = models.CharField(max_length=64, help_text="會員手機 手機", unique=True, null=True)
     account = models.CharField(max_length=128, help_text="會員帳號", unique=True)
     password = models.CharField(max_length=128, help_text="密碼")
     remarks = models.CharField(max_length=1024, help_text="備註", null=True)
@@ -182,6 +182,7 @@ class Member(DefaultAbstract, AbstractBaseUser):
     validate_code = models.CharField(max_length=64, help_text='驗證碼', unique=True, null=True)
     expire_datetime = models.DateTimeField(help_text='validate_code 到期時間', null=True, default=default_expire_datetime)
     local = models.CharField(max_length=128, help_text="會員所在地")
+    email_status = models.BooleanField(help_text="是否接收電子報", default=False, null=True)
 
     def __str__(self):
         return f'{self.name}({self.id})'

@@ -227,7 +227,7 @@ class MemberSerializer(DefaultModelSerializer):
                                       message='請輸入 6 - 12 個英數混合密碼')
         ]
     )
-    cellphone = serializers.CharField(max_length=64, required=True, help_text="會員手機 手機", validators=[
+    cellphone = serializers.CharField(max_length=64, required=False, help_text="會員手機 手機", validators=[
         UniqueValidator(
             queryset=Member.original_objects.all(),
             message="電話號碼已經被註冊",
@@ -255,6 +255,7 @@ class MemberSerializer(DefaultModelSerializer):
     reward = serializers.SerializerMethodField()
     in_blacklist = serializers.SerializerMethodField(read_only=True)
     was_in_blacklist = serializers.SerializerMethodField(read_only=True)
+    location = serializers.SerializerMethodField(read_only=True)
 
     class Meta(UserCommonMeta):
         model = Member
@@ -267,6 +268,11 @@ class MemberSerializer(DefaultModelSerializer):
         if blacklist_record:
             return blacklist_record.status
         return False
+
+    def get_location(self, instance):
+        if instance.local == '1':
+            return '台灣'
+        return '海外'
 
     def get_was_in_blacklist(self, instance):
         all_blacklist_record = BlacklistRecord.objects.filter(member=instance).all()
