@@ -459,10 +459,13 @@ class ActivityFilter(filters.BaseFilterBackend):
         keywords = request.query_params.get('keywords')
         if keywords is not None:
             for keyword in keywords.strip().split():
-                q = or_q(q, Q(cn_name__icontains=keyword))
+                q = or_q(q, Q(ch_name__icontains=keyword))
                 q = or_q(q, Q(en_name__icontains=keyword))
 
-        return queryset
+        if q:
+            return queryset.filter(q)
+        else:
+            return queryset
 
     def get_schema_fields(self, view):
         if view.action != 'list':
