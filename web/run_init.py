@@ -374,26 +374,33 @@ def generate_banners(count):
 
 
 def generate_categories():
-    def loop_categoreis(data, main_category=None):
-        for cate in data:
-            obj = dict()
-            if main_category:
-                obj['main_category'] = main_category
-            # simple loop
-            if isinstance(cate, str):
-                obj['name'] = cate
-                instance = Category.objects.create(**obj)
-                continue
-
-            for key in ['name', 'image_url']:
-                if cate.get(key):
-                    obj[key] = cate[key]
-
-            instance = Category.objects.create(**obj)
-            if cate.get('children'):
-                loop_categoreis(cate['children'], instance)
-
-    loop_categoreis(categories)
+    categories = ['商品總覽',
+                  '三角內褲',
+                  '四角內褲',
+                  '比基尼三角',
+                  '提臀內褲',
+                  '周邊商品']
+    all_categories = ['熱銷商品',
+                      '材質分類',
+                      '顏色分類']
+    material_categories = ['純棉',
+                           '洞洞彈性']
+    for category in categories:
+        Category.objects.create(
+            name=category
+        )
+    all_category = Category.objects.filter(name='商品總覽').first()
+    for category in all_categories:
+        Category.objects.create(
+            main_category=all_category,
+            name=category
+        )
+    material_category = Category.objects.filter(name='材質分類').first()
+    for category in material_categories:
+        Category.objects.create(
+            main_category=material_category,
+            name=category
+        )
 
 
 def generate_tags():
@@ -489,7 +496,7 @@ def generate_products_for_test(count, config_data):
             product.level1_title = '尺寸'
             product.level2_title = '顏色'
             product.save()
-            sizes = ['X', 'B', 'C', 'D', 'XL', 'S', 'L', 'LLL', 'XXXL']
+            sizes = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL']
             colors = ['Blue', 'Red', 'Yello', 'White', 'RGB三原色']
             random.shuffle(sizes)
             random.shuffle(colors)
