@@ -13,7 +13,7 @@ from rest_framework_nested import routers
 from rest_framework.parsers import MultiPartParser, FormParser
 from .models import (BannerContent, Banner, File, Permission, Manager, AdminTokens, Member, Category, Tag, Brand,
                      Product, ConfigSetting, SpecificationDetail, Country, RewardRecordTemp, Reward, RewardRecord,
-                     RewardRecordTemp, Activity, BlacklistRecord,
+                     RewardRecordTemp, Activity, BlacklistRecord, MemberSpec,
                      ProductImage, Cart, ProductQuitShot, TagImage, FreeShipping, Coupon, MemberStore)
 from .serializers import (BannerSerializer, FileSerializer, PermissionSerializer, ManagerSerializer,
                           ManagerLoginSerializer,
@@ -208,10 +208,15 @@ class EcpayViewSet(GenericViewSet):
             raise serializers.serializers.ValidationError('no carts')
         product_shot = []
         # todo 沒有檢查庫存
+        spec_size_data = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3L']
+        member_spec = set()
         for cart in carts:
             # 更新商品 order count
             cart.product.order_count += cart.quantity
             cart.product.save()
+            for spec in cart.product.specifications.filter(level=1):
+                if spec.name in spec_size_data:
+                    member_spec.add(spec.name)
 
             obj = serializers.ProductSerializer(cart.product).data
             product_price += cart.quantity * cart.specification_detail.price
@@ -220,6 +225,11 @@ class EcpayViewSet(GenericViewSet):
             total_weight += cart.specification_detail.weight * cart.quantity
             product_shot.append(obj)
         request.user.cart.all().delete()
+
+        for spec_name in member_spec:
+            queryset = MemberSpec.objects.filter(member=request.user, name=spec_name)
+            if not queryset:
+                MemberSpec.objects.create(member=request.user, name=spec_name)
 
         # coupon price discount
         coupon_id = request.data.get('coupon_id')
@@ -284,6 +294,13 @@ class EcpayViewSet(GenericViewSet):
         request.data['product_price'] = product_price
         request.data['coupon_price'] = coupon_discount
         request.data['reward_price'] = reward_discount
+
+        member = request.user
+        member.gender = request.data['gender']
+        member.height = request.data['height']
+        member.weight = request.data['weight']
+        member.birthday = request.data['birthday']
+        member.save()
         return product_shot, total_price
 
     def get_activity_price(self, carts):
@@ -1274,8 +1291,7 @@ class MemberStoreViewSet(CreateModelMixin, ListModelMixin, DestroyModelMixin, vi
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.filter(member=self.request.user)\
-
+        return queryset.filter(member=self.request.user)
 
 
 @router_url('blacklistrecord')

@@ -183,6 +183,11 @@ class Member(DefaultAbstract, AbstractBaseUser):
     expire_datetime = models.DateTimeField(help_text='validate_code 到期時間', null=True, default=default_expire_datetime)
     local = models.CharField(max_length=128, help_text="會員所在地")
     email_status = models.BooleanField(help_text="是否接收電子報", default=False, null=True)
+    # ------ from order
+    birthday = models.DateField(help_text='生日', null=True)
+    gender = models.SmallIntegerField(help_text='性別 1: 男生 2:女生', default=1, null=True)
+    weight = models.IntegerField(help_text='體重', null=True)
+    height = models.IntegerField(help_text='身高', null=True)
 
     def __str__(self):
         return f'{self.name}({self.id})'
@@ -212,6 +217,11 @@ class Member(DefaultAbstract, AbstractBaseUser):
             if ret + el.point < product_price:
                 ret += el.point
         return ret
+
+
+class MemberSpec(DefaultAbstract):
+    member = models.ForeignKey(Member, related_name="memberspec", on_delete=models.CASCADE, help_text="member fk")
+    name = models.CharField(max_length=128, help_text="S M L ...etc")
 
 
 class BlacklistRecord(DefaultAbstract):
@@ -414,7 +424,8 @@ class Order(DefaultAbstract):
     take_number = models.SmallIntegerField(help_text='1: 取號成功 0: 取號失敗', default=0)
     shipping_status = models.IntegerField(help_text='shipping map', null=True)
     simple_status = models.IntegerField(help_text="簡單對status 做分類", null=True, default=1)
-    simple_status_display = models.CharField(max_length=64, help_text="簡單對status 做分類: 1: 待出貨; 2: 付款失敗; 3: 取號成功; 4: 取號失敗; 5: 已取消",
+    simple_status_display = models.CharField(max_length=64,
+                                             help_text="簡單對status 做分類: 1: 待出貨; 2: 付款失敗; 3: 取號成功; 4: 取號失敗; 5: 已取消",
                                              null=True, default='未付款')
     # --- only 國外 ---
     location = models.SmallIntegerField(help_text="地區: 1：國內 2: 國外", default=1)
@@ -437,6 +448,12 @@ class Order(DefaultAbstract):
     ecpay_data = models.TextField(help_text='ECPAY RETURN DATA', null=True)
     store_name = models.CharField(max_length=32, help_text="store name", null=True)
     all_pay_logistics_id = models.CharField(max_length=64, help_text='物流交易編號', null=True)
+
+    # -----亞凡-----
+    birthday = models.DateField(help_text='生日', null=True)
+    gender = models.SmallIntegerField(help_text='性別 1: 男生 2:女生', default=1, null=True)
+    weight = models.IntegerField(help_text='體重', null=True)
+    height = models.IntegerField(help_text='身高', null=True)
 
     def save(self, force_insert=False, force_update=False, using=None,
              update_fields=None):
