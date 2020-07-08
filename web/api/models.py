@@ -184,7 +184,7 @@ class Member(DefaultAbstract, AbstractBaseUser):
     expire_datetime = models.DateTimeField(help_text='validate_code 到期時間', null=True, default=default_expire_datetime)
     in_blacklist = models.BooleanField(default=False, help_text="黑名單")
     was_in_blacklist = models.BooleanField(default=False, help_text="曾經是黑名單")
-    local = models.CharField(max_length=128, help_text="會員所在地")
+    local = models.CharField(max_length=128, help_text="會員所在地", null=True)
 
     def __str__(self):
         return f'{self.name}({self.id})'

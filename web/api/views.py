@@ -408,13 +408,14 @@ class EcpayViewSet(GenericViewSet):
     def reward_process(self, order):
         # 減少
         instance = RewardRecord.objects.filter(member=order.member).first()
-        rewardrecord = RewardRecord.objects.create(
-            member=order.member,
-            order=order,
-            point=-order.reward_price,
-            total_point=instance.total_point - order.reward_price,
-            desc=f'購物獎勵金折抵\n（ 訂單編號 : {order.order_number} ）'
-        )
+        if instance:
+            rewardrecord = RewardRecord.objects.create(
+                member=order.member,
+                order=order,
+                point=-order.reward_price,
+                total_point=instance.total_point - order.reward_price,
+                desc=f'購物獎勵金折抵\n（ 訂單編號 : {order.order_number} ）'
+            )
         # 新增
         self.to_reward(order)
 

@@ -192,9 +192,9 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-# EMAIL_HOST_USER = 'Ezgobuyusa@gmail.com'
-# EMAIL_HOST_PASSWORD = 'ez0910778133'
-# EMAIL_FROM = 'Ezgobuyusa@gmail.com'
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-EMAIL_FROM = ''
+EMAIL_HOST_USER = 'Ezgobuyusa@gmail.com'
+EMAIL_HOST_PASSWORD = 'ez0910778133'
+EMAIL_FROM = 'Ezgobuyusa@gmail.com'
+# EMAIL_HOST_USER = ''
+# EMAIL_HOST_PASSWORD = ''
+# EMAIL_FROM = ''
