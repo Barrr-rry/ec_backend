@@ -1654,7 +1654,7 @@ class ExportOrderViewSet(ListModelMixin, viewsets.GenericViewSet):
         df = pd.DataFrame(data=ret)
         # file_name = f'{str(uuid.uuid4())[:10]}.csv'
         file_name = f'訂單資訊.csv'
-        df.to_csv(f'./media/{file_name}')
+        df.to_csv(f'./media/{file_name}', encoding='big5')
         return Response(data=dict(
             file_name=file_name,
         ))
@@ -1694,7 +1694,7 @@ class ExportMemberViewSet(ListModelMixin, viewsets.GenericViewSet):
         df = pd.DataFrame(data=ret)
         # file_name = f'{str(uuid.uuid4())[:10]}.csv'
         file_name = f'會員資訊.csv'
-        df.to_csv(f'./media/{file_name}')
+        df.to_csv(f'./media/{file_name}', encoding='big5')
         return Response(data=dict(
             file_name=file_name,
         ))
