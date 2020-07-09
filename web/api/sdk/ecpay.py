@@ -8,7 +8,7 @@ import os
 
 host_url_map = dict(
     prod='https://ezgo-buy.com/',
-    dev='https://a51abafd9548.ngrok.io/',
+    dev='https://1b6addd0203f.ngrok.io/',
     test='http://li1858-106.members.linode.com/'
 )
 ENV = os.environ.get('ENV')
@@ -69,7 +69,7 @@ def create_html(callback_url, order, lang=''):
     import random
     import string
     product_shot = json.loads(order.product_shot)
-    names = [f'{el["name"]} X {el["quantity"]}' for el in product_shot]
+    names = [f'{el["cn_name"]} X {el["quantity"]}' for el in product_shot]
     product_name = "#".join(names)
     trader_no = order.order_number + ''.join(random.choices(string.digits, k=2))
     return_url = f'{host_url}api/ecpay/return_url/'
@@ -198,7 +198,7 @@ def shipping(sub_type, store_id, order):
         logger.info('原來是這邊沒有加入C2C: %s', sub_type)
         sub_type += 'C2C'
     product_shot = json.loads(order.product_shot)
-    names = [f'{el["name"]} X {el["quantity"]}' for el in product_shot]
+    names = [f'{el["cn_name"]} X {el["quantity"]}' for el in product_shot]
     product_name = " ".join(names)
     product_name = re.sub(r'\W', '', product_name)
     service_replay_url = f'{host_url}api/ecpay/shipping_return_url/'
