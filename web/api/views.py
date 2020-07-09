@@ -1079,20 +1079,20 @@ class BrandViewSet(MyMixin, UpdateCache):
         data = response.data
         dct = defaultdict(list)
         ret = []
-        i = 0
         for el in data:
             name = el['en_name']
             key = name[0].upper()
             if key in string.digits:
                 key = '0-9'
             dct[key].append(el)
+        i = 0
         for k in sorted(dct.keys()):
-            i += 1
             children = []
             for el in sorted(dct[k], key=lambda d: d['en_name'].upper()):
                 i += 1
                 el['fake_id'] = i
                 children.append(el)
+            i += 1
             ret.append(dict(
                 name=k,
                 fake_id=i,
