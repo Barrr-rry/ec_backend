@@ -458,11 +458,16 @@ def generate_products_for_test(count, config_data):
         dct = dict(
             product_number=f'P{now}{i}',
             brand=random.choice(brand),
-            name=f'黑人頭內褲{i}',
-            title='title',
-            sub_title='sub_title',
-            product_info="""<div class="red">包貨時本公司可能會需要將外盒拆除，以方便運送，產品品質將不受影響。產品運送時可能因機上艙壓而造成產品渗漏，由於這點本公司無法控制，因此無法做任何賠償，敬請見諒。</div><div class="red">訂購超過 12 瓶的買家，請分開下單，並提供多個收件人資料，本公司會協助將包裹分開寄出。</div><p>產品簡介</p><p>美國好市多 Costco 獨家銷售的 KirkLand 5% Minoxidil 生髮水所含的成份與落健 5% 強效生髮水相同，對於經常使用且不想花大錢的人來說是個不錯的選擇。</p><li>無色無味</li><li>每罐容量 ： 60ml</li><li>含有 5% 的 Minoxidil</li><li>實驗證明能幫助頭髮重新生長</li><li>有效刺激毛囊，幫助毛囊再度生長</li><li>通常在 2 ~ 4 個月就可以看到成效</li><li>價格比同效果的落健更為划算</li><li>此產品為男性專用，女性不可使用</li><p>&nbsp;</p><p>Kirkland 生髮水的有效成分為 5% 的 Minoxidil ( 米諾地爾 )，Minoxidil 是目前唯一被美國 FDA 認證有效的外用生髮產品，已有充分的臨床試驗證實米諾地爾對雄激素性脫髮（ 遺傳型脫髮、脂溢型脫髮 ），斑禿等都有較好的療效。</p><em><i>*這些聲明尚未經過美國食品和藥物管理局評估。本產品不能用於診斷，治療，治癒或預防任何疾病。</i></em><p>&nbsp;</p><figure class="table"><table><tbody><tr><td colspan="2">&nbsp;<strong>產品規格</strong>&nbsp;</td></tr><tr><td>製造廠商</td><td>&nbsp;Costco Wholesale Corporation</td></tr><tr><td>&nbsp;製造產地</td><td>以色列&nbsp;</td></tr><tr><td>保存期限&nbsp;</td><td>新貨 保存期限到 2021 年 1 月&nbsp;</td></tr><tr><td>產品容量&nbsp;</td><td>6 瓶 x 60 ml - ( 共六個月份量 &nbsp;)</td></tr><tr><td>產品重量&nbsp;</td><td>1.3 磅&nbsp;</td></tr><tr><td>產品體積&nbsp;</td><td>原廠包裝 ( 英寸 ) : 6 x 5.5 x 3&nbsp;</td></tr></tbody></table></figure>""",
-            detail_info="""<p><strong>使用方式 :</strong></p><li>每天在脫髮區域用滴液管滴兩次，每次 1 mL</li><li>使用更多劑量或更多次數不會有任何幫助</li><li>持續使用才能確保頭髮持續再生，不然脫髮會再次出現</li><figure class="table"><table><tbody><tr><td colspan="2"><strong>Drug Facts ( 藥物成份表 )</strong></td></tr><tr><td colspan="2"><strong>Active Ingredient ( 活性成分 )</strong></td></tr><tr><td>Minoxidil 5% w/v ( 米諾地爾 )</td><td>Hair regrowth treatment for men ( 男性頭髮再生治療 )</td></tr><tr><td colspan="2"><strong>USE</strong> to regrow hair on the top of the scalp ( vertex only )<br>效用 : 幫助頂部頭髮再生（ 僅適用於髮渦性禿頭）</td></tr><tr><td colspan="2"><strong>Warnings ( 警告 )</strong><br><strong>For external use only, For use by men only</strong><br><strong>( 僅供外部使用，僅供男性使用 )</strong><br><strong>Flammable:</strong> keep away from fire or flame<br><strong>( 易燃：遠離火源或火焰 )</strong></td></tr><tr><td colspan="2"><p><strong>Do not use if ( 如有以下狀況請停止使用 )</strong></p><li>you are woman ( 你是女姓 )</li><li>your amount of hair loss is different than that shown on the side of this carton or your hair loss is on the front of the scalp. Minoxidil topical solution 5 % is not intended for frontal balness or receding hairline. ( 你的脫髮量與這個紙核側面圖案上顯示的不同，或者你的脫髮是在前面部位。 米諾地爾不適用於前禿或退後髮線。 )</li><li>you have no family history of hair loss ( 家族裡沒有其他成員有落髮現象出現 )</li><li>your hair loss is sudden and/or patchy ( 你的脫髮是突然發生 和/或 出現片狀落髮 )</li><li>you do not know the reason for your hair loss ( 你不知道落髮原因 )</li><li>you are under 18 years of age. do not use on babies and children ( 未滿 18歲，不可使用於嬰兒或兒童 )</li><li>your scalp is red, inflamed, infected, irritated, or painful ( 您的頭皮發紅、發炎、感染、刺痛 或疼痛感 )</li><li>you use other medicines on the scalp ( 頭皮上使用其他藥物 )</li></td></tr><tr><td colspan="2"><strong>Ask a doctor before use if you have heart disease</strong><br><strong>( 如果您患有心髒病，請在使用前詢問醫生 )</strong></td></tr><tr><td colspan="2"><p><strong>When using this product ( 使用這項產品時 )</strong></p><li>do not apply on other parts of the body ( 請勿使用在其他身體部位 )</li><li>avoid contact with the eyes. In case of accidental contact, rinse eyes with large amounts of cool tap water. ( 請避免接觸眼睛。 萬一意外接觸，請量盡快使用大量冷水沖洗眼睛。 )</li><li>some people have experienced changes in hair color and/or texture ( 部份使用者出現髮色和髮質的變化 )</li><li>it takes time to regrow hair. Results may occur at 2 months with twice a day usage. For some men, you may need to use this product at least 4 months before you see results. ( 生髮需要時間。每日使用兩次的使用者通常需要2個月的時間才會看到成效。而部份男士可能需要至少4個月才能看到效果。 )</li><li>the amount of hair regrowth is different for each person. This product will not work for all men ( 每人頭髮再生的情況不同。本產品不適合所有男士使用 )</li></td></tr><tr><td colspan="2"><p><strong>Stop use and ask a doctor if ( 發生以下情況請停止使用並詢問專業醫師 )</strong></p><li>chest pain, rapid heartbeat, fantness, or dizziness occurs ( 胸痛，心跳加快，暈厥或眩暈 )</li><li>sudden, unexplained weight gain occurs ( 突然發生、不明原因的體重增加 )</li><li>your hands or feet swell ( 你的手或腳腫脹 )</li><li>scalp irritation or redness occurs ( 發生頭皮刺痛或發紅 )</li><li>unwanted facial hair growth occurs ( 出現不需要的毛髮生長 )</li><li>you do not see hair regrowth in 4 month ( 4 個月內看不到頭髮再度生長 )</li></td></tr><tr><td colspan="2"><strong>May be harmful if used when pregnant or breast-feeding. ( 懷孕或哺乳時使用可能有害 )</strong><br><strong>keep out of reach of children.</strong>if swallowed, get medical help or contact a Poison Control center right away (<strong> 遠離兒童</strong>。如果吞嚥，請馬上尋求醫療幫助 )</td></tr><tr><td colspan="2"><p><strong>Directions ( 使用方式 )</strong></p><li>apply one mL with dropper 2 times a day directly onto the scalp in the hair loss area ( 每天在脫髮區域用滴液管滴兩次，每次 1 mL)</li><li>using more or more often will not improve result ( 使用更多劑量或更多次數不會有任何幫助 )</li><li>continued use is necessary to increase and keep your hair regrowth, or hair loss will begin again ( 持續使用才能確保頭髮持續再生，不然脫髮會再次出現 )</li></td></tr><tr><td colspan="2"><p><strong>Other informantion ( 其他資料 )</strong></p><li>see hair loss pictures on the side of this carton ( 請看紙盒側面的脫髮圖片 )</li><li>before use, read all information on carton and enclosed leaflet ( 使用前請閱讀外盒上的資訊以及附帶的說明書 )</li><li>keep the carton. it contains important information ( 保留紙盒。 它包含了重要信息 )</li><li>hair regrowth has not been shown to last longer than 48 weeks in large clinical trials with continuous treatment with minoxidil topical solution 5 % for men ( 在大規模臨床試驗中，連續用 5% 米諾地爾治療的實驗者，頭髮再生長期沒有超過48週 )</li><li>in clinical studies with mostly white men aged 18-49 years of moderate degress of hair loss, minoxidil topical solution 5% for men provided more hair regrowth than minoxidil topical solution 2% ( 在臨床試驗中，大部份的實驗對象大多為白人，年記 18到49歲，擁有中等程度的脫髮。實驗證明 5% 的米諾地爾效果比 2% 的還要有效。 )</li><li>store at 20° to 25°C (68° to 77°F). keep tightly closed. (請保存於 20°C 至 25°C（ 68° 至 77 °F ）的溫度內，並保持蓋子密閉。 )</li></td></tr><tr><td colspan="2"><strong>Inactive ingredients ( 非活性成分 )</strong> alcohol ( 酒精 ), propylene glycol ( 丙二醇 ), purified water( 淨化水 )</td></tr></tbody></table></figure><p>&nbsp;</p>""",
+            cn_name=f'黑人頭內褲{i}',
+            en_name=f'Underpants{i}',
+            cn_title='標題',
+            en_title='title',
+            cn_sub_title='副標題',
+            en_sub_title='sub_title',
+            cn_product_info="""<div class="red">包貨時本公司可能會需要將外盒拆除，以方便運送，產品品質將不受影響。產品運送時可能因機上艙壓而造成產品渗漏，由於這點本公司無法控制，因此無法做任何賠償，敬請見諒。</div><div class="red">訂購超過 12 瓶的買家，請分開下單，並提供多個收件人資料，本公司會協助將包裹分開寄出。</div><p>產品簡介</p><p>美國好市多 Costco 獨家銷售的 KirkLand 5% Minoxidil 生髮水所含的成份與落健 5% 強效生髮水相同，對於經常使用且不想花大錢的人來說是個不錯的選擇。</p><li>無色無味</li><li>每罐容量 ： 60ml</li><li>含有 5% 的 Minoxidil</li><li>實驗證明能幫助頭髮重新生長</li><li>有效刺激毛囊，幫助毛囊再度生長</li><li>通常在 2 ~ 4 個月就可以看到成效</li><li>價格比同效果的落健更為划算</li><li>此產品為男性專用，女性不可使用</li><p>&nbsp;</p><p>Kirkland 生髮水的有效成分為 5% 的 Minoxidil ( 米諾地爾 )，Minoxidil 是目前唯一被美國 FDA 認證有效的外用生髮產品，已有充分的臨床試驗證實米諾地爾對雄激素性脫髮（ 遺傳型脫髮、脂溢型脫髮 ），斑禿等都有較好的療效。</p><em><i>*這些聲明尚未經過美國食品和藥物管理局評估。本產品不能用於診斷，治療，治癒或預防任何疾病。</i></em><p>&nbsp;</p><figure class="table"><table><tbody><tr><td colspan="2">&nbsp;<strong>產品規格</strong>&nbsp;</td></tr><tr><td>製造廠商</td><td>&nbsp;Costco Wholesale Corporation</td></tr><tr><td>&nbsp;製造產地</td><td>以色列&nbsp;</td></tr><tr><td>保存期限&nbsp;</td><td>新貨 保存期限到 2021 年 1 月&nbsp;</td></tr><tr><td>產品容量&nbsp;</td><td>6 瓶 x 60 ml - ( 共六個月份量 &nbsp;)</td></tr><tr><td>產品重量&nbsp;</td><td>1.3 磅&nbsp;</td></tr><tr><td>產品體積&nbsp;</td><td>原廠包裝 ( 英寸 ) : 6 x 5.5 x 3&nbsp;</td></tr></tbody></table></figure>""",
+            cn_detail_info="""<p><strong>使用方式 :</strong></p><li>每天在脫髮區域用滴液管滴兩次，每次 1 mL</li><li>使用更多劑量或更多次數不會有任何幫助</li><li>持續使用才能確保頭髮持續再生，不然脫髮會再次出現</li><figure class="table"><table><tbody><tr><td colspan="2"><strong>Drug Facts ( 藥物成份表 )</strong></td></tr><tr><td colspan="2"><strong>Active Ingredient ( 活性成分 )</strong></td></tr><tr><td>Minoxidil 5% w/v ( 米諾地爾 )</td><td>Hair regrowth treatment for men ( 男性頭髮再生治療 )</td></tr><tr><td colspan="2"><strong>USE</strong> to regrow hair on the top of the scalp ( vertex only )<br>效用 : 幫助頂部頭髮再生（ 僅適用於髮渦性禿頭）</td></tr><tr><td colspan="2"><strong>Warnings ( 警告 )</strong><br><strong>For external use only, For use by men only</strong><br><strong>( 僅供外部使用，僅供男性使用 )</strong><br><strong>Flammable:</strong> keep away from fire or flame<br><strong>( 易燃：遠離火源或火焰 )</strong></td></tr><tr><td colspan="2"><p><strong>Do not use if ( 如有以下狀況請停止使用 )</strong></p><li>you are woman ( 你是女姓 )</li><li>your amount of hair loss is different than that shown on the side of this carton or your hair loss is on the front of the scalp. Minoxidil topical solution 5 % is not intended for frontal balness or receding hairline. ( 你的脫髮量與這個紙核側面圖案上顯示的不同，或者你的脫髮是在前面部位。 米諾地爾不適用於前禿或退後髮線。 )</li><li>you have no family history of hair loss ( 家族裡沒有其他成員有落髮現象出現 )</li><li>your hair loss is sudden and/or patchy ( 你的脫髮是突然發生 和/或 出現片狀落髮 )</li><li>you do not know the reason for your hair loss ( 你不知道落髮原因 )</li><li>you are under 18 years of age. do not use on babies and children ( 未滿 18歲，不可使用於嬰兒或兒童 )</li><li>your scalp is red, inflamed, infected, irritated, or painful ( 您的頭皮發紅、發炎、感染、刺痛 或疼痛感 )</li><li>you use other medicines on the scalp ( 頭皮上使用其他藥物 )</li></td></tr><tr><td colspan="2"><strong>Ask a doctor before use if you have heart disease</strong><br><strong>( 如果您患有心髒病，請在使用前詢問醫生 )</strong></td></tr><tr><td colspan="2"><p><strong>When using this product ( 使用這項產品時 )</strong></p><li>do not apply on other parts of the body ( 請勿使用在其他身體部位 )</li><li>avoid contact with the eyes. In case of accidental contact, rinse eyes with large amounts of cool tap water. ( 請避免接觸眼睛。 萬一意外接觸，請量盡快使用大量冷水沖洗眼睛。 )</li><li>some people have experienced changes in hair color and/or texture ( 部份使用者出現髮色和髮質的變化 )</li><li>it takes time to regrow hair. Results may occur at 2 months with twice a day usage. For some men, you may need to use this product at least 4 months before you see results. ( 生髮需要時間。每日使用兩次的使用者通常需要2個月的時間才會看到成效。而部份男士可能需要至少4個月才能看到效果。 )</li><li>the amount of hair regrowth is different for each person. This product will not work for all men ( 每人頭髮再生的情況不同。本產品不適合所有男士使用 )</li></td></tr><tr><td colspan="2"><p><strong>Stop use and ask a doctor if ( 發生以下情況請停止使用並詢問專業醫師 )</strong></p><li>chest pain, rapid heartbeat, fantness, or dizziness occurs ( 胸痛，心跳加快，暈厥或眩暈 )</li><li>sudden, unexplained weight gain occurs ( 突然發生、不明原因的體重增加 )</li><li>your hands or feet swell ( 你的手或腳腫脹 )</li><li>scalp irritation or redness occurs ( 發生頭皮刺痛或發紅 )</li><li>unwanted facial hair growth occurs ( 出現不需要的毛髮生長 )</li><li>you do not see hair regrowth in 4 month ( 4 個月內看不到頭髮再度生長 )</li></td></tr><tr><td colspan="2"><strong>May be harmful if used when pregnant or breast-feeding. ( 懷孕或哺乳時使用可能有害 )</strong><br><strong>keep out of reach of children.</strong>if swallowed, get medical help or contact a Poison Control center right away (<strong> 遠離兒童</strong>。如果吞嚥，請馬上尋求醫療幫助 )</td></tr><tr><td colspan="2"><p><strong>Directions ( 使用方式 )</strong></p><li>apply one mL with dropper 2 times a day directly onto the scalp in the hair loss area ( 每天在脫髮區域用滴液管滴兩次，每次 1 mL)</li><li>using more or more often will not improve result ( 使用更多劑量或更多次數不會有任何幫助 )</li><li>continued use is necessary to increase and keep your hair regrowth, or hair loss will begin again ( 持續使用才能確保頭髮持續再生，不然脫髮會再次出現 )</li></td></tr><tr><td colspan="2"><p><strong>Other informantion ( 其他資料 )</strong></p><li>see hair loss pictures on the side of this carton ( 請看紙盒側面的脫髮圖片 )</li><li>before use, read all information on carton and enclosed leaflet ( 使用前請閱讀外盒上的資訊以及附帶的說明書 )</li><li>keep the carton. it contains important information ( 保留紙盒。 它包含了重要信息 )</li><li>hair regrowth has not been shown to last longer than 48 weeks in large clinical trials with continuous treatment with minoxidil topical solution 5 % for men ( 在大規模臨床試驗中，連續用 5% 米諾地爾治療的實驗者，頭髮再生長期沒有超過48週 )</li><li>in clinical studies with mostly white men aged 18-49 years of moderate degress of hair loss, minoxidil topical solution 5% for men provided more hair regrowth than minoxidil topical solution 2% ( 在臨床試驗中，大部份的實驗對象大多為白人，年記 18到49歲，擁有中等程度的脫髮。實驗證明 5% 的米諾地爾效果比 2% 的還要有效。 )</li><li>store at 20° to 25°C (68° to 77°F). keep tightly closed. (請保存於 20°C 至 25°C（ 68° 至 77 °F ）的溫度內，並保持蓋子密閉。 )</li></td></tr><tr><td colspan="2"><strong>Inactive ingredients ( 非活性成分 )</strong> alcohol ( 酒精 ), propylene glycol ( 丙二醇 ), purified water( 淨化水 )</td></tr></tbody></table></figure><p>&nbsp;</p>""",
+            en_product_info="""<div class="red">包貨時本公司可能會需要將外盒拆除，以方便運送，產品品質將不受影響。產品運送時可能因機上艙壓而造成產品渗漏，由於這點本公司無法控制，因此無法做任何賠償，敬請見諒。</div><div class="red">訂購超過 12 瓶的買家，請分開下單，並提供多個收件人資料，本公司會協助將包裹分開寄出。</div><p>產品簡介</p><p>美國好市多 Costco 獨家銷售的 KirkLand 5% Minoxidil 生髮水所含的成份與落健 5% 強效生髮水相同，對於經常使用且不想花大錢的人來說是個不錯的選擇。</p><li>無色無味</li><li>每罐容量 ： 60ml</li><li>含有 5% 的 Minoxidil</li><li>實驗證明能幫助頭髮重新生長</li><li>有效刺激毛囊，幫助毛囊再度生長</li><li>通常在 2 ~ 4 個月就可以看到成效</li><li>價格比同效果的落健更為划算</li><li>此產品為男性專用，女性不可使用</li><p>&nbsp;</p><p>Kirkland 生髮水的有效成分為 5% 的 Minoxidil ( 米諾地爾 )，Minoxidil 是目前唯一被美國 FDA 認證有效的外用生髮產品，已有充分的臨床試驗證實米諾地爾對雄激素性脫髮（ 遺傳型脫髮、脂溢型脫髮 ），斑禿等都有較好的療效。</p><em><i>*這些聲明尚未經過美國食品和藥物管理局評估。本產品不能用於診斷，治療，治癒或預防任何疾病。</i></em><p>&nbsp;</p><figure class="table"><table><tbody><tr><td colspan="2">&nbsp;<strong>產品規格</strong>&nbsp;</td></tr><tr><td>製造廠商</td><td>&nbsp;Costco Wholesale Corporation</td></tr><tr><td>&nbsp;製造產地</td><td>以色列&nbsp;</td></tr><tr><td>保存期限&nbsp;</td><td>新貨 保存期限到 2021 年 1 月&nbsp;</td></tr><tr><td>產品容量&nbsp;</td><td>6 瓶 x 60 ml - ( 共六個月份量 &nbsp;)</td></tr><tr><td>產品重量&nbsp;</td><td>1.3 磅&nbsp;</td></tr><tr><td>產品體積&nbsp;</td><td>原廠包裝 ( 英寸 ) : 6 x 5.5 x 3&nbsp;</td></tr></tbody></table></figure>""",
+            en_detail_info="""<p><strong>使用方式 :</strong></p><li>每天在脫髮區域用滴液管滴兩次，每次 1 mL</li><li>使用更多劑量或更多次數不會有任何幫助</li><li>持續使用才能確保頭髮持續再生，不然脫髮會再次出現</li><figure class="table"><table><tbody><tr><td colspan="2"><strong>Drug Facts ( 藥物成份表 )</strong></td></tr><tr><td colspan="2"><strong>Active Ingredient ( 活性成分 )</strong></td></tr><tr><td>Minoxidil 5% w/v ( 米諾地爾 )</td><td>Hair regrowth treatment for men ( 男性頭髮再生治療 )</td></tr><tr><td colspan="2"><strong>USE</strong> to regrow hair on the top of the scalp ( vertex only )<br>效用 : 幫助頂部頭髮再生（ 僅適用於髮渦性禿頭）</td></tr><tr><td colspan="2"><strong>Warnings ( 警告 )</strong><br><strong>For external use only, For use by men only</strong><br><strong>( 僅供外部使用，僅供男性使用 )</strong><br><strong>Flammable:</strong> keep away from fire or flame<br><strong>( 易燃：遠離火源或火焰 )</strong></td></tr><tr><td colspan="2"><p><strong>Do not use if ( 如有以下狀況請停止使用 )</strong></p><li>you are woman ( 你是女姓 )</li><li>your amount of hair loss is different than that shown on the side of this carton or your hair loss is on the front of the scalp. Minoxidil topical solution 5 % is not intended for frontal balness or receding hairline. ( 你的脫髮量與這個紙核側面圖案上顯示的不同，或者你的脫髮是在前面部位。 米諾地爾不適用於前禿或退後髮線。 )</li><li>you have no family history of hair loss ( 家族裡沒有其他成員有落髮現象出現 )</li><li>your hair loss is sudden and/or patchy ( 你的脫髮是突然發生 和/或 出現片狀落髮 )</li><li>you do not know the reason for your hair loss ( 你不知道落髮原因 )</li><li>you are under 18 years of age. do not use on babies and children ( 未滿 18歲，不可使用於嬰兒或兒童 )</li><li>your scalp is red, inflamed, infected, irritated, or painful ( 您的頭皮發紅、發炎、感染、刺痛 或疼痛感 )</li><li>you use other medicines on the scalp ( 頭皮上使用其他藥物 )</li></td></tr><tr><td colspan="2"><strong>Ask a doctor before use if you have heart disease</strong><br><strong>( 如果您患有心髒病，請在使用前詢問醫生 )</strong></td></tr><tr><td colspan="2"><p><strong>When using this product ( 使用這項產品時 )</strong></p><li>do not apply on other parts of the body ( 請勿使用在其他身體部位 )</li><li>avoid contact with the eyes. In case of accidental contact, rinse eyes with large amounts of cool tap water. ( 請避免接觸眼睛。 萬一意外接觸，請量盡快使用大量冷水沖洗眼睛。 )</li><li>some people have experienced changes in hair color and/or texture ( 部份使用者出現髮色和髮質的變化 )</li><li>it takes time to regrow hair. Results may occur at 2 months with twice a day usage. For some men, you may need to use this product at least 4 months before you see results. ( 生髮需要時間。每日使用兩次的使用者通常需要2個月的時間才會看到成效。而部份男士可能需要至少4個月才能看到效果。 )</li><li>the amount of hair regrowth is different for each person. This product will not work for all men ( 每人頭髮再生的情況不同。本產品不適合所有男士使用 )</li></td></tr><tr><td colspan="2"><p><strong>Stop use and ask a doctor if ( 發生以下情況請停止使用並詢問專業醫師 )</strong></p><li>chest pain, rapid heartbeat, fantness, or dizziness occurs ( 胸痛，心跳加快，暈厥或眩暈 )</li><li>sudden, unexplained weight gain occurs ( 突然發生、不明原因的體重增加 )</li><li>your hands or feet swell ( 你的手或腳腫脹 )</li><li>scalp irritation or redness occurs ( 發生頭皮刺痛或發紅 )</li><li>unwanted facial hair growth occurs ( 出現不需要的毛髮生長 )</li><li>you do not see hair regrowth in 4 month ( 4 個月內看不到頭髮再度生長 )</li></td></tr><tr><td colspan="2"><strong>May be harmful if used when pregnant or breast-feeding. ( 懷孕或哺乳時使用可能有害 )</strong><br><strong>keep out of reach of children.</strong>if swallowed, get medical help or contact a Poison Control center right away (<strong> 遠離兒童</strong>。如果吞嚥，請馬上尋求醫療幫助 )</td></tr><tr><td colspan="2"><p><strong>Directions ( 使用方式 )</strong></p><li>apply one mL with dropper 2 times a day directly onto the scalp in the hair loss area ( 每天在脫髮區域用滴液管滴兩次，每次 1 mL)</li><li>using more or more often will not improve result ( 使用更多劑量或更多次數不會有任何幫助 )</li><li>continued use is necessary to increase and keep your hair regrowth, or hair loss will begin again ( 持續使用才能確保頭髮持續再生，不然脫髮會再次出現 )</li></td></tr><tr><td colspan="2"><p><strong>Other informantion ( 其他資料 )</strong></p><li>see hair loss pictures on the side of this carton ( 請看紙盒側面的脫髮圖片 )</li><li>before use, read all information on carton and enclosed leaflet ( 使用前請閱讀外盒上的資訊以及附帶的說明書 )</li><li>keep the carton. it contains important information ( 保留紙盒。 它包含了重要信息 )</li><li>hair regrowth has not been shown to last longer than 48 weeks in large clinical trials with continuous treatment with minoxidil topical solution 5 % for men ( 在大規模臨床試驗中，連續用 5% 米諾地爾治療的實驗者，頭髮再生長期沒有超過48週 )</li><li>in clinical studies with mostly white men aged 18-49 years of moderate degress of hair loss, minoxidil topical solution 5% for men provided more hair regrowth than minoxidil topical solution 2% ( 在臨床試驗中，大部份的實驗對象大多為白人，年記 18到49歲，擁有中等程度的脫髮。實驗證明 5% 的米諾地爾效果比 2% 的還要有效。 )</li><li>store at 20° to 25°C (68° to 77°F). keep tightly closed. (請保存於 20°C 至 25°C（ 68° 至 77 °F ）的溫度內，並保持蓋子密閉。 )</li></td></tr><tr><td colspan="2"><strong>Inactive ingredients ( 非活性成分 )</strong> alcohol ( 酒精 ), propylene glycol ( 丙二醇 ), purified water( 淨化水 )</td></tr></tbody></table></figure><p>&nbsp;</p>""",
         )
         product = Product.objects.create(
             **dct
@@ -497,7 +502,8 @@ def generate_products_for_test(count, config_data):
                 spec1_list.append(
                     Specification.objects.create(
                         product=product,
-                        name=size,
+                        cn_name=size,
+                        en_name=size,
                         level=1,
                     )
                 )
@@ -505,7 +511,8 @@ def generate_products_for_test(count, config_data):
                 spec2_list.append(
                     Specification.objects.create(
                         product=product,
-                        name=color,
+                        cn_name=color,
+                        en_name=color,
                         level=2,
                     )
                 )
@@ -544,7 +551,8 @@ def generate_products_for_test(count, config_data):
 
                 spec1 = Specification.objects.create(
                     product=product,
-                    name=f'一般{i if i != 1 else ""}',
+                    cn_name=f'一般{i if i != 1 else ""}',
+                    en_name=f'一般{i if i != 1 else ""}',
                 )
                 SpecificationDetail.objects.create(
                     product=product,
@@ -597,6 +605,7 @@ def generate_products_ezgo(config_data):
             instance.tag.add(random.choice(tag))
         Specification.objects.create(
             product=instance,
+            cn_name='一般',
             name='一般',
         )
         ProductImage.objects.create(
@@ -626,52 +635,52 @@ def generate_products_ezgo(config_data):
 
 def generate_freeshipping():
     oversea = FreeShipping.objects.create(
-        title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='10', price=60,
+        cn_title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='10', price=60,
         cash_on_delivery=False, frontend_name='DHL', backstage_name='海外（DHL）', location=2,
         use_ecpay_delivery=False,
     )
     oversea = FreeShipping.objects.create(
-        title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='5', price=60,
+        cn_title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='5', price=60,
         cash_on_delivery=False, frontend_name='EMS', backstage_name='海外（EMS）', location=2,
         use_ecpay_delivery=False,
     )
     oversea = FreeShipping.objects.create(
-        title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='3', price=60,
+        cn_title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='3', price=60,
         cash_on_delivery=False, frontend_name='郵寄', backstage_name='海外（郵寄）', location=2,
         use_ecpay_delivery=False,
     )
     store = FreeShipping.objects.create(
-        title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='5', price=65,
+        cn_title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='5', price=65,
         cash_on_delivery=True, frontend_name='OK 超商', backstage_name='超商取貨（OK 超商）',
         sub_type=None, location=1,
         use_ecpay_delivery=False,
 
     )
     store = FreeShipping.objects.create(
-        title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='5', price=65,
+        cn_title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='5', price=65,
         cash_on_delivery=True, frontend_name='萊爾富', backstage_name='超商取貨（萊爾富）',
         sub_type='HILIFE', location=1,
         use_ecpay_delivery=True,
     )
     store = FreeShipping.objects.create(
-        title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='5', price=65,
+        cn_title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='5', price=65,
         cash_on_delivery=True, frontend_name='7-11', backstage_name='超商取貨（7-11）',
         sub_type='UNIMART', location=1,
         use_ecpay_delivery=True,
     )
     store = FreeShipping.objects.create(
-        title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='5', price=65,
+        cn_title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='5', price=65,
         cash_on_delivery=True, frontend_name='全家', backstage_name='超商取貨（全家）',
         sub_type='FAMI', location=1,
         use_ecpay_delivery=True,
     )
     home_delivery = FreeShipping.objects.create(
-        title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='999', price=90,
+        cn_title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='999', price=90,
         cash_on_delivery=False, frontend_name='宅配', backstage_name='宅配', location=1,
         use_ecpay_delivery=False,
     )
     post = FreeShipping.objects.create(
-        title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='1', price=60,
+        cn_title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='1', price=60,
         cash_on_delivery=False, frontend_name='郵寄', backstage_name='郵寄', location=1,
         use_ecpay_delivery=False,
     )
@@ -684,7 +693,8 @@ def generate_coupon(count):
             role=random.randint(0, 100),
             method=random.choice([1, 2]),
             discount=random.randint(0, 100),
-            title=f'折價券{i}',
+            cn_title=f'折價券{i}',
+            en_title=f'coupon{i}',
             discount_code=f'DC{get_random_number(7)}',
             image_url='11697.jpg',
             start_time=timezone.now() + timezone.timedelta(days=day-10),

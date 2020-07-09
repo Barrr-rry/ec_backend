@@ -413,11 +413,12 @@ class BrandSerializer(DefaultModelSerializer):
 
 
 class ProductImageSerializer(DefaultModelSerializer):
-    specification_name = serializers.CharField(max_length=128, write_only=True, required=False, help_text='規格名字')
+    specification_cn_name = serializers.CharField(max_length=128, write_only=True, required=False, help_text='規格名字')
+    specification_en_name = serializers.CharField(max_length=128, write_only=True, required=False, help_text='規格名字')
 
     class Meta:
         model = ProductImage
-        fields = ('main_image', 'image_url', 'specification_name', 'specification')
+        fields = ('main_image', 'image_url', 'specification_cn_name', 'specification_en_name', 'specification')
 
 
 # todo
@@ -426,7 +427,7 @@ class ProductListSerializer(DefaultModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'product_number', 'productimages')
+        fields = ('id', 'cn_name', 'en_name', 'product_number', 'productimages')
 
 
 class SpecificationSerializer(DefaultModelSerializer):
@@ -435,7 +436,8 @@ class SpecificationSerializer(DefaultModelSerializer):
 
 
 class SpecificationWriteSerializer(serializers.Serializer):
-    name = serializers.CharField(max_length=128, help_text='規格名稱')
+    cn_name = serializers.CharField(max_length=128, help_text='規格中文名稱')
+    en_name = serializers.CharField(max_length=128, help_text='規格英文名稱')
     id = serializers.IntegerField(help_text='規格id', required=False)
 
     def create(self, validated_data):
@@ -446,18 +448,27 @@ class SpecificationWriteSerializer(serializers.Serializer):
 
 
 class SpecificationDetailSerializer(DefaultModelSerializer):
-    spec1_name = serializers.SerializerMethodField()
-    spec2_name = serializers.SerializerMethodField()
+    spec1_cn_name = serializers.SerializerMethodField()
+    spec2_cn_name = serializers.SerializerMethodField()
+    spec1_en_name = serializers.SerializerMethodField()
+    spec2_en_name = serializers.SerializerMethodField()
 
     class Meta(CommonMeta):
         model = SpecificationDetail
 
-    def get_spec1_name(self, instance):
-        return instance.level1_spec.name
+    def get_spec1_cn_name(self, instance):
+        return instance.level1_spec.cn_name
 
-    def get_spec2_name(self, instance):
+    def get_spec2_cn_name(self, instance):
         level2_spec = instance.level2_spec
-        return level2_spec.name if level2_spec else None
+        return level2_spec.cn_name if level2_spec else None
+
+    def get_spec1_en_name(self, instance):
+        return instance.level1_spec.en_name
+
+    def get_spec2_en_name(self, instance):
+        level2_spec = instance.level2_spec
+        return level2_spec.en_name if level2_spec else None
 
 
 class ActivitySerializer(DefaultModelSerializer):
@@ -624,17 +635,19 @@ class ProductSerializer(DefaultModelSerializer):
 
             for product_image in product_images:
                 product_image['product'] = product
-                if 'specification_name' in product_image:
-                    specification_name = product_image['specification_name']
-                    del product_image['specification_name']
-                    specification = Specification.objects.filter(product=product, name=specification_name).first()
+                if 'specification_cn_name' in product_image or 'specification_en_name' in product_image :
+                    specification_cn_name = product_image['specification_cn_name']
+                    specification_en_name = product_image['specification_en_name']
+                    del product_image['specification_cn_name']
+                    del product_image['specification_en_name']
+                    specification = Specification.objects.filter(product=product).filter(Q(cn_name=specification_cn_name) | Q(en_name=specification_en_name)).first()
                     product_image['specification'] = specification
                 ProductImage.objects.create(**product_image)
 
             for spec_detail in specifications_detail_data:
                 for key in ['level1_spec', 'level2_spec']:
                     if key in spec_detail:
-                        spec = Specification.objects.filter(product=product, name=spec_detail[key]).first()
+                        spec = Specification.objects.filter(product=product).filter(Q(cn_name=spec_detail[key]) | Q(en_name=spec_detail[key])).first()
                         spec_detail[key] = spec
 
                 spec_detail['product'] = product
@@ -680,7 +693,8 @@ class ProductSerializer(DefaultModelSerializer):
                 # create or update
                 if specification.get('id'):
                     target = Specification.objects.get(pk=specification.get('id'))
-                    target.name = specification['name']
+                    target.cn_name = specification['cn_name']
+                    target.en_name = specification['en_name']
                     target.save()
                 else:
                     specification['product'] = instance
@@ -691,7 +705,7 @@ class ProductSerializer(DefaultModelSerializer):
                 # create or update
                 if specification.get('id'):
                     target = Specification.objects.get(pk=specification.get('id'))
-                    target.name = specification['name']
+                    target.name = specification['cn_name']
                     target.save()
                 else:
                     specification['product'] = instance
@@ -701,10 +715,12 @@ class ProductSerializer(DefaultModelSerializer):
             ProductImage.original_objects.filter(product=instance).delete()
             for product_image in product_images:
                 product_image['product'] = instance
-                if 'specification_name' in product_image:
-                    specification_name = product_image['specification_name']
-                    del product_image['specification_name']
-                    specification = Specification.objects.filter(product=instance, name=specification_name).first()
+                if 'specification_cn_name' in product_image or 'specification_en_name' in product_image :
+                    specification_cn_name = product_image['specification_cn_name']
+                    specification_en_name = product_image['specification_en_name']
+                    del product_image['specification_cn_name']
+                    del product_image['specification_en_name']
+                    specification = Specification.objects.filter(product=instance).filter(Q(cn_name=specification_cn_name) | Q(en_name=specification_en_name)).first()
                     product_image['specification'] = specification
                 ProductImage.objects.create(**product_image)
 
@@ -713,7 +729,7 @@ class ProductSerializer(DefaultModelSerializer):
             for spec_detail in specifications_detail_data:
                 for key in ['level1_spec', 'level2_spec']:
                     if key in spec_detail:
-                        spec = Specification.objects.filter(product=instance, name=spec_detail[key]).first()
+                        spec = Specification.objects.filter(product=instance).filter(Q(cn_name=spec_detail[key]) | Q(en_name=spec_detail[key])).first()
                         spec_detail[key] = spec
                 spec_detail['product'] = instance
                 # create or update
@@ -800,8 +816,10 @@ class TagImageSerializer(DefaultModelSerializer):
 
 class CartSerializer(DefaultModelSerializer):
     member = serializers.HiddenField(default=MemberHiddenField())
-    spec1_name = serializers.SerializerMethodField()
-    spec2_name = serializers.SerializerMethodField()
+    spec1_cn_name = serializers.SerializerMethodField()
+    spec2_cn_name = serializers.SerializerMethodField()
+    spec1_en_name = serializers.SerializerMethodField()
+    spec2_en_name = serializers.SerializerMethodField()
 
     class Meta(CommonMeta):
         model = Cart
@@ -822,12 +840,19 @@ class CartSerializer(DefaultModelSerializer):
                 raise serializers.ValidationError("商品已無庫存")
         return data
 
-    def get_spec1_name(self, instance):
-        return instance.specification_detail.level1_spec.name
+    def get_spec1_cn_name(self, instance):
+        return instance.specification_detail.level1_spec.cn_name
 
-    def get_spec2_name(self, instance):
+    def get_spec2_cn_name(self, instance):
         level2_spec = instance.specification_detail.level2_spec
-        return level2_spec.name if level2_spec else None
+        return level2_spec.cn_name if level2_spec else None
+
+    def get_spec1_en_name(self, instance):
+        return instance.specification_detail.level1_spec.en_name
+
+    def get_spec2_en_name(self, instance):
+        level2_spec = instance.specification_detail.level2_spec
+        return level2_spec.en_name if level2_spec else None
 
     def update(self, instance, validated_data):
         find_instance = Cart.objects.filter(member=instance.member, product=instance.product,
