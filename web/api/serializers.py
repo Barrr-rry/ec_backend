@@ -556,6 +556,18 @@ class ProductSerializer(DefaultModelSerializer):
     def get_tag_detail(self, instance):
         return TagListSerializer(many=True, instance=instance.tag.all()).data
 
+    def validate(self, attrs):
+        product_codes = []
+        for el in attrs['specifications_detail_data']:
+            product_code = el['product_code']
+            if SpecificationDetail.objects.filter(product_code=product_code):
+                raise serializers.ValidationError(f'重複的商品代號: {product_code}')
+            if product_code not in product_codes:
+                product_codes.append(product_code)
+            else:
+                raise serializers.ValidationError(f'重複的商品代號: {product_code}')
+        return attrs
+
     def get_specifications_quantity(self, instance):
         specificationdetails = SpecificationDetail.objects.filter(product=instance.id).all()
         if specificationdetails.count():
