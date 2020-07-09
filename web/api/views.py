@@ -1101,13 +1101,9 @@ class BrandViewSet(MyMixin, UpdateCache):
         response.data = ret
         return response
 
-    def create(self, request, *args, **kwargs):
-        brand = Brand.original_objects.filter(en_name=request.data['en_name']).delete()
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    def destroy(self, request, *args, **kwargs):
+        Brand.original_objects.filter(pk=kwargs['pk']).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @router_url('product')
