@@ -527,14 +527,21 @@ class ProductSerializer(DefaultModelSerializer):
 
     def validate(self, attrs):
         product_codes = []
-        for el in attrs['specifications_detail_data']:
-            product_code = el['product_code']
-            if SpecificationDetail.objects.filter(product_code=product_code):
-                raise serializers.ValidationError(f'重複的商品代號: {product_code}')
-            if product_code not in product_codes:
-                product_codes.append(product_code)
-            else:
-                raise serializers.ValidationError(f'重複的商品代號: {product_code}')
+        config = ConfigSetting.objects.first()
+        if config.product_specifications_setting == 2:
+            for el in attrs['specifications_detail_data']:
+                product_code = el.get('product_code', None)
+                if not product_code:
+                    raise serializers.ValidationError('請輸入商品貨號')
+                specificationdetail = SpecificationDetail.objects.filter(product_code=product_code).first()
+                if self.context['view'].action == 'create' and specificationdetail:
+                    raise serializers.ValidationError(f'重複的商品貨號: {product_code}')
+                if self.context['view'].action == 'update' and specificationdetail and specificationdetail.id != el['id']:
+                    raise serializers.ValidationError(f'重複的商品貨號: {product_code}')
+                if product_code not in product_codes:
+                    product_codes.append(product_code)
+                else:
+                    raise serializers.ValidationError(f'重複的商品貨號: {product_code}')
         return attrs
 
     def get_specifications_quantity(self, instance):
