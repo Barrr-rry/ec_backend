@@ -445,7 +445,7 @@ class BrandSerializer(DefaultModelSerializer):
 
 class ProductImageSerializer(DefaultModelSerializer):
     specification_name = serializers.CharField(max_length=128, write_only=True, required=False, help_text='規格中文名字')
-    specification_en_name = serializers.CharField(max_length=128, write_only=True, required=False, help_text='規格英文名字')
+    specification_en_name = serializers.CharField(max_length=128, write_only=True, required=False, help_text='規格英文名字', allow_blank=True, allow_null=True)
 
     class Meta:
         model = ProductImage
@@ -468,7 +468,7 @@ class SpecificationSerializer(DefaultModelSerializer):
 
 class SpecificationWriteSerializer(serializers.Serializer):
     name = serializers.CharField(max_length=128, help_text='規格中文名稱')
-    en_name = serializers.CharField(max_length=128, help_text='規格英文名稱')
+    en_name = serializers.CharField(max_length=128, help_text='規格英文名稱', allow_null=True, allow_blank=True)
     id = serializers.IntegerField(help_text='規格id', required=False)
 
     def create(self, validated_data):
@@ -725,7 +725,7 @@ class ProductSerializer(DefaultModelSerializer):
                 if specification.get('id'):
                     target = Specification.objects.get(pk=specification.get('id'))
                     target.name = specification['name']
-                    target.en_name = specification['en_name']
+                    target.en_name = specification.get('en_name')
                     target.save()
                 else:
                     specification['product'] = instance
@@ -737,6 +737,7 @@ class ProductSerializer(DefaultModelSerializer):
                 if specification.get('id'):
                     target = Specification.objects.get(pk=specification.get('id'))
                     target.name = specification['name']
+                    target.en_name = specification.get('en_name')
                     target.save()
                 else:
                     specification['product'] = instance
@@ -748,7 +749,7 @@ class ProductSerializer(DefaultModelSerializer):
                 product_image['product'] = instance
                 if 'specification_name' in product_image or 'specification_en_name' in product_image:
                     specification_name = product_image['specification_name']
-                    specification_en_name = product_image['specification_en_name']
+                    specification_en_name = product_image.get('specification_en_name')
                     del product_image['specification_name']
                     del product_image['specification_en_name']
                     specification = Specification.objects.filter(product=instance).filter(Q(name=specification_name) | Q(en_name=specification_en_name)).first()
@@ -905,7 +906,7 @@ class ProductForCartSerializer(ProductListSerializer):
     class Meta:
         model = Product
         fields = ('id', 'name', 'product_number', 'productimages', 'specifications',
-                  'level1_title', 'level2_title', 'status', 'activity',
+                  'level1_title', 'level2_title', 'level1_en_title', 'level2_en_title', 'status', 'activity',
                   'activity_detail',
                   'specifications_detail')
 

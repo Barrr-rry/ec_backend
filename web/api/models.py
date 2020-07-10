@@ -292,6 +292,11 @@ class Product(DefaultAbstract):
                                     null=True)
     level2_title = models.CharField(max_length=128, help_text="規則1 的主題 只有在config:product_specifications_setting",
                                     null=True)
+    level1_en_title = models.CharField(max_length=128, help_text="規則1 的主題 只有在config:product_specifications_setting",
+                                       default='規格',
+                                       null=True)
+    level2_en_title = models.CharField(max_length=128, help_text="規則1 的主題 只有在config:product_specifications_setting",
+                                       null=True)
     status = models.BooleanField(help_text='上架狀態', default=True)
     # todo 活動?
     order = models.IntegerField(help_text='排序順序', default=1)
@@ -313,7 +318,7 @@ class Specification(DefaultAbstract):
     product = models.ForeignKey(Product, related_name='specifications', on_delete=models.CASCADE,
                                 help_text='產品編號')
     name = models.CharField(max_length=128, help_text='規格中文名稱')
-    en_name = models.CharField(max_length=128, help_text='規格英文名稱', null=True)
+    en_name = models.CharField(max_length=128, help_text='規格英文名稱', null=True, blank=True)
     level = models.SmallIntegerField(help_text="LEVEL 1, 2", default=1)
 
 

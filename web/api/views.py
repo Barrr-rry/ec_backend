@@ -1272,6 +1272,8 @@ class CartViewSet(MyMixin):
                     product=product.data,
                     spec1_name=product.data['level1_title'],
                     spec2_name=product.data['level2_title'],
+                    spec1_en_name=product.data['level1_en_title'],
+                    spec2_nen_ame=product.data['level2_en_title'],
                     quantity=c['quantity'],
                 ))
             return Response(ret)
