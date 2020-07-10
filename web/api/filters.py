@@ -223,6 +223,7 @@ class ProductFilter(filters.BaseFilterBackend):
                 q = or_q(q, Q(brand__cn_name__icontains=keyword))
                 q = or_q(q, Q(specifications_detail__product_code__icontains=keyword))
                 q = or_q(q, Q(name__icontains=keyword))
+                q = or_q(q, Q(en_name__icontains=keyword))
 
         brand = request.query_params.get('brand')
         if brand is not None:

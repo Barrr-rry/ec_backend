@@ -272,16 +272,21 @@ class Product(DefaultAbstract):
     product_number = models.CharField(max_length=64, help_text="產品編號 P201912190000", unique=True, null=True)
     brand = models.ForeignKey(Brand, related_name='product', on_delete=models.CASCADE,
                               help_text='品牌編號', null=True)
-    name = models.CharField(max_length=128, help_text='產品名稱')
+    name = models.CharField(max_length=128, help_text='產品中文名稱', null=True)
+    en_name = models.CharField(max_length=128, help_text='產品英文名稱', null=True)
     order_count = models.IntegerField(help_text='訂單數量', default=0)
-    title = models.CharField(max_length=1024, help_text='標題', null=True)
-    sub_title = models.CharField(max_length=1024, help_text='副標', null=True)
+    title = models.CharField(max_length=1024, help_text='中文標題', null=True)
+    en_title = models.CharField(max_length=1024, help_text='英文標題', null=True)
+    sub_title = models.CharField(max_length=1024, help_text='中文副標', null=True)
+    en_sub_title = models.CharField(max_length=1024, help_text='英文副標', null=True)
     description = models.TextField(help_text='商品說明', null=True)
     description_2 = models.TextField(help_text='詳細資訊', null=True)
     tag = models.ManyToManyField(Tag, related_name='product', help_text='標籤流水號')
     category = models.ManyToManyField(Category, related_name='product', help_text='分類流水號')
-    product_info = models.TextField(help_text='商品資訊', null=True, blank=True)
-    detail_info = models.TextField(help_text='詳細資訊', null=True, blank=True)
+    product_info = models.TextField(help_text='商品中文資訊', null=True, blank=True)
+    detail_info = models.TextField(help_text='詳細中文資訊', null=True, blank=True)
+    en_product_info = models.TextField(help_text='商品英文資訊', null=True, blank=True)
+    en_detail_info = models.TextField(help_text='詳細英文資訊', null=True, blank=True)
     level1_title = models.CharField(max_length=128, help_text="規則1 的主題 只有在config:product_specifications_setting",
                                     default='規格',
                                     null=True)
@@ -307,7 +312,8 @@ class MemberWish(DefaultAbstract):
 class Specification(DefaultAbstract):
     product = models.ForeignKey(Product, related_name='specifications', on_delete=models.CASCADE,
                                 help_text='產品編號')
-    name = models.CharField(max_length=128, help_text='規格名稱')
+    name = models.CharField(max_length=128, help_text='規格中文名稱')
+    en_name = models.CharField(max_length=128, help_text='規格英文名稱', null=True)
     level = models.SmallIntegerField(help_text="LEVEL 1, 2", default=1)
 
 
@@ -471,7 +477,8 @@ class Order(DefaultAbstract):
 class FreeShipping(DefaultAbstract):
     backstage_name = models.CharField(max_length=256, help_text='後台名字')
     frontend_name = models.CharField(max_length=256, help_text='前台名字')
-    title = models.CharField(max_length=256, help_text='免運標語')
+    title = models.CharField(max_length=256, help_text='免運中文標語', null=True)
+    en_title = models.CharField(max_length=256, help_text='免運英文標語', null=True)
     cash_on_delivery = models.SmallIntegerField(help_text="貨到付款")
     role = models.IntegerField(help_text='免運門檻')
     weight = models.IntegerField(help_text='免運限制')
@@ -487,7 +494,8 @@ class Coupon(DefaultAbstract):
     role = models.IntegerField(help_text='折價門檻')
     method = models.SmallIntegerField(help_text='折價方式 1: 元 2: 百分比')
     discount = models.IntegerField(help_text='折價金額, 折價折數')
-    title = models.CharField(max_length=128, help_text='標題')
+    title = models.CharField(max_length=128, help_text='中文標題', null=True)
+    en_title = models.CharField(max_length=128, help_text='英文標題', null=True)
     discount_code = models.CharField(max_length=32, help_text='折價券序號', unique=True)
     image_url = models.CharField(max_length=1024, help_text='圖片路徑')
     start_time = models.DateField(help_text='啟用日期', null=True)
