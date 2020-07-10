@@ -383,8 +383,6 @@ def generate_categories():
     all_categories = ['熱銷商品',
                       '材質分類',
                       '顏色分類']
-    material_categories = ['純棉',
-                           '洞洞彈性']
     for category in categories:
         Category.objects.create(
             name=category
@@ -396,11 +394,16 @@ def generate_categories():
             name=category
         )
     material_category = Category.objects.filter(name='材質分類').first()
-    for category in material_categories:
-        Category.objects.create(
-            main_category=material_category,
-            name=category
-        )
+    Category.objects.create(
+        main_category=material_category,
+        name='洞洞彈性',
+        image_url='材質icon_洞洞彈性.svg'
+    )
+    Category.objects.create(
+        main_category=material_category,
+        name='純棉',
+        image_url='材質icon_純棉.svg'
+    )
 
 
 def generate_tags():
