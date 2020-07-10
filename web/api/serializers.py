@@ -414,7 +414,7 @@ class BrandSerializer(DefaultModelSerializer):
 
 class ProductImageSerializer(DefaultModelSerializer):
     specification_cn_name = serializers.CharField(max_length=128, write_only=True, required=False, help_text='規格名字')
-    specification_en_name = serializers.CharField(max_length=128, write_only=True, required=False, help_text='規格名字')
+    specification_en_name = serializers.CharField(max_length=128, write_only=True, required=False, help_text='規格名字', allow_null=True, allow_blank=True)
 
     class Meta:
         model = ProductImage
@@ -437,7 +437,7 @@ class SpecificationSerializer(DefaultModelSerializer):
 
 class SpecificationWriteSerializer(serializers.Serializer):
     cn_name = serializers.CharField(max_length=128, help_text='規格中文名稱')
-    en_name = serializers.CharField(max_length=128, help_text='規格英文名稱')
+    en_name = serializers.CharField(max_length=128, help_text='規格英文名稱', allow_blank=True, allow_null=True)
     id = serializers.IntegerField(help_text='規格id', required=False)
 
     def create(self, validated_data):
@@ -457,14 +457,14 @@ class SpecificationDetailSerializer(DefaultModelSerializer):
         model = SpecificationDetail
 
     def get_spec1_cn_name(self, instance):
-        return instance.level1_spec.cn_name
+        return instance.level1_spec.cn_name if instance.level1_spec else None
 
     def get_spec2_cn_name(self, instance):
         level2_spec = instance.level2_spec
         return level2_spec.cn_name if level2_spec else None
 
     def get_spec1_en_name(self, instance):
-        return instance.level1_spec.en_name
+        return instance.level1_spec.en_name if instance.level1_spec else None
 
     def get_spec2_en_name(self, instance):
         level2_spec = instance.level2_spec
@@ -874,7 +874,7 @@ class ProductForCartSerializer(ProductListSerializer):
     class Meta:
         model = Product
         fields = ('id', 'cn_name', 'product_number', 'productimages', 'specifications',
-                  'level1_title', 'level2_title', 'status', 'activity',
+                  'level1_title', 'level2_title', 'level1_en_title', 'level2_en_title', 'status', 'activity',
                   'activity_detail',
                   'specifications_detail')
 
