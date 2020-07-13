@@ -221,6 +221,13 @@ class Member(DefaultAbstract, AbstractBaseUser):
         return ret
 
 
+class BlacklistRecord(DefaultAbstract):
+    member = models.ForeignKey(Member, related_name='blacklist_record', on_delete=models.CASCADE,
+                               help_text='會員流水號')
+    status = models.BooleanField(help_text="是否為黑名單")
+    description = models.CharField(max_length=1024, help_text='標記備註', null=True)
+
+
 class Category(DefaultAbstract):
     main_category = models.ForeignKey('Category', related_name='sub_categories', on_delete=models.CASCADE,
                                       help_text='母產品分類流水號', null=True)
