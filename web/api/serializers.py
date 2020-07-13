@@ -409,9 +409,21 @@ class MemberPasswordSerializer(DefaultModelSerializer):
 class CategorySerializer(DefaultModelSerializer):
     sub_categories = serializers.SerializerMethodField(read_only=True, method_name="get_sub_categories")
     has_product = serializers.SerializerMethodField(read_only=True)
+    activity_name = serializers.SerializerMethodField(read_only=True)
 
     class Meta(CommonMeta):
         model = Category
+
+    def get_activity_name(self, obj):
+        ret = None
+        obj.product.filter(activity__isnull=False)
+        q = obj.product.filter(activity__isnull=False).values_list('activity', flat=True)
+        qdistinct = q.order_by('activity').distinct()
+        if q.count() == obj.product.count() and qdistinct.count() == 1:
+            instance = Activity.objects.get(pk=qdistinct[0])
+            ret = instance.ch_name
+
+        return ret
 
     def get_sub_categories(self, obj):
         """ self referral field """

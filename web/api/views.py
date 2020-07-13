@@ -1595,6 +1595,7 @@ class ActivityViewSet(MyMixin):
         with transaction.atomic():
             for product in products:
                 product.activity_id = activity_id
+                product.save()
         return Response(dict(msg='ok'), status=status.HTTP_201_CREATED)
 
 
