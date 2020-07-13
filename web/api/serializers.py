@@ -11,7 +11,8 @@ from django.http.request import QueryDict
 from .models import (BannerContent, Banner, File, Permission, Manager, AdminTokens, Member, Brand, Product,
                      Specification, MemberTokens, Order, MemberStore, Reward, RewardRecord, MemberAddress,
                      ProductImage, Category, Tag, TagImage, Cart, ProductQuitShot, FreeShipping, Coupon,
-                     MemberWish, ConfigSetting, SpecificationDetail, Country, RewardRecordTemp, Activity
+                     MemberWish, ConfigSetting, SpecificationDetail, Country, RewardRecordTemp, Activity,
+                     BlacklistRecord
                      )
 from django.utils.functional import cached_property
 from rest_framework.utils.serializer_helpers import BindingDict
@@ -178,6 +179,13 @@ class MemberAddressSerializer(DefaultModelSerializer):
         model = MemberAddress
 
 
+class BlackListRecordSerializer(DefaultModelSerializer):
+    create_at = serializers.DateTimeField(source='created_at', read_only=True, format="%Y-%m-%d")
+
+    class Meta(CommonMeta):
+        model = BlacklistRecord
+
+
 class RewardRecordSerializer(DefaultModelSerializer):
     end_date = serializers.DateField(format="%Y-%m-%d")
     created_at = serializers.DateTimeField(read_only=True, format="%Y-%m-%d")
@@ -241,12 +249,29 @@ class MemberSerializer(DefaultModelSerializer):
     join_at = serializers.DateTimeField(source='created_at', read_only=True, format="%Y-%m-%d %H:%M:%S")
     memberaddress = MemberAddressSerializer(many=True, read_only=True)
     order = OrderForMemberSerializer(many=True, read_only=True)
+    blacklist_record = BlackListRecordSerializer(many=True, read_only=True)
     order_count = serializers.SerializerMethodField(read_only=True)
     pay_total = serializers.SerializerMethodField(read_only=True)
     reward = serializers.SerializerMethodField()
+    in_blacklist = serializers.SerializerMethodField(read_only=True)
+    was_in_blacklist = serializers.SerializerMethodField(read_only=True)
 
     class Meta(UserCommonMeta):
         model = Member
+
+    def get_in_blacklist(self, instance):
+        blacklist_record = BlacklistRecord.objects.filter(member=instance).first()
+        if blacklist_record:
+            return blacklist_record.status
+        return False
+
+    def get_was_in_blacklist(self, instance):
+        all_blacklist_record = BlacklistRecord.objects.filter(member=instance).all()
+        if len(all_blacklist_record) > 0:
+            for blacklist_record in all_blacklist_record:
+                if blacklist_record.status:
+                    return True
+        return False
 
     def get_reward(self, obj):
         return RewardRecordSerializer(instance=obj.reward.all()[:10], many=True).data

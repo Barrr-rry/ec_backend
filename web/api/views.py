@@ -13,14 +13,14 @@ from rest_framework_nested import routers
 from rest_framework.parsers import MultiPartParser, FormParser
 from .models import (BannerContent, Banner, File, Permission, Manager, AdminTokens, Member, Category, Tag, Brand,
                      Product, ConfigSetting, SpecificationDetail, Country, RewardRecordTemp, Reward, RewardRecord,
-                     RewardRecordTemp, Activity,
+                     RewardRecordTemp, Activity, BlacklistRecord,
                      ProductImage, Cart, ProductQuitShot, TagImage, FreeShipping, Coupon, MemberStore)
 from .serializers import (BannerSerializer, FileSerializer, PermissionSerializer, ManagerSerializer,
                           ManagerLoginSerializer,
                           MemberSerializer, CategorySerializer, TagSerializer, BrandSerializer, ProductSerializer,
                           CartSerializer, ProductQuitShotSerializer, TagImageSerializer, TagListSerializer,
                           ProductListSerializer, FreeShippingSerializer, CouponSerializer, MemberLoginSerializer,
-                          MemberPasswordSerializer)
+                          MemberPasswordSerializer, BlackListRecordSerializer)
 from . import permissions
 from . import serializers
 # todo 之後要加入回來
@@ -1304,7 +1304,17 @@ class MemberStoreViewSet(CreateModelMixin, ListModelMixin, DestroyModelMixin, vi
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.filter(member=self.request.user)
+        return queryset.filter(member=self.request.user)\
+
+
+
+@router_url('blacklistrecord')
+class BlackListRecordViewSet(CreateModelMixin, viewsets.GenericViewSet):
+    queryset = serializers.BlacklistRecord.objects.all()
+    serializer_class = serializers.BlackListRecordSerializer
+    authentication_classes = [MangerOrMemberAuthentication]
+    permission_classes = [(
+            permissions.MemberAuthenticated | permissions.MemberManagerEditPermission & permissions.MemberManagerReadPermission)]
 
 
 @router_url('productquitshot')
