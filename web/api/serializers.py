@@ -705,7 +705,8 @@ class ProductSerializer(DefaultModelSerializer):
                 # create or update
                 if specification.get('id'):
                     target = Specification.objects.get(pk=specification.get('id'))
-                    target.name = specification['cn_name']
+                    target.cn_name = specification['cn_name']
+                    target.en_name = specification['en_name']
                     target.save()
                 else:
                     specification['product'] = instance
