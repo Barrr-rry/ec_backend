@@ -752,7 +752,7 @@ class ProductSerializer(DefaultModelSerializer):
                     specification_en_name = product_image.get('specification_en_name')
                     del product_image['specification_name']
                     del product_image['specification_en_name']
-                    specification = Specification.objects.filter(product=instance).filter(Q(name=specification_name) | Q(en_name=specification_en_name)).first()
+                    specification = Specification.objects.filter(product=instance).filter(name=specification_name).filter(level=1).first()
                     product_image['specification'] = specification
                 ProductImage.objects.create(**product_image)
 
