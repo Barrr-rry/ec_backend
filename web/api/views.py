@@ -294,6 +294,7 @@ class EcpayViewSet(GenericViewSet):
         request.data['product_price'] = product_price
         request.data['coupon_price'] = coupon_discount
         request.data['reward_price'] = reward_discount
+        request.data['shipping_status'] = 1
 
         member = request.user
         member.gender = request.data['gender']
