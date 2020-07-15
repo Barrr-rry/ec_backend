@@ -284,6 +284,7 @@ class EcpayViewSet(GenericViewSet):
         request.data['product_price'] = product_price
         request.data['coupon_price'] = coupon_discount
         request.data['reward_price'] = reward_discount
+        request.data['shipping_status'] = 1
         return product_shot, total_price
 
     def get_activity_price(self, carts):
@@ -1304,8 +1305,7 @@ class MemberStoreViewSet(CreateModelMixin, ListModelMixin, DestroyModelMixin, vi
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.filter(member=self.request.user)\
-
+        return queryset.filter(member=self.request.user)
 
 
 @router_url('blacklistrecord')
