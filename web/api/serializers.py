@@ -473,6 +473,12 @@ class ProductListSerializer(DefaultModelSerializer):
         fields = ('id', 'name', 'en_name', 'product_number', 'productimages')
 
 
+class MemberGetEmailSerializer(DefaultModelSerializer):
+    class Meta:
+        model = Member
+        fields = ('member_number', 'name', 'account')
+
+
 class SpecificationSerializer(DefaultModelSerializer):
     class Meta(CommonMeta):
         model = Specification

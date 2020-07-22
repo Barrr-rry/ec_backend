@@ -339,6 +339,7 @@ def generate_members(count):
             password='abc123',
             remarks='HI',
             status=random.choice([True, False]),
+            email_status=random.choice([True, False]),
             validate=True,
             local='台灣'
         )
