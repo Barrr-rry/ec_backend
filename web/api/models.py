@@ -398,6 +398,7 @@ class MemberAddress(DefaultAbstract):
     # ---- 國外 only ----
     first_name = models.CharField(max_length=64, help_text="First Name(海外)", null=True)
     last_name = models.CharField(max_length=64, help_text="Last Name(海外)", null=True)
+    gender = models.SmallIntegerField(help_text='1: mr, 2: mrs', null=True, blank=True)
     country = models.CharField(max_length=64, help_text="Country", null=True)
     building = models.CharField(max_length=64, help_text="大樓名字(海外)", null=True)
     company_name = models.CharField(max_length=64, help_text="公司名字(海外)", null=True)
