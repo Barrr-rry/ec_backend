@@ -8,7 +8,7 @@ import os
 
 host_url_map = dict(
     prod='https://ezgo-buy.com/',
-    dev='https://ce16a30918e8.ngrok.io/',
+    dev='https://b06f0b17b0cb.ngrok.io/',
     test='http://li1871-48.members.linode.com/'
 )
 ENV = os.environ.get('ENV')
@@ -75,6 +75,7 @@ def create_html(callback_url, order, lang=''):
     return_url = f'{host_url}api/ecpay/return_url/'
     payment_info_url = f'{host_url}api/ecpay/payment_info_url/'
     ecpay_loggger.info(f'ecpay create html:{trader_no} {return_url}')
+    ecpay_loggger.info(f'ecpay create html:{trader_no} {payment_info_url}')
     order_params = {
         'MerchantTradeNo': trader_no,
         'StoreID': '',

@@ -61,5 +61,5 @@ class CatchErrorMiddleware:
         """
         logger.error(f'{request.build_absolute_uri()} , {traceback.format_exc()}')
         # 發出錯誤通知 告訴notify 哪裡有錯誤
-        line_notify(f'coupon3: {traceback.format_exc()}')
+        line_notify(f'凡凡凡: {traceback.format_exc()}')
         raise exception
