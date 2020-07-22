@@ -452,9 +452,8 @@ class EcpayViewSet(GenericViewSet):
 
     @action(methods=['POST', 'GET', 'DELETE', 'PUT'], detail=False, authentication_classes=[], permission_classes=[])
     def return_url(self, request, *args, **kwargs):
-        logger.info('return url method: %s', request.stream.method)
+        ecpay_loggger.info(f'return url method: {request.stream.method}')
         """payment return url"""
-        logger.info('return url: %s', request.data['MerchantTradeNo'])
         ecpay_loggger.info(f'return url: {request.data["MerchantTradeNo"]}')
         instance = serializers.Order.objects.filter(order_number=request.data['MerchantTradeNo'][:-2]).first()
         if not instance:
@@ -479,9 +478,9 @@ class EcpayViewSet(GenericViewSet):
     @action(methods=['POST'], detail=False, authentication_classes=[], permission_classes=[])
     def payment_info_url(self, request, *args, **kwargs):
         """payment info return url"""
-        logger.info('payment info url: %s', request.data['MerchantTradeNo'])
-        logger.info('PaymentType: %s', request.data['PaymentType'])
-        logger.info('RtnCode: %s', request.data['RtnCode'])
+        ecpay_loggger.info('payment info url: %s', request.data['MerchantTradeNo'])
+        ecpay_loggger.info('PaymentType: %s', request.data['PaymentType'])
+        ecpay_loggger.info('RtnCode: %s', request.data['RtnCode'])
         instance = serializers.Order.objects.filter(order_number=request.data['MerchantTradeNo'][:-2]).first()
         if not instance:
             print('no return instance:', request.data['MerchantTradeNo'])
@@ -493,7 +492,7 @@ class EcpayViewSet(GenericViewSet):
             instance.simple_status_display = '取號失敗'
             instance.simple_status = 4
             instance.take_number = 0
-            logger.warning('取號失敗: %s', request.data['RtnCode'])
+            ecpay_loggger.warning('取號失敗: %s', request.data['RtnCode'])
         instance.ecpay_data = json.dumps(request.data)
         instance.payment_type = request.data.get('PaymentType')
         instance.save()

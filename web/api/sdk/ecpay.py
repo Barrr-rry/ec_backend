@@ -74,7 +74,7 @@ def create_html(callback_url, order, lang=''):
     trader_no = order.order_number + ''.join(random.choices(string.digits, k=2))
     return_url = f'{host_url}api/ecpay/return_url/'
     payment_info_url = f'{host_url}api/ecpay/payment_info_url/'
-    ecpay_loggger.info('ecpay create html: %s %s', trader_no, return_url)
+    ecpay_loggger.info(f'ecpay create html:{trader_no} {return_url}')
     order_params = {
         'MerchantTradeNo': trader_no,
         'StoreID': '',
