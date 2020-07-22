@@ -9,7 +9,7 @@ import os
 host_url_map = dict(
     prod='https://ezgo-buy.com/',
     dev='https://1b6addd0203f.ngrok.io/',
-    test='http://li1858-106.members.linode.com/'
+    test='https://li1858-106.members.linode.com/'
 )
 ENV = os.environ.get('ENV')
 host_url = host_url_map[ENV]
