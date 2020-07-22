@@ -3,7 +3,7 @@ from . import ecpay_logistic_sdk
 import json
 
 from datetime import datetime
-from log import logger
+from log import logger, ecpay_loggger
 import os
 
 host_url_map = dict(
@@ -32,8 +32,8 @@ else:
         HashKey='1KNuJ3exSlgXEtrp',
         HashIV='YNOdMJKcofOCyC1x'
     )
-logger.info(f'ENV: {ENV} {host_url}')
-logger.info(f'ecpay_keys: {ecpay_keys}')
+ecpay_loggger.info(f'ENV: {ENV} {host_url}')
+ecpay_loggger.info(f'ecpay_keys: {ecpay_keys}')
 payment_type = dict(
     WebATM_TAISHIN='台新銀行 WebATM',
     WebATM_ESUN='玉山銀行 WebATM(暫不提供)',
@@ -74,7 +74,7 @@ def create_html(callback_url, order, lang=''):
     trader_no = order.order_number + ''.join(random.choices(string.digits, k=2))
     return_url = f'{host_url}api/ecpay/return_url/'
     payment_info_url = f'{host_url}api/ecpay/payment_info_url/'
-    logger.info('ecpay create html: %s %s', trader_no, return_url)
+    ecpay_loggger.info('ecpay create html: %s %s', trader_no, return_url)
     order_params = {
         'MerchantTradeNo': trader_no,
         'StoreID': '',
@@ -145,8 +145,8 @@ def create_html(callback_url, order, lang=''):
         action_url = 'https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5'  # 測試環境
     else:
         action_url = 'https://payment.ecpay.com.tw/Cashier/AioCheckOut/V5'  # 正式環境
-    logger.info(
-        'action_url: %s params: %s', action_url, final_order_params
+    ecpay_loggger.info(
+        f'action_url: {action_url} params: {final_order_params}',
     )
     html = ecpay_payment_sdk_instance.gen_html_post_form(action_url, final_order_params)
     return html
@@ -174,8 +174,8 @@ def create_shipping_map(sub_type, member_id, callback_url):
     instance = ecpay_logistic_sdk.ECPayLogisticSdk(
         **ecpay_keys
     )
-    logger.info('shipping keys: %s', ecpay_keys)
-    logger.info('sub_type: %s', sub_type)
+    ecpay_loggger.info(f'shipping keys: {ecpay_keys}')
+    ecpay_loggger.info(f'sub_type: {sub_type}')
 
     try:
         # 產生綠界物流訂單所需參數
@@ -195,14 +195,14 @@ def create_shipping_map(sub_type, member_id, callback_url):
 def shipping(sub_type, store_id, order):
     import re
     if check_env(ENV) is False and 'C2C' not in sub_type:
-        logger.info('原來是這邊沒有加入C2C: %s', sub_type)
+        ecpay_loggger.info(f'原來是這邊沒有加入C2C: {sub_type}')
         sub_type += 'C2C'
     product_shot = json.loads(order.product_shot)
     names = [f'{el["name"]} X {el["quantity"]}' for el in product_shot]
     product_name = " ".join(names)
     product_name = re.sub(r'\W', '', product_name)
     service_replay_url = f'{host_url}api/ecpay/shipping_return_url/'
-    logger.info('shipping url: %s', service_replay_url)
+    ecpay_loggger.info(f'shipping url: {service_replay_url}')
     create_shipping_order_params = {
         'MerchantTradeNo': order.order_number,
         'MerchantTradeDate': datetime.now().strftime("%Y/%m/%d %H:%M:%S"),
@@ -243,13 +243,13 @@ def shipping(sub_type, store_id, order):
             action_url = 'https://logistics-stage.ecpay.com.tw/Express/Create'  # 測試環境
         else:
             action_url = 'https://logistics.ecpay.com.tw/Express/Create'  # 正式環境
-        logger.info('shiiping url: %s', action_url)
-        logger.info('order params: %s', create_shipping_order_params)
+        ecpay_loggger.info(f'shiiping url: {action_url}')
+        ecpay_loggger.info(f'order params: {create_shipping_order_params}')
         # 建立物流訂單並接收回應訊息
         reply_result = instance.create_shipping_order(
             action_url=action_url,
             client_parameters=create_shipping_order_params)
-        logger.info('reply: %s', reply_result)
+        ecpay_loggger.info(f'reply: {reply_result}')
         return reply_result
 
     except Exception as error:

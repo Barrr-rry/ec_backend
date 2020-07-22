@@ -55,7 +55,7 @@ from django.contrib.auth.models import AnonymousUser
 import os
 from pyquery import PyQuery as pq
 import requests
-from log import logger
+from log import logger, ecpay_loggger
 
 from django.utils.decorators import method_decorator
 from django.db.models import Q, F
@@ -455,8 +455,10 @@ class EcpayViewSet(GenericViewSet):
         logger.info('return url method: %s', request.stream.method)
         """payment return url"""
         logger.info('return url: %s', request.data['MerchantTradeNo'])
+        ecpay_loggger.info(f'return url: {request.data["MerchantTradeNo"]}')
         instance = serializers.Order.objects.filter(order_number=request.data['MerchantTradeNo'][:-2]).first()
         if not instance:
+            ecpay_loggger.warning(f'no return instance: {request.data["MerchantTradeNo"]}')
             print('no return instance:', request.data['MerchantTradeNo'])
         if int(request.data['RtnCode']) == 1:
             instance.pay_status = 1
@@ -466,6 +468,7 @@ class EcpayViewSet(GenericViewSet):
             if instance.to_store:
                 ecpay.shipping(instance.store_type, instance.store_id, instance)
         if int(request.data['RtnCode']) == 10100141:
+            ecpay_loggger.warning(f'pay fail instance: {request.data["MerchantTradeNo"]}')
             instance.simple_status_display = '付款失敗'
             instance.simple_status = 2
         instance.ecpay_data = json.dumps(request.data)
