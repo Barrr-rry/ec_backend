@@ -297,10 +297,10 @@ class EcpayViewSet(GenericViewSet):
         request.data['shipping_status'] = 1
 
         member = request.user
-        member.gender = request.data['gender']
-        member.height = request.data['height']
-        member.weight = request.data['weight']
-        member.birthday = request.data['birthday']
+        member.gender = request.data.get('gender')
+        member.height = request.data.get('height')
+        member.weight = request.data.get('weight')
+        # member.birthday = request.data.get('birthday')
         member.save()
         return product_shot, total_price
 
