@@ -8,8 +8,8 @@ import os
 
 host_url_map = dict(
     prod='https://ezgo-buy.com/',
-    dev='https://307e68adef78.ngrok.io/',
-    test='http://li1858-106.members.linode.com/'
+    dev='https://ce16a30918e8.ngrok.io/',
+    test='http://li1871-48.members.linode.com/'
 )
 ENV = os.environ.get('ENV')
 host_url = host_url_map[ENV]
