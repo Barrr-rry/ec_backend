@@ -451,7 +451,8 @@ class BrandSerializer(DefaultModelSerializer):
 
 class ProductImageSerializer(DefaultModelSerializer):
     specification_cn_name = serializers.CharField(max_length=128, write_only=True, required=False, help_text='規格名字')
-    specification_en_name = serializers.CharField(max_length=128, write_only=True, required=False, help_text='規格名字', allow_null=True, allow_blank=True)
+    specification_en_name = serializers.CharField(max_length=128, write_only=True, required=False, help_text='規格名字',
+                                                  allow_null=True, allow_blank=True)
 
     class Meta:
         model = ProductImage
@@ -916,7 +917,7 @@ class ProductForCartSerializer(ProductListSerializer):
 
     class Meta:
         model = Product
-        fields = ('id', 'cn_name', 'product_number', 'productimages', 'specifications',
+        fields = ('id', 'cn_name', 'en_name', 'product_number', 'productimages', 'specifications',
                   'level1_title', 'level2_title', 'level1_en_title', 'level2_en_title', 'status', 'activity',
                   'activity_detail',
                   'specifications_detail')
