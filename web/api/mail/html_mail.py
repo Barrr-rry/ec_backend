@@ -5,7 +5,7 @@ from email.mime.image import MIMEImage
 def send_mail(subject, tomail, part_content, tourl):
     from_email = 'Ezgobuyusa@gmail.com'
     text_content = f'''
-            親愛的汴利購會員您好：
+            親愛的電商系統會員您好：
             {part_content}：
             {tourl}
             '''

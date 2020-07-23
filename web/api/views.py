@@ -692,7 +692,7 @@ class MemberViewSet(MyMixin):
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         send_mail(
-            subject='【 會員驗證 】EZGO - 汴利購會員驗證信',
+            subject='【 會員驗證 】EC - 電商系統會員驗證信',
             tomail=serializer.instance.account,
             part_content='請點擊下列網址進行信箱驗證',
             tourl=f'{host}/register-validate/{serializer.instance.validate_code}'
@@ -712,7 +712,7 @@ class MemberViewSet(MyMixin):
         instance.set_validate_code()
         instance.save()
         send_mail(
-            subject='【 會員驗證 】EZGO - 汴利購會員驗證信',
+            subject='【 會員驗證 】EC - 電商系統會員驗證信',
             tomail=instance.account,
             part_content='請點擊下列網址進行信箱驗證',
             tourl=f'{host}/register-validate/{instance.validate_code}'
@@ -867,7 +867,7 @@ class MemberViewSet(MyMixin):
             raise serializers.serializers.ValidationError(error)
 
         send_mail(
-            subject='【 重設密碼 】EZGO - 汴利購會員重設密碼信',
+            subject='【 重設密碼 】EC - 電商系統會員重設密碼信',
             tomail=account,
             part_content='請點擊下列網址重設新密碼',
             tourl=f'{host}/set-password/{instance.validate_code}'
@@ -927,7 +927,7 @@ class MemberViewSet(MyMixin):
             instance.set_validate_code()
             instance.save()
             send_mail(
-                subject='【 會員驗證 】EZGO - 汴利購會員驗證信',
+                subject='【 會員驗證 】EC - 電商系統會員驗證信',
                 tomail=account,
                 part_content='請點擊下列網址進行信箱驗證',
                 tourl=f'{host}/register-validate/{instance.validate_code}'

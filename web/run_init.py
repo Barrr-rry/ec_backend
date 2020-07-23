@@ -331,7 +331,7 @@ def generate_members(count):
         number_count = random.choice(range(5, 10))
         prefix_email = get_random_letters(random.choice(range(10, 15)))
         member = Member.objects.create(
-            member_number=f"ezgo${get_random_number(number_count)}",
+            member_number=f"ec{get_random_number(number_count)}",
             name=random.choice(cn_name),
             phone=f'02-{get_random_number(8)}',
             cellphone=f'09{get_random_number(8)}',
