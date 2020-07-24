@@ -467,7 +467,7 @@ class EcpayViewSet(GenericViewSet):
             print('no return instance:', request.data['MerchantTradeNo'])
         if int(request.data['RtnCode']) == 2 or int(request.data['RtnCode']) == 10100073:
             instance.take_number = 1
-            instance.simple_status_display = '取號成功'
+            instance.simple_status_display = '等待付款'
             instance.simple_status = 3
         else:
             instance.simple_status_display = '取號失敗'
