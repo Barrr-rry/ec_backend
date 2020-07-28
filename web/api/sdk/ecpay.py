@@ -7,8 +7,8 @@ from log import logger, ecpay_loggger
 import os
 
 host_url_map = dict(
-    prod='https://ezgo-buy.com/',
-    dev='https://b06f0b17b0cb.ngrok.io/',
+    prod='https://li1871-48.members.linode.com/',
+    dev='https://ff97b5572743.ngrok.io/',
     test='https://li1871-48.members.linode.com/'
 )
 ENV = os.environ.get('ENV')
@@ -28,9 +28,9 @@ if check_env(ENV):
 
 else:
     ecpay_keys = dict(
-        MerchantID='3176819',
-        HashKey='1KNuJ3exSlgXEtrp',
-        HashIV='YNOdMJKcofOCyC1x'
+        MerchantID='3051883',
+        HashKey='0YKAktxUZyOLoEou',
+        HashIV='L9cBDBC42kQKl2bH'
     )
 ecpay_loggger.info(f'ENV: {ENV} {host_url}')
 ecpay_loggger.info(f'ecpay_keys: {ecpay_keys}')
@@ -213,7 +213,7 @@ def shipping(sub_type, store_id, order):
         'GoodsAmount': int(order.total_price),
         'CollectionAmount': int(order.total_price),
         'GoodsName': product_name[:20],
-        'SenderName': 'EZGO',
+        'SenderName': 'HFMU',
         'SenderCellPhone': '0911222333',
         'ReceiverName': order.shipping_name,
         'ReceiverCellPhone': order.phone,
