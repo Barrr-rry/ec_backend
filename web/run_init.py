@@ -662,19 +662,19 @@ def generate_freeshipping():
     )
     store = FreeShipping.objects.create(
         title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='5', price=65,
-        cash_on_delivery=True, frontend_name='萊爾富', backstage_name='超商取貨（萊爾富）',
-        sub_type='HILIFE', location=1,
-        use_ecpay_delivery=True,
-    )
-    store = FreeShipping.objects.create(
-        title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='5', price=65,
         cash_on_delivery=True, frontend_name='7-11', backstage_name='超商取貨（7-11）',
         sub_type='UNIMART', location=1,
         use_ecpay_delivery=True,
     )
     store = FreeShipping.objects.create(
         title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='5', price=65,
-        cash_on_delivery=True, frontend_name='全家', backstage_name='超商取貨（全家）',
+        cash_on_delivery=True, frontend_name='萊爾富(免運推薦)', backstage_name='超商取貨（萊爾富）',
+        sub_type='HILIFE', location=1,
+        use_ecpay_delivery=True,
+    )
+    store = FreeShipping.objects.create(
+        title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='5', price=65,
+        cash_on_delivery=True, frontend_name='全家(免運推薦)', backstage_name='超商取貨（全家）',
         sub_type='FAMI', location=1,
         use_ecpay_delivery=True,
     )
