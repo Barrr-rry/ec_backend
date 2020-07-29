@@ -6,11 +6,13 @@ from datetime import datetime
 from log import logger, ecpay_loggger
 import os
 
+# 根據環境 對應到相對應的url
 host_url_map = dict(
     prod='https://li1871-48.members.linode.com/',
     dev='https://ff97b5572743.ngrok.io/',
     test='https://li1871-48.members.linode.com/'
 )
+# 取得環境
 ENV = os.environ.get('ENV')
 host_url = host_url_map[ENV]
 
@@ -19,6 +21,7 @@ def check_env(env):
     return env != 'prod'
 
 
+# 正式跟測試的環境key
 if check_env(ENV):
     ecpay_keys = dict(
         MerchantID='2000132',
@@ -34,6 +37,7 @@ else:
     )
 ecpay_loggger.info(f'ENV: {ENV} {host_url}')
 ecpay_loggger.info(f'ecpay_keys: {ecpay_keys}')
+# 沒有用到 範例code 給的
 payment_type = dict(
     WebATM_TAISHIN='台新銀行 WebATM',
     WebATM_ESUN='玉山銀行 WebATM(暫不提供)',
@@ -66,6 +70,14 @@ payment_type = dict(
 
 
 def create_html(callback_url, order, lang=''):
+    """
+    建立 ttml 他會有post form ...etc 他會傳相對應資料到ecpay
+    我已前端要執行該html
+    :param callback_url: 成功後要返回的畫面
+    :param order: 訂單 instance
+    :param lang: 顯示語言
+    :return:
+    """
     import random
     import string
     product_shot = json.loads(order.product_shot)

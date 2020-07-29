@@ -3,6 +3,14 @@ from email.mime.image import MIMEImage
 
 
 def send_mail(subject, tomail, part_content, tourl):
+    """
+    寄信功能
+    :param subject: 主題
+    :param tomail: user
+    :param part_content: 部分內容，因為剩下內容有固定格式要組成
+    :param tourl: 驗證網址等 傳給範例template
+    :return:
+    """
     from_email = 'Ezgobuyusa@gmail.com'
     text_content = f'''
             親愛的汴利購會員您好：
