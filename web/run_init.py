@@ -683,11 +683,6 @@ def generate_freeshipping():
         cash_on_delivery=False, frontend_name='宅配', backstage_name='宅配', location=1,
         use_ecpay_delivery=False,
     )
-    post = FreeShipping.objects.create(
-        title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='1', price=60,
-        cash_on_delivery=False, frontend_name='郵寄', backstage_name='郵寄', location=1,
-        use_ecpay_delivery=False,
-    )
 
 
 def generate_coupon(count):
