@@ -1693,8 +1693,13 @@ class ExportMemberViewSet(ListModelMixin, viewsets.GenericViewSet):
         for el in serializer.data:
             dct = {
                 '會員編號': el['member_number'],
+                '會員所在地': el['local'],
                 '姓名': el['name'],
                 '會員帳號': el['account'],
+                'LINE ID': el['line_id'],
+                '會員電話': el['phone'],
+                '會員手機': el['cellphone'],
+                '內部備註': el['remarks'],
                 '註冊時間': el['join_at'],
                 '回饋點數': el['returns'],
                 '消費次數': el['order_count'],
