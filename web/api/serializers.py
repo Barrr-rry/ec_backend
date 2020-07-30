@@ -512,6 +512,7 @@ class SpecificationDetailSerializer(DefaultModelSerializer):
 class ActivitySerializer(DefaultModelSerializer):
     product_ids = serializers.ListField(child=serializers.IntegerField(min_value=0), write_only=True)
     products = ProductListSerializer(many=True, read_only=True, source='product')
+    products_all = serializers.BooleanField(write_only=True, default=False)
 
     class Meta(CommonMeta):
         model = Activity
@@ -519,6 +520,7 @@ class ActivitySerializer(DefaultModelSerializer):
     def create(self, validated_data):
         product_ids = self.pull_validate_data(validated_data, 'product_ids')
         with transaction.atomic():
+            del validated_data['products_all']
             instance = super(ActivitySerializer, self).create(validated_data)
             products = Product.objects.filter(id__in=product_ids)
             for product in products:
@@ -528,13 +530,14 @@ class ActivitySerializer(DefaultModelSerializer):
 
     def update(self, instance, validated_data):
         product_ids = self.pull_validate_data(validated_data, 'product_ids')
+        products_all = validated_data.get('products_all')
         with transaction.atomic():
             instance = super(ActivitySerializer, self).update(instance, validated_data)
-            queryset = Product.objects.filter(activity=instance)
+            queryset = Product.objects.all() if products_all else Product.objects.filter(activity=instance)
             for pd in queryset:
                 pd.activity = None
                 pd.save()
-            products = Product.objects.filter(id__in=product_ids)
+            products = queryset if products_all else Product.objects.filter(id__in=product_ids)
             for product in products:
                 product.activity = instance
                 product.save()
