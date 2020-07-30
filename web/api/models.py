@@ -366,7 +366,7 @@ class ProductQuitShot(DefaultAbstract):
 class ProductImage(DefaultAbstract):
     product = models.ForeignKey(Product, related_name='productimages', on_delete=models.CASCADE,
                                 help_text='產品編號')
-    image_url = models.CharField(max_length=1024, help_text='圖片路徑')
+    image_url = models.CharField(max_length=1024, help_text='圖片路徑', null=True)
     main_image = models.BooleanField(help_text='是否為主圖', default=False)
     specification = models.ForeignKey(Specification,
                                       related_name="product_image",
