@@ -18,7 +18,7 @@ host_url = host_url_map[ENV]
 
 
 def check_env(env):
-    return env != 'test'
+    return env != 'prod'
 
 
 # 正式跟測試的環境key
