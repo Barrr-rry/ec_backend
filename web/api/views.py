@@ -1482,7 +1482,7 @@ class MemberTokenViewSet(MyMixin):
 
 class PriceHandler:
     def __init__(self):
-        self.url = 'https://rate.bot.com.tw/cr?Lang=zh-TW'
+        self.url = 'https://rate.bot.com.tw/cr/2020-06'
         self.format = '%Y-%m-%dT%H:%M:%S'
 
     def crawl_data(self):
