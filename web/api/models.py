@@ -190,6 +190,7 @@ class Member(DefaultAbstract, AbstractBaseUser):
     gender = models.SmallIntegerField(help_text='性別 1: 男生 2:女生', default=1, null=True)
     weight = models.IntegerField(help_text='體重', null=True)
     height = models.IntegerField(help_text='身高', null=True)
+    bmi = models.IntegerField(help_text='bmi', null=True)
 
     def __str__(self):
         return f'{self.name}({self.id})'

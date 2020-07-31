@@ -3,6 +3,7 @@ from rest_framework import filters
 from rest_framework.compat import coreapi, coreschema
 from django.utils import timezone
 from django.utils.timezone import make_aware
+from dateutil.relativedelta import relativedelta
 import datetime
 
 or_q = lambda q, other_fn: other_fn if q is None else q | other_fn
@@ -25,6 +26,21 @@ class MemberFilter(filters.BaseFilterBackend):
         if status is not None:
             q = and_q(q, Q(status=status))
 
+        sizes = request.query_params.get('size')
+        if sizes is not None:
+            for size in sizes:
+                q = and_q(q, Q(member__order=size))
+
+        gender = request.query_params.get('gender')
+        if gender is not None and gender != '0':
+            q = and_q(q, Q(gender=gender))
+
+        local = request.query_params.get('local')
+        if local is not None and local != '0':
+            local_map = {'1': '台灣', '2': '海外'}
+            local = local_map[local]
+            q = and_q(q, Q(local=local))
+
         reward_upper = request.query_params.get('reward_upper')
         reward_lower = request.query_params.get('reward_lower')
         if reward_lower is not None or reward_upper is not None:
@@ -33,6 +49,23 @@ class MemberFilter(filters.BaseFilterBackend):
             q = and_q(q, Q(reward__point__sum__lte=reward_upper))
         if reward_lower is not None:
             q = and_q(q, Q(reward__point__sum__gte=reward_lower))
+
+        age_upper = request.query_params.get('age_upper')
+        age_lower = request.query_params.get('age_lower')
+        now = datetime.datetime.now()
+        if age_upper is not None:
+            bir_upper = (now - relativedelta(years=int(age_upper))).strftime('%Y-%m-%d')
+            q = and_q(q, Q(birthday__gte=bir_upper))
+        if age_lower is not None:
+            bir_lower = (now - relativedelta(years=int(age_lower))).strftime('%Y-%m-%d')
+            q = and_q(q, Q(birthday__lte=bir_lower))
+
+        bmi_upper = request.query_params.get('bmi_upper')
+        bmi_lower = request.query_params.get('bmi_lower')
+        if bmi_upper is not None:
+            q = and_q(q, Q(bmi__lte=bmi_upper))
+        if bmi_lower is not None:
+            q = and_q(q, Q(bmi__gte=bmi_lower))
 
         start_date = request.query_params.get('start_date')
         if start_date:
@@ -59,7 +92,7 @@ class MemberFilter(filters.BaseFilterBackend):
         if order_count_upper:
             q = and_q(q, Q(order__count__lte=order_count_upper))
         if order_count_lower:
-            q = and_q(q, Q(order__count__lte=order_count_lower))
+            q = and_q(q, Q(order__count__gte=order_count_lower))
 
         order_by = request.query_params.get('order_by')
         if order_by:
@@ -111,6 +144,69 @@ class MemberFilter(filters.BaseFilterBackend):
                 schema=coreschema.Number(
                     title='reward_upper',
                     description='int: 回饋金點數上限'
+                )
+            ),
+            coreapi.Field(
+                name='age_upper',
+                required=False,
+                # location='query',
+                schema=coreschema.Number(
+                    title='age_upper',
+                    description='int: 年齡上限'
+                )
+            ),
+            coreapi.Field(
+                name='age_lower',
+                required=False,
+                # location='query',
+                schema=coreschema.Number(
+                    title='age_lower',
+                    description='int: 年齡下限'
+                )
+            ),
+            coreapi.Field(
+                name='bmi_upper',
+                required=False,
+                # location='query',
+                schema=coreschema.Number(
+                    title='bmi_upper',
+                    description='int: BMI上限'
+                )
+            ),
+            coreapi.Field(
+                name='bmi_lower',
+                required=False,
+                # location='query',
+                schema=coreschema.Number(
+                    title='bmi_lower',
+                    description='int: BMI下限'
+                )
+            ),
+            coreapi.Field(
+                name='gender',
+                required=False,
+                # location='query',
+                schema=coreschema.Number(
+                    title='gender',
+                    description='int: 性別'
+                )
+            ),
+            coreapi.Field(
+                name='local',
+                required=False,
+                # location='query',
+                schema=coreschema.Number(
+                    title='local',
+                    description='int: 所在地'
+                )
+            ),
+            coreapi.Field(
+                name='size',
+                required=False,
+                # location='query',
+                schema=coreschema.String(
+                    title='size',
+                    description='str: 尺寸'
                 )
             ),
             coreapi.Field(

@@ -270,7 +270,7 @@ class MemberSerializer(DefaultModelSerializer):
         return False
 
     def get_location(self, instance):
-        if instance.local == '1':
+        if instance.local == '台灣':
             return '台灣'
         return '海外'
 

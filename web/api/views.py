@@ -300,6 +300,7 @@ class EcpayViewSet(GenericViewSet):
         member.gender = request.data.get('gender')
         member.height = request.data.get('height')
         member.weight = request.data.get('weight')
+        member.bmi = int(member.weight) / pow((int(member.height) / 100), 2)
         # member.birthday = request.data.get('birthday')
         member.save()
         return product_shot, total_price

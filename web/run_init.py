@@ -15,6 +15,7 @@ from fake_data import cn_name, en_name, get_random_letters, get_random_number, b
 import json
 from django.utils.timezone import make_aware
 from munch import Munch
+from dateutil.relativedelta import relativedelta
 
 fmt = '%Y-%m-%d %H:%M:%S'
 test_email = 'max@conquers.co'
@@ -330,6 +331,11 @@ def generate_members(count):
     for i in range(count):
         number_count = random.choice(range(5, 10))
         prefix_email = get_random_letters(random.choice(range(10, 15)))
+        now = datetime.datetime.now()
+        bir = (now - relativedelta(years=int(random.randint(0, 100)))).strftime('%Y-%m-%d')
+        wei = random.randint(50, 100)
+        hei = random.randint(160, 190)
+        bmi = wei / pow((hei / 100), 2)
         member = Member.objects.create(
             member_number=f"hfmu${get_random_number(number_count)}",
             name=random.choice(cn_name),
@@ -341,7 +347,12 @@ def generate_members(count):
             status=random.choice([True, False]),
             email_status=random.choice([True, False]),
             validate=True,
-            local='台灣'
+            local=random.choice(['海外', '台灣']),
+            gender=random.choice([1, 2]),
+            birthday=bir,
+            weight=wei,
+            height=hei,
+            bmi=bmi
         )
         member.set_password('abc123')
         member.save()
