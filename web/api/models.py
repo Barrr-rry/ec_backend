@@ -271,6 +271,11 @@ class Activity(DefaultAbstract):
     give_count = models.IntegerField(help_text="送多少？")
 
 
+class HomeActivity(DefaultAbstract):
+    ch_name = models.CharField(max_length=256, help_text="首頁活動中文名稱")
+    en_name = models.CharField(max_length=256, help_text="首頁活動英文名稱")
+
+
 class Product(DefaultAbstract):
     product_number = models.CharField(max_length=64, help_text="產品編號 P201912190000", unique=True, null=True)
     brand = models.ForeignKey(Brand, related_name='product', on_delete=models.CASCADE,
