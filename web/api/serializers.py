@@ -10,7 +10,7 @@ from django.http.request import QueryDict
 # check admin
 from .models import (BannerContent, Banner, File, Permission, Manager, AdminTokens, Member, Brand, Product,
                      Specification, MemberTokens, Order, MemberStore, Reward, RewardRecord, MemberAddress,
-                     ProductImage, Category, Tag, TagImage, Cart, ProductQuitShot, FreeShipping, Coupon,
+                     ProductImage, Category, Tag, TagImage, Cart, ProductQuitShot, FreeShipping, Coupon, HomeActivity,
                      MemberWish, ConfigSetting, SpecificationDetail, Country, RewardRecordTemp, Activity,
                      BlacklistRecord
                      )
@@ -518,6 +518,11 @@ class SpecificationDetailSerializer(DefaultModelSerializer):
     def get_spec2_en_name(self, instance):
         level2_spec = instance.level2_spec
         return level2_spec.en_name if level2_spec else None
+
+
+class HomeActivitySerializer(DefaultModelSerializer):
+    class Meta(CommonMeta):
+        model = HomeActivity
 
 
 class ActivitySerializer(DefaultModelSerializer):

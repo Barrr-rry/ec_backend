@@ -13,10 +13,10 @@ from rest_framework_nested import routers
 from rest_framework.parsers import MultiPartParser, FormParser
 from .models import (BannerContent, Banner, File, Permission, Manager, AdminTokens, Member, Category, Tag, Brand,
                      Product, ConfigSetting, SpecificationDetail, Country, RewardRecordTemp, Reward, RewardRecord,
-                     RewardRecordTemp, Activity, BlacklistRecord, MemberSpec,
+                     RewardRecordTemp, Activity, BlacklistRecord, MemberSpec, HomeActivity,
                      ProductImage, Cart, ProductQuitShot, TagImage, FreeShipping, Coupon, MemberStore)
 from .serializers import (BannerSerializer, FileSerializer, PermissionSerializer, ManagerSerializer,
-                          ManagerLoginSerializer,
+                          ManagerLoginSerializer, HomeActivitySerializer,
                           MemberSerializer, CategorySerializer, TagSerializer, BrandSerializer, ProductSerializer,
                           CartSerializer, ProductQuitShotSerializer, TagImageSerializer, TagListSerializer,
                           ProductListSerializer, FreeShippingSerializer, CouponSerializer, MemberLoginSerializer,
@@ -1602,6 +1602,22 @@ class ActivityViewSet(MyMixin):
                 product.activity_id = activity_id
                 product.save()
         return Response(dict(msg='ok'), status=status.HTTP_201_CREATED)
+
+
+@router_url('homeactivity')
+class HomeActivityViewSet(MyMixin):
+    queryset = serializers.HomeActivity.objects.all()
+    serializer_class = serializers.HomeActivitySerializer
+    authentication_classes = [TokenCheckAuthentication]
+    permission_classes = [(permissions.ReadAuthenticated | permissions.CouponManagerEditPermission)]
+
+    def list(self, request, *args, **kwargs):
+        if not HomeActivity.objects.first():
+            HomeActivity.objects.create(
+                ch_name='預設文字',
+                en_name='預設文字',
+            )
+        return super().list(request, *args, **kwargs)
 
 
 @router_url('exportorder')
