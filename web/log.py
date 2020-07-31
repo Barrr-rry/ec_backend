@@ -16,5 +16,6 @@ logger.add(
     rotation='1 day',
     retention='7 days',
     level='ERROR',
-    format="{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}"
+    format="{time:YYYY-MM-DD at HH:mm:ss} | {level} | {message}",
+    backtrace=True, diagnose=True
 )

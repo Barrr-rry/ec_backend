@@ -48,6 +48,7 @@ INSTALLED_APPS = [
 ]
 MIDDLEWARE = [
     'api.middleware.defaultmiddleware',
+    'api.middleware.CatchErrorMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'corsheaders.middleware.CorsMiddleware',
