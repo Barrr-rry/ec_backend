@@ -104,6 +104,8 @@ class QueueMixin:
 class Banner(QueueMixin, DefaultAbstract):
     bigimage = models.CharField(max_length=256, help_text='大圖')
     smallimage = models.CharField(max_length=256, null=True, help_text='小圖')
+    en_bigimage = models.CharField(max_length=256, help_text='英文大圖', null=True)
+    en_smallimage = models.CharField(max_length=256, null=True, help_text='英文小圖')
     link = models.CharField(max_length=256, null=True, help_text='連結')
     queue = models.SmallIntegerField(help_text='排序	TINYINT	0 ~ 255 內正整數')
     status = models.BooleanField(help_text='啟用狀態')
@@ -366,7 +368,7 @@ class ProductQuitShot(DefaultAbstract):
 class ProductImage(DefaultAbstract):
     product = models.ForeignKey(Product, related_name='productimages', on_delete=models.CASCADE,
                                 help_text='產品編號')
-    image_url = models.CharField(max_length=1024, help_text='圖片路徑')
+    image_url = models.CharField(max_length=1024, help_text='圖片路徑', null=True)
     main_image = models.BooleanField(help_text='是否為主圖', default=False)
     specification = models.ForeignKey(Specification,
                                       related_name="product_image",
@@ -504,6 +506,7 @@ class Coupon(DefaultAbstract):
     en_title = models.CharField(max_length=128, help_text='英文標題', null=True)
     discount_code = models.CharField(max_length=32, help_text='折價券序號', unique=True)
     image_url = models.CharField(max_length=1024, help_text='圖片路徑')
+    en_image_url = models.CharField(max_length=1024, help_text='英文圖片路徑', null=True)
     start_time = models.DateField(help_text='啟用日期', null=True)
     end_time = models.DateField(help_text='到期日期', null=True)
     has_period = models.BooleanField(default=False, help_text="有使用期限")
