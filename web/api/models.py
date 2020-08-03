@@ -625,6 +625,7 @@ class ConfigSetting(DefaultAbstract):
     # 會員回饋金
     feeback_money_setting = models.SmallIntegerField(help_text="會員回饋金 1: 沒有回饋金功能 2: 回饋期限日期統一 3: 依造訂單設定回饋日期")
     activity = models.BooleanField(default=False, help_text="活動： 買幾送幾")
+    in_maintenance = models.BooleanField(default=False, help_text="維護中")
 
 
 class Country(DefaultAbstract):
