@@ -28,8 +28,8 @@ class MemberFilter(filters.BaseFilterBackend):
 
         sizes = request.query_params.get('size')
         if sizes is not None:
-            for size in sizes:
-                q = and_q(q, Q(member__order=size))
+            for size in sizes.split(','):
+                q = and_q(q, Q(memberspec__name__icontains=size))
 
         gender = request.query_params.get('gender')
         if gender is not None and gender != '0':
@@ -74,7 +74,7 @@ class MemberFilter(filters.BaseFilterBackend):
         end_date = request.query_params.get('end_date')
         if end_date:
             end_date = make_aware(datetime.datetime.strptime(end_date, '%Y-%m-%d'))
-            q = and_q(q, Q(order__created_at__gte=end_date))
+            q = and_q(q, Q(order__created_at__lte=end_date))
 
         money_upper = request.query_params.get('money_upper')
         money_lower = request.query_params.get('money_lower')

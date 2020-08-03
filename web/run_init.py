@@ -468,7 +468,7 @@ def generate_product_image():
 
 
 def generate_products_for_test(count, config_data):
-    spec_level1 = ['S', 'SM', 'M', 'L', 'XL', 'XX']
+    spec_level1 = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL']
     spec_level2 = ['紅色', '藍色', '黃色', '綠色', '白色', '黑色']
     tag = Tag.objects.all()
     brand = Brand.objects.all()
@@ -511,7 +511,7 @@ def generate_products_for_test(count, config_data):
             product.level1_title = '尺寸'
             product.level2_title = '顏色'
             product.save()
-            sizes = ['XXS', 'XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL']
+            sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL']
             colors = ['Blue', 'Red', 'Yello', 'White', 'RGB三原色']
             random.shuffle(sizes)
             random.shuffle(colors)

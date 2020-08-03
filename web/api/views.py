@@ -208,15 +208,15 @@ class EcpayViewSet(GenericViewSet):
             raise serializers.serializers.ValidationError('no carts')
         product_shot = []
         # todo 沒有檢查庫存
-        spec_size_data = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3L']
+        spec_size_data = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL']
         member_spec = set()
         for cart in carts:
             # 更新商品 order count
             cart.product.order_count += cart.quantity
             cart.product.save()
-            for spec in cart.product.specifications.filter(level=1):
-                if spec.name in spec_size_data:
-                    member_spec.add(spec.name)
+            spec = cart.specification_detail.level1_spec
+            if spec.name in spec_size_data:
+                member_spec.add(spec.name)
 
             obj = serializers.ProductSerializer(cart.product).data
             product_price += cart.quantity * cart.specification_detail.price
