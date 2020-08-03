@@ -94,6 +94,7 @@ class PermissionSerializer(DefaultModelSerializer):
 
     def update(self, instance, validated_data):
         data = validated_data
+        # 最高管理員只能更新name和description
         if instance.highest_permission:
             data = dict()
             for key in ['name', 'description']:
@@ -261,6 +262,7 @@ class MemberSerializer(DefaultModelSerializer):
         model = Member
 
     def get_reward(self, obj):
+        # 前10筆資料
         return RewardRecordSerializer(instance=obj.reward.all()[:10], many=True).data
 
     def get_in_blacklist(self, instance):
@@ -275,6 +277,7 @@ class MemberSerializer(DefaultModelSerializer):
         return '海外'
 
     def get_was_in_blacklist(self, instance):
+        # 判斷黑名單紀錄
         all_blacklist_record = BlacklistRecord.objects.filter(member=instance).all()
         if len(all_blacklist_record) > 0:
             for blacklist_record in all_blacklist_record:
@@ -299,6 +302,7 @@ class MemberSerializer(DefaultModelSerializer):
         return order.count()
 
     def get_pay_total(self, instance):
+        # 總訂單金額
         pay_total = 0
         for order in instance.order.all():
             pay_total += order.total_price
@@ -549,6 +553,7 @@ class ActivitySerializer(DefaultModelSerializer):
         products_all = validated_data.get('products_all')
         with transaction.atomic():
             instance = super(ActivitySerializer, self).update(instance, validated_data)
+            # products_all時，加入所有產品
             queryset = Product.objects.all() if products_all else Product.objects.filter(activity=instance)
             for pd in queryset:
                 pd.activity = None
@@ -594,6 +599,7 @@ class ProductSerializer(DefaultModelSerializer):
         return TagListSerializer(many=True, instance=instance.tag.all()).data
 
     def validate(self, attrs):
+        # 判斷商品貨號
         product_codes = []
         config = ConfigSetting.objects.first()
         if config.product_specifications_setting == 2:
@@ -1028,6 +1034,7 @@ class OrderSerializer(DefaultModelSerializer):
                 reward_temp = RewardRecordTemp.objects.filter(order=instance).first()
                 reward = RewardRecord.objects.filter(order=instance).first()
                 if shipping_status == 400:
+                    # 還是temp時只要把temp刪掉，反之reward增加一筆取消訂單
                     if reward_temp and not reward:
                         reward_temp.delete()
                         reward_temp.save()
