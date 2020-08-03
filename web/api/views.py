@@ -1682,7 +1682,9 @@ class ExportMemberViewSet(ListModelMixin, viewsets.GenericViewSet):
             permissions.MemberAuthenticated | permissions.MemberManagerEditPermission & permissions.MemberManagerReadPermission)]
 
     def list(self, request, *args, **kwargs):
-        queryset = self.filter_queryset(self.get_queryset())
+        ids = request.query_params.get('ids')
+        ids = ids.split(',')
+        queryset = self.filter_queryset(self.get_queryset()).filter()
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -1690,21 +1692,22 @@ class ExportMemberViewSet(ListModelMixin, viewsets.GenericViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         ret = []
-        for el in serializer.data:
+        for mid in ids:
+            el = self.get_serializer(queryset.filter(pk=mid), many=True).data
             dct = {
-                '會員編號': el['member_number'],
-                '會員所在地': el['local'],
-                '姓名': el['name'],
-                '會員帳號': el['account'],
-                'LINE ID': el['line_id'],
-                '會員電話': el['phone'],
-                '會員手機': el['cellphone'],
-                '內部備註': el['remarks'],
-                '註冊時間': el['join_at'],
-                '回饋點數': el['returns'],
-                '消費次數': el['order_count'],
-                '消費金額': el['pay_total'],
-                '狀態': '啟用中' if el['status'] else '停用中',
+                '會員編號': el[0]['member_number'],
+                '會員所在地': el[0]['local'],
+                '姓名': el[0]['name'],
+                '會員帳號': el[0]['account'],
+                'LINE ID': el[0]['line_id'],
+                '會員電話': el[0]['phone'],
+                '會員手機': el[0]['cellphone'],
+                '內部備註': el[0]['remarks'],
+                '註冊時間': el[0]['join_at'],
+                '回饋點數': el[0]['returns'],
+                '消費次數': el[0]['order_count'],
+                '消費金額': el[0]['pay_total'],
+                '狀態': '啟用中' if el[0]['status'] else '停用中',
             }
             ret.append(dct)
         df = pd.DataFrame(data=ret)
