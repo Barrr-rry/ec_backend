@@ -24,7 +24,7 @@ from django.contrib.auth.hashers import make_password
 from django.core import validators
 from api.sdk import shipping_map
 from api.util import get_config
-
+import math
 fmt = '%Y-%m-%d %H:%M:%S'
 
 
@@ -247,7 +247,7 @@ class MemberSerializer(DefaultModelSerializer):
             message="Email已經被註冊",
         )]
     )
-    join_at = serializers.DateTimeField(source='created_at', read_only=True, format="%Y-%m-%d %H:%M:%S")
+    join_at = serializers.DateTimeField(source='created_at', read_only=True, format="%Y-%m-%d")
     memberaddress = MemberAddressSerializer(many=True, read_only=True)
     order = OrderForMemberSerializer(many=True, read_only=True)
     blacklist_record = BlackListRecordSerializer(many=True, read_only=True)
@@ -257,6 +257,7 @@ class MemberSerializer(DefaultModelSerializer):
     in_blacklist = serializers.SerializerMethodField(read_only=True)
     was_in_blacklist = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
+    age = serializers.SerializerMethodField(read_only=True)
 
     class Meta(UserCommonMeta):
         model = Member
@@ -264,6 +265,12 @@ class MemberSerializer(DefaultModelSerializer):
     def get_reward(self, obj):
         # 前10筆資料
         return RewardRecordSerializer(instance=obj.reward.all()[:10], many=True).data
+
+    def get_age(self, instance):
+        if instance.birthday:
+            now = datetime.datetime.now()
+            return math.floor((datetime.date.today() - instance.birthday).days/365)
+        return None
 
     def get_in_blacklist(self, instance):
         blacklist_record = BlacklistRecord.objects.filter(member=instance).first()
