@@ -478,7 +478,7 @@ class FreeShipping(DefaultAbstract):
     en_title = models.CharField(max_length=256, help_text='免運英文標語', null=True)
     cash_on_delivery = models.SmallIntegerField(help_text="貨到付款")
     role = models.IntegerField(help_text='免運門檻')
-    weight = models.IntegerField(help_text='免運限制')
+    weight = models.IntegerField(help_text='免運限制', null=True)
     price = models.IntegerField(help_text='運費金額')
     # 店家的代號 之前的設計 名字不改掉 不然要改掉的部分太多
     sub_type = models.CharField(max_length=128, help_text='店家的代號 ex: FAMI', null=True)
