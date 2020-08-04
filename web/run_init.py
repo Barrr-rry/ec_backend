@@ -522,7 +522,7 @@ def generate_products_for_test(count, config_data):
                     number_count = random.choice(range(5, 10))
                     weight = 0.6 if config_data.weight else None
                     price = random.randint(100, 1000)
-                    fake_price = 213
+                    fake_price = random.randint(1000, 2000)
                     inventory_status = 0 if config_data.product_stock_setting != 2 else random.randint(1, 3)
                     quantity = None if config_data.product_stock_setting != 3 else random.randint(0, 10)
 
