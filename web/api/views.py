@@ -65,6 +65,8 @@ from django.db.models import Max, Min
 from collections import defaultdict
 import pandas as pd
 import uuid
+from django.db.models import Q, Sum, Count
+from django.db.models.functions import Coalesce
 
 router = routers.DefaultRouter()
 nested_routers = []
@@ -158,7 +160,7 @@ class OrderViewSet(MyMixin):
     authentication_classes = [MangerOrMemberAuthentication]
     permission_classes = [(
             (permissions.OrderAuthenticated | permissions.OrderManagerEditPermission) & (
-             permissions.OrderManagerReadPermission | permissions.OrderOwnaerPermission))]
+            permissions.OrderManagerReadPermission | permissions.OrderOwnaerPermission))]
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -674,7 +676,10 @@ class ManagerViewSet(MyMixin):
 @router_url('member')
 class MemberViewSet(MyMixin):
     serializer_class = MemberSerializer
-    queryset = serializers.Member.objects.all()
+    queryset = serializers.Member.objects.annotate(
+        pay_total=Coalesce(Sum('order__total_price'), 0,),
+        order_count=Coalesce(Count('order'), 0)
+    )
     filter_backends = (filters.MemberFilter,)
     pagination_class = LimitOffsetPagination
     authentication_classes = [TokenAuthentication]

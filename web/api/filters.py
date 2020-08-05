@@ -80,27 +80,21 @@ class MemberFilter(filters.BaseFilterBackend):
         money_lower = request.query_params.get('money_lower')
         order_count_upper = request.query_params.get('order_count_upper')
         order_count_lower = request.query_params.get('order_count_lower')
-        if money_lower or money_upper:
-            queryset = queryset.annotate(Sum('order__total_price'))
-        if order_count_upper or order_count_lower:
-            queryset = queryset.annotate(Count('order'))
         if money_lower:
-            q = and_q(q, Q(order__total_price__sum__gte=money_lower))
+            q = and_q(q, Q(pay_total__gte=money_lower))
         if money_upper:
-            q = and_q(q, Q(order__total_price__sum__lte=money_upper))
+            q = and_q(q, Q(pay_total__lte=money_upper))
 
         if order_count_upper:
-            q = and_q(q, Q(order__count__lte=order_count_upper))
+            q = and_q(q, Q(order_count__lte=order_count_upper))
         if order_count_lower:
-            q = and_q(q, Q(order__count__gte=order_count_lower))
+            q = and_q(q, Q(order_count__gte=order_count_lower))
 
         order_by = request.query_params.get('order_by')
         if order_by:
             order_by = order_by.replace('join_at', 'created_at')
             if 'returns' in order_by:
                 queryset = queryset.annotate(returns=Sum('reward__point'))
-            if 'pay_total' in order_by:
-                queryset = queryset.annotate(pay_total=Sum('order__total_price'))
             queryset = queryset.order_by(order_by)
         if q:
             return queryset.filter(q)

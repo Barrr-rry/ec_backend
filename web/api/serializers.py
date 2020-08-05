@@ -310,10 +310,7 @@ class MemberSerializer(DefaultModelSerializer):
 
     def get_pay_total(self, instance):
         # 總訂單金額
-        pay_total = 0
-        for order in instance.order.all():
-            pay_total += order.total_price
-        return pay_total
+        return instance.pay_total
 
     def validate(self, data):
         """
