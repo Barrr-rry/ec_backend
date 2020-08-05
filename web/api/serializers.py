@@ -25,6 +25,7 @@ from django.core import validators
 from api.sdk import shipping_map
 from api.util import get_config
 import math
+
 fmt = '%Y-%m-%d %H:%M:%S'
 
 
@@ -269,7 +270,7 @@ class MemberSerializer(DefaultModelSerializer):
     def get_age(self, instance):
         if instance.birthday:
             now = datetime.datetime.now()
-            return math.floor((datetime.date.today() - instance.birthday).days/365)
+            return math.floor((datetime.date.today() - instance.birthday).days / 365)
         return None
 
     def get_in_blacklist(self, instance):
@@ -310,7 +311,7 @@ class MemberSerializer(DefaultModelSerializer):
 
     def get_pay_total(self, instance):
         # 總訂單金額
-        return instance.pay_total
+        return getattr(instance, 'pay_total', 0)
 
     def validate(self, data):
         """
@@ -465,7 +466,8 @@ class BrandSerializer(DefaultModelSerializer):
 
 class ProductImageSerializer(DefaultModelSerializer):
     specification_name = serializers.CharField(max_length=128, write_only=True, required=False, help_text='規格中文名字')
-    specification_en_name = serializers.CharField(max_length=128, write_only=True, required=False, help_text='規格英文名字', allow_blank=True, allow_null=True)
+    specification_en_name = serializers.CharField(max_length=128, write_only=True, required=False, help_text='規格英文名字',
+                                                  allow_blank=True, allow_null=True)
 
     class Meta:
         model = ProductImage
@@ -614,7 +616,8 @@ class ProductSerializer(DefaultModelSerializer):
                 specificationdetail = SpecificationDetail.objects.filter(product_code=product_code).first()
                 if self.context['view'].action == 'create' and specificationdetail:
                     raise serializers.ValidationError(f'重複的商品貨號: {product_code}')
-                if self.context['view'].action == 'update' and specificationdetail and specificationdetail.id != el['id']:
+                if self.context['view'].action == 'update' and specificationdetail and specificationdetail.id != el[
+                    'id']:
                     raise serializers.ValidationError(f'重複的商品貨號: {product_code}')
                 if product_code not in product_codes:
                     product_codes.append(product_code)
@@ -707,14 +710,16 @@ class ProductSerializer(DefaultModelSerializer):
                     specification_en_name = product_image['specification_en_name']
                     del product_image['specification_name']
                     del product_image['specification_en_name']
-                    specification = Specification.objects.filter(product=product).filter(Q(name=specification_name) | Q(en_name=specification_en_name)).first()
+                    specification = Specification.objects.filter(product=product).filter(
+                        Q(name=specification_name) | Q(en_name=specification_en_name)).first()
                     product_image['specification'] = specification
                 ProductImage.objects.create(**product_image)
 
             for spec_detail in specifications_detail_data:
                 for key in ['level1_spec', 'level2_spec']:
                     if key in spec_detail:
-                        spec = Specification.objects.filter(product=product).filter(Q(name=spec_detail[key]) | Q(en_name=spec_detail[key])).first()
+                        spec = Specification.objects.filter(product=product).filter(
+                            Q(name=spec_detail[key]) | Q(en_name=spec_detail[key])).first()
                         spec_detail[key] = spec
 
                 spec_detail['product'] = product
@@ -788,7 +793,8 @@ class ProductSerializer(DefaultModelSerializer):
                     specification_en_name = product_image.get('specification_en_name')
                     del product_image['specification_name']
                     del product_image['specification_en_name']
-                    specification = Specification.objects.filter(product=instance).filter(name=specification_name).filter(level=1).first()
+                    specification = Specification.objects.filter(product=instance).filter(
+                        name=specification_name).filter(level=1).first()
                     product_image['specification'] = specification
                 ProductImage.objects.create(**product_image)
 
@@ -797,7 +803,8 @@ class ProductSerializer(DefaultModelSerializer):
             for spec_detail in specifications_detail_data:
                 for key in ['level1_spec', 'level2_spec']:
                     if key in spec_detail:
-                        spec = Specification.objects.filter(product=instance).filter(Q(name=spec_detail[key]) | Q(en_name=spec_detail[key])).first()
+                        spec = Specification.objects.filter(product=instance).filter(
+                            Q(name=spec_detail[key]) | Q(en_name=spec_detail[key])).first()
                         spec_detail[key] = spec
                 spec_detail['product'] = instance
                 # create or update
