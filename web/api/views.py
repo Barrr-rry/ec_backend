@@ -863,7 +863,7 @@ class MemberViewSet(MyMixin):
             raise serializers.serializers.ValidationError(error)
 
         send_mail(
-            subject='【 重設密碼 】EZGO - 汴利購會員重設密碼信',
+            subject='【 重設密碼 】HFMU - HaveFun Mens Underwear | 男性內褲會員重設密碼信',
             tomail=account,
             part_content='請點擊下列網址重設新密碼',
             tourl=f'{host}/set-password/{instance.validate_code}'
