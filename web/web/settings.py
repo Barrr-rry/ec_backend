@@ -122,7 +122,7 @@ WSGI_APPLICATION = 'web.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'hfmu',
+        'NAME': 'cqdb',
         'USER': 'root',
         'PASSWORD': 'conquers666',
         "DEFAULT-CHARACTER-SET": 'utf8',
