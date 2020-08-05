@@ -122,7 +122,7 @@ WSGI_APPLICATION = 'web.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'ec',
+        'NAME': 'cqdb',
         'USER': 'root',
         'PASSWORD': 'conquers666',
         "DEFAULT-CHARACTER-SET": 'utf8',
@@ -193,6 +193,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
+# todo change
 EMAIL_HOST_USER = 'Ezgobuyusa@gmail.com'
 EMAIL_HOST_PASSWORD = 'ez0910778133'
 EMAIL_FROM = 'Ezgobuyusa@gmail.com'
