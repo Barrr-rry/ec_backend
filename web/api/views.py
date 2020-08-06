@@ -74,17 +74,25 @@ orderdct = OrderedDict()
 
 
 class UpdateCache:
+    """
+    有些rest api 需要cache
+    除了get 資料以外 每一次 都會更新 該資料的uuid
+    前端對到了發現如果不一樣的話 就要重新要資料不能抓cache的資料
+    """
     prefix_key = None
 
     def update(self, *args, **kwargs):
+        # 資料異動 更新cache uuid
         self.cache_process()
         return super().update(*args, **kwargs)
 
     def create(self, *args, **kwargs):
+        # 資料異動 更新cache uuid
         self.cache_process()
         return super().create(*args, **kwargs)
 
     def destroy(self, *args, **kwargs):
+        # 資料異動 更新cache uuid
         self.cache_process()
         return super().destroy(*args, **kwargs)
 
@@ -92,6 +100,7 @@ class UpdateCache:
         if not self.prefix_key:
             return
         data = pickle_redis.get_data('cache')
+        # 將這些table key 加上 uuid 做之後的判斷 是不是同一組
         if not data:
             data = dict()
             cache_list = ['coupon', 'product', 'banner', 'caetegory', 'tag', 'price', 'configsetting']
@@ -108,6 +117,7 @@ class UpdateModelMixin:
     """
 
     def update(self, request, *args, **kwargs):
+        # default 的update partial 是False 就是代表必須要全部更新 但是很長我們只想要更新部分的資料 所以取代update 的功能
         kwargs['partial'] = True
         partial = kwargs.pop('partial', True)
         instance = self.get_object()
@@ -128,10 +138,19 @@ class UpdateModelMixin:
 
 class MyMixin(CreateModelMixin, UpdateModelMixin, ListModelMixin, RetrieveModelMixin, DestroyModelMixin,
               viewsets.GenericViewSet):
-    pass
+    """
+    這樣如果CRUD 都要的話 直接繼承這個 避免上面的update 還要額外繼承
+    """
 
 
 def router_url(url, prefix=None, *args, **kwargs):
+    """
+    這樣物件 就可以直接註冊urls 網址
+    就不用每一個class 還要在urls.py 註冊減少切換的時間
+    且不用每次要從路徑找class 也不用切換 好處多多
+    寫法仿造Flask
+    """
+
     def decorator(cls):
         if not prefix:
             router.register(url, cls, *args, **kwargs)
@@ -151,6 +170,15 @@ def router_url(url, prefix=None, *args, **kwargs):
     return decorator
 
 
+"""
+viewset 寫法是根據framework
+如果function 沒有介紹就是framework 的function
+在此不多贅述
+要使用人家的套件還是要看一下有什麼東西
+ref: https://www.django-rest-framework.org/api-guide/viewsets/
+"""
+
+
 @router_url('order')
 class OrderViewSet(MyMixin):
     queryset = serializers.Order.objects.all()
@@ -164,11 +192,16 @@ class OrderViewSet(MyMixin):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+        # 如果是會員而不是管理者的話 就只能抓該會員的訂單
         if isinstance(self.request.user, Member):
             queryset.filter(member=self.request.user)
         return queryset
 
     def update(self, request, *args, **kwargs):
+        """
+        如果rewmark 更新 就要連更新時間一起更新
+        不用updated_at 是因為有可能 沒更新remark 這樣就會抓不到真正的時間了
+        """
         if 'remark' in request.data:
             request.data['remark_date'] = timezone.now()
         return super().update(request, *args, **kwargs)
@@ -196,20 +229,27 @@ class EcpayViewSet(GenericViewSet):
         return serializer_class(*args, **kwargs)
 
     def update_request(self, request):
+        """
+        要針對request 做一些前處理
+        :param request: raw request
+        :return: product_shot, total_price
+        """
         carts = request.user.cart.all()
         product_price = 0
         coupon_discount = 0
-        # todo reward_discount check!!!
+        # 這不是被用來存進db 的 所以要把它刪除
         reward_discount = request.data.get('reward_discount', 0)
         if 'reward_discount' in request.data:
             del request.data['reward_discount']
         freeshipping_price = 0
         total_weight = 0
+        # 判斷coupon 時間用
         now = datetime.datetime.now()
+        # 購物車沒有資料 就代表有問題
         if not carts:
             raise serializers.serializers.ValidationError('no carts')
         product_shot = []
-        # todo 沒有檢查庫存
+        # 如果 規格含這些文字 則會存入member spec 未來會用到
         spec_size_data = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL']
         member_spec = set()
         for cart in carts:
@@ -219,21 +259,25 @@ class EcpayViewSet(GenericViewSet):
             spec = cart.specification_detail.level1_spec
             if spec.name in spec_size_data:
                 member_spec.add(spec.name)
-
+            # 計算購物車目前的product 價錢 數量 重量等 並且存成product shot
             obj = serializers.ProductSerializer(cart.product).data
             product_price += cart.quantity * cart.specification_detail.price
             obj['specification_detail'] = serializers.SpecificationDetailSerializer(cart.specification_detail).data
             obj['quantity'] = cart.quantity
             total_weight += cart.specification_detail.weight * cart.quantity
             product_shot.append(obj)
+        # 清空購物車
         request.user.cart.all().delete()
-
+        # 包含spec_size_data 的規格新增
         for spec_name in member_spec:
             queryset = MemberSpec.objects.filter(member=request.user, name=spec_name)
             if not queryset:
                 MemberSpec.objects.create(member=request.user, name=spec_name)
 
-        # coupon price discount
+        """
+        判斷coupon 是否在時間內以及他是否有使用權限
+        如果有使用權限的話計算 coupoon discount
+        """
         coupon_id = request.data.get('coupon_id')
         coupon = Coupon.objects.get(pk=coupon_id) if coupon_id else None
         check_time = coupon and (coupon.start_time <= now.date() <= coupon.end_time or coupon.start_time is None and (
@@ -277,7 +321,10 @@ class EcpayViewSet(GenericViewSet):
                 if not temp_reward_discount:
                     break
 
-        # freeshipping price add
+        """
+        判斷免運費重量是否合理
+        以及價錢為多少
+        """
         freeshipping_id = request.data.get('freeshipping_id')
         freeshipping = serializers.FreeShipping.objects.get(pk=freeshipping_id)
         if freeshipping.weight >= total_weight:
@@ -287,8 +334,11 @@ class EcpayViewSet(GenericViewSet):
                 freeshipping_price = 0
         else:
             raise Exception('超出重量')
+        # 計算活動折扣金額
         activity_price = self.get_activity_price(carts)
+        # 計算總金額
         total_price = product_price + freeshipping_price - activity_price - coupon_discount - reward_discount
+        # 更新request 資料 之後要存入db
         request.data['product_shot'] = json.dumps(product_shot)
         request.data['total_price'] = total_price
         request.data['activity_price'] = activity_price
@@ -298,6 +348,7 @@ class EcpayViewSet(GenericViewSet):
         request.data['reward_price'] = reward_discount
         request.data['shipping_status'] = 1
 
+        # 每筆訂單更新 會員資料
         member = request.user
         member.gender = request.data.get('gender')
         member.height = request.data.get('height')
@@ -308,8 +359,14 @@ class EcpayViewSet(GenericViewSet):
         return product_shot, total_price
 
     def get_activity_price(self, carts):
+        """
+        計算活動折扣
+        :param carts: 購物車商品
+        :return: 折扣金額
+        """
         ret = 0
         in_activity_obj = dict()
+        # 計算公式
         for cart in carts:
             if not cart.product.activity:
                 continue
@@ -329,7 +386,6 @@ class EcpayViewSet(GenericViewSet):
                 obj['product_count'] += 1
             obj['save_count'] = (int(obj['product_count'] / obj['limit_count'])) * activity.give_count
             obj['price_list'] = sorted(obj['price_list'])
-        a = [2, 3]
         for key, el in in_activity_obj.items():
             save_count = el['save_count']
             while save_count:
@@ -340,7 +396,10 @@ class EcpayViewSet(GenericViewSet):
 
     @action(methods=['POST'], detail=False)
     def repayment(self, request, *args, **kwargs):
-        # todo no api no test
+        """
+        從該order 重新付款
+        取得html form 給前端 讓前端執行submit
+        """
         order_id = request.data.get('order_id')
         url = request.data['callback_url']
         lang = request.data.get('lang', '')
@@ -351,8 +410,10 @@ class EcpayViewSet(GenericViewSet):
     @action(methods=['POST'], detail=False)
     def payment(self, request, *args, **kwargs):
         data = request.data
+        # 判斷前端是否有勾選儲存 地址
         if data.get('check_address'):
             user = request.user
+            # 如果找不到相同的才要新增
             member_address_parmas = dict(
                 member=user,
                 shipping_name=data.get('shipping_name'),
@@ -375,9 +436,11 @@ class EcpayViewSet(GenericViewSet):
                 instance = serializers.MemberAddress.objects.create(
                     **member_address_parmas,
                 )
+        # 取得 付款成功callback url 並且刪掉 無法存進db
         url = data['callback_url']
         del data['callback_url']
 
+        # 更新data store id address
         memberstore_id = data.get('memberstore_id')
         if memberstore_id:
             memberstore = serializers.MemberStore.objects.get(pk=memberstore_id)
@@ -385,6 +448,9 @@ class EcpayViewSet(GenericViewSet):
             data['store_id'] = store_id
             data['address'] = memberstore.address
         with transaction.atomic():
+            """
+            做的處理 update request 都做好了 serializer 只要直接儲存就好
+            """
             self.update_request(request)
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -427,6 +493,9 @@ class EcpayViewSet(GenericViewSet):
         return Response(ret)
 
     def reward_process(self, order):
+        """
+        reward 新增或減少判斷
+        """
         # 減少
         instance = RewardRecord.objects.filter(member=order.member).first()
         if instance:
@@ -443,6 +512,7 @@ class EcpayViewSet(GenericViewSet):
         self.to_reward(order)
 
     def to_reward(self, order):
+        # 新增reward
         reward = serializers.Reward.objects.first()
         point = self.total_price_to_reward_point(order.total_price)
         start_date = datetime.datetime.now() + datetime.timedelta(days=reward.start_day)
@@ -457,6 +527,9 @@ class EcpayViewSet(GenericViewSet):
 
     @action(methods=['POST', 'GET', 'DELETE', 'PUT'], detail=False, authentication_classes=[], permission_classes=[])
     def return_url(self, request, *args, **kwargs):
+        """
+        payment return 後端的時候就是來到這邊
+        """
         ecpay_loggger.info(f'return url method: {request.stream.method}')
         """payment return url"""
         ecpay_loggger.info(f'return url: {request.data["MerchantTradeNo"]}')
@@ -505,6 +578,9 @@ class EcpayViewSet(GenericViewSet):
 
     @action(methods=['POST'], detail=False)
     def shipping(self, request, *args, **kwargs):
+        """
+        純粹物流
+        """
         sub_type = request.data['store_type']
         memberstore_id = request.data['memberstore_id']
         memberstore = serializers.MemberStore.objects.get(pk=memberstore_id)
@@ -513,6 +589,9 @@ class EcpayViewSet(GenericViewSet):
         request.data['store_id'] = store_id
         del request.data['memberstore_id']
         with transaction.atomic():
+            """
+            物流也是要update 但是做的事情不一樣
+            """
             self.update_request(request)
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
@@ -523,6 +602,9 @@ class EcpayViewSet(GenericViewSet):
 
     @action(methods=['POST'], detail=False, authentication_classes=[], permission_classes=[])
     def shipping_return_url(self, request, *args, **kwargs):
+        """
+        物流return 的url
+        """
         instance = serializers.Order.objects.filter(order_number=request.data['MerchantTradeNo']).first()
         instance.shipping_status = request.data['RtnCode']
         instance.all_pay_logistics_id = request.data['AllPayLogisticsID']
@@ -534,6 +616,9 @@ class EcpayViewSet(GenericViewSet):
 
     @action(methods=['POST'], detail=False, authentication_classes=[], permission_classes=[])
     def map_return_url(self, request, *ars, **kwargs):
+        """
+        取得物流 地圖的return url 當前端選擇哪一個店家 會傳到這個地方
+        """
         logger.info('get map_return_url!!!')
         member_id, callback_url = request.data['ExtraData'].split('###')
         member = Member.objects.get(pk=member_id)
@@ -559,7 +644,9 @@ class EcpayViewSet(GenericViewSet):
 
     @action(methods=['POST'], detail=False)
     def chosse_map(self, request, *ars, **kwargs):
-        # todo 要讓api 頁面測試 還有問題
+        """
+        呼叫map 的html form 前端主動submit
+        """
         sub_type = request.data['sub_type']
         callback_url = request.data['callback_url']
         logger.info('chose_map: %s %s', sub_type, callback_url)
@@ -579,6 +666,9 @@ class BannerViewSet(UpdateCache, MyMixin):
         return super().list(request, *args, **kwargs)
 
     def get_permissions(self):
+        """
+        list 的permission 不一樣 要單獨
+        """
         if self.action == 'list':
             permission_classes = [(permissions.ReadAuthenticated | permissions.BannerManagerEditPermission),
                                   permissions.BannerReadAuthenticated]
@@ -589,6 +679,7 @@ class BannerViewSet(UpdateCache, MyMixin):
     def get_queryset(self):
         queryset = super().get_queryset()
         now = timezone.now().date()
+        # 不是管理員的話 就只抓開始的banner
         if not isinstance(self.request.user, serializers.Manager):
             queryset = queryset.filter(
                 Q(status=True) & (Q(display_type=True) | (Q(start_time__lte=now) & Q(end_time__gt=now))))
@@ -606,6 +697,9 @@ class FileViewSet(MyMixin):
 
 
 def get_urls():
+    """
+    將router urls 的uels 轉到urls.py
+    """
     urls = router.get_urls()
     for nested_router in nested_routers:
         urls += nested_router.get_urls()
@@ -632,6 +726,9 @@ class ManagerViewSet(MyMixin):
     __doc__ = docs.manager
 
     def get_serializer_class(self):
+        """
+        login 的話 切換serializer
+        """
         serializer_class = self.serializer_class
         if self.action == 'login':
             serializer_class = serializers.ManagerLoginSerializer
@@ -642,16 +739,21 @@ class ManagerViewSet(MyMixin):
             permission_classes=[],
             )
     def login(self, request, *args, **kwargs):
-        # for test ，problem
+        """
+        登入判斷
+        """
         data = request.data
+        # 先判斷帳號
         raw_password = data['password']
         del data['password']
         try:
             user = serializers.Manager.objects.filter(status=True).get(**data)
         except Exception as e:
             return Response(data='帳號或密碼錯誤', status=403)
+        # 在判斷密碼
         if not user.check_password(raw_password):
             return Response(data='帳號或密碼錯誤', status=403)
+        # 給token
         token, created = serializers.AdminTokens.objects.get_or_create(user=user)
         return Response({'token': token.key})
 
@@ -660,6 +762,9 @@ class ManagerViewSet(MyMixin):
             permission_classes=(),
             )
     def logout(self, request, *args, **kwargs):
+        """
+        刪除token
+        """
         request.auth.delete()
         return Response({'msg': 'success'})
 
@@ -668,6 +773,9 @@ class ManagerViewSet(MyMixin):
             permission_classes=[],
             )
     def info(self, request, *args, **kwargs):
+        """
+        get request.user 取得該user 的info
+        """
         user = request.user
         serializer = self.get_serializer(user)
         return Response(serializer.data)
@@ -676,8 +784,9 @@ class ManagerViewSet(MyMixin):
 @router_url('member')
 class MemberViewSet(MyMixin):
     serializer_class = MemberSerializer
+    # 計算訂單total 跟下訂單次數
     queryset = serializers.Member.objects.annotate(
-        pay_total=Coalesce(Sum('order__total_price'), 0,),
+        pay_total=Coalesce(Sum('order__total_price'), 0, ),
         order_count=Coalesce(Count('order'), 0)
     )
     filter_backends = (filters.MemberFilter,)
@@ -687,6 +796,9 @@ class MemberViewSet(MyMixin):
                           permissions.MemberManagerReadPermission]
 
     def get_serializer_class(self):
+        """
+        抓對應的serializer
+        """
         serializer_class = self.serializer_class
         if self.action == 'login':
             serializer_class = serializers.MemberLoginSerializer
@@ -700,11 +812,13 @@ class MemberViewSet(MyMixin):
         self.action = self.action_map.get(method)
         if self.action == 'create':
             authentication_classes = []
+        # 要判斷角色 update 的時候 manager or member 才可以
         if self.action == 'update':
             authentication_classes = [MangerOrMemberAuthentication]
         return [auth() for auth in authentication_classes]
 
     def get_permissions(self):
+        # update 判斷角色
         if self.action in ('create',):
             self.permission_classes = []
         if self.action in ('update',):
@@ -713,6 +827,7 @@ class MemberViewSet(MyMixin):
 
     @action(methods=['POST'], detail=False, authentication_classes=[], permission_classes=[])
     def register(self, request, *args, **kwargs):
+        # 註冊其實就是create
         host = request.data.get('host')
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -756,16 +871,19 @@ class MemberViewSet(MyMixin):
             permission_classes=[],
             )
     def login(self, request, *args, **kwargs):
-        # for test ，problem
+        # 登入判斷
         data = request.data.copy()
         raw_password = data['password']
         del data['password']
+        # 判斷帳號
         try:
             user = serializers.Member.objects.filter(status=True).get(**data)
         except Exception as e:
             return Response(data='帳號或密碼錯誤', status=403)
+        # 判斷密碼
         if not user.check_password(raw_password):
             return Response(data='帳號或密碼錯誤', status=403)
+        # 給token
         token, created = serializers.MemberTokens.objects.get_or_create(user=user)
         response = Response({'token': token.key})
         # response.set_cookie('token', token.key)
@@ -777,6 +895,7 @@ class MemberViewSet(MyMixin):
             authentication_classes=[MemberCheckAuthentication]
             )
     def logout(self, request, *args, **kwargs):
+        # 登出刪掉token
         request.auth.delete()
         response = Response({'msg': 'success'})
         # response.set_cookie('token', None)
@@ -836,7 +955,7 @@ class MemberViewSet(MyMixin):
     @action(methods=['POST'], detail=False, authentication_classes=[], permission_classes=[])
     def validate_expired(self, request, *args, **kwargs):
         """
-        for registe validate
+        註冊的驗證
         """
         # todo missing test case
         validate_code = request.data.get('validate_code')
@@ -855,7 +974,9 @@ class MemberViewSet(MyMixin):
             permission_classes=[],
             )
     def forgotpassword(self, request, *args, **kwargs):
-        # todo missing test case
+        """
+        忘記密碼 如果帳號對的話就寄信
+        """
         account = request.data.get('account')
         host = request.data.get('host')
         try:
@@ -882,7 +1003,9 @@ class MemberViewSet(MyMixin):
             serializer_class=serializers.MemberForgotPasswordToSrtSerializer
             )
     def forgotpassword_setpassword(self, request, *args, **kwargs):
-        # todo missing test case
+        """
+        取得寄信的連結後重新設定密碼
+        """
         kwargs['partial'] = True
         partial = kwargs.pop('partial', True)
         validate_code = request.data.get('validate_code')
@@ -918,6 +1041,9 @@ class MemberViewSet(MyMixin):
             permission_classes=[],
             )
     def self_update(self, request, *args, **kwargs):
+        """
+        更新自己的資料
+        """
         kwargs['partial'] = True
         partial = kwargs.pop('partial', True)
         host = request.data.get('host')
@@ -950,6 +1076,9 @@ class MemberViewSet(MyMixin):
             permission_classes=(),
             )
     def memberaddress(self, request, *args, **kwargs):
+        """
+        新增member address
+        """
         data = request.data.copy()
         data['member'] = request.user.id
         serializer = self.get_serializer(data=data)
@@ -967,7 +1096,11 @@ class MemberViewSet(MyMixin):
             serializer_class=serializers.MemberWishSerializer
             )
     def memberwish(self, request, *args, **kwargs):
+        """
+        新增該user的member 喜愛的商品
+        """
         user = request.user
+        # 只有會員可以 無角色則是存在cookie
         if isinstance(user, Member):
             serializer = self.get_serializer(user.memberwish.all(), many=True)
             return Response(serializer.data)
@@ -980,6 +1113,7 @@ class MemberViewSet(MyMixin):
             serializer_class=serializers.OrderSerializer
             )
     def order(self, request, *args, **kwargs):
+        # 取得該user 的order
         user = request.user
         serializer = self.get_serializer(user.order.all(), many=True)
         return Response(serializer.data)
@@ -993,6 +1127,7 @@ class MemberWishViewSet(CreateModelMixin, DestroyModelMixin, GenericViewSet):
     permission_classes = []
 
     def create(self, request, *args, **kwargs):
+        # memberwish create or delete
         queryset = serializers.MemberWish.objects.filter(member=request.user, product=request.data.get('product'))
         if queryset.count():
             queryset.delete()
@@ -1023,6 +1158,7 @@ class CategoryViewSet(MyMixin, UpdateCache):
 
     def get_queryset(self):
         queryset = self.queryset
+        # 抓最上層的 serializer 會自動抓下面的sub category
         if self.action == 'list':
             queryset = serializers.Category.objects.filter(main_category=None)
         return queryset
@@ -1069,6 +1205,11 @@ class BrandViewSet(MyMixin, UpdateCache):
     prefix_key = 'brand'
 
     def list(self, request, *args, **kwargs):
+        """
+        品牌 給前端看
+        所以要做資料重新的format
+        ex: 0-9 A-Z
+        """
         from collections import defaultdict
         import string
         response = super().list(request, *args, **kwargs)
@@ -1098,6 +1239,9 @@ class BrandViewSet(MyMixin, UpdateCache):
         return response
 
     def destroy(self, request, *args, **kwargs):
+        """
+        要真的刪除 有issue 反應刪除後 不能再新增相同 name的 brand
+        """
         Brand.original_objects.filter(pk=kwargs['pk']).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
@@ -1132,6 +1276,9 @@ class ProductViewSet(MyMixin, UpdateCache):
 
     @action(methods=['GET'], detail=False, permission_classes=[], authentication_classes=[])
     def index_page(self, request, *args, **kwargs):
+        """
+        hfmu 不需要 其他專案則是有固定要抓product 的寫法
+        """
         # new product 4
         queryset = self.filter_queryset(self.get_queryset())
         new_products = self.get_data(queryset[:28])
@@ -1155,6 +1302,10 @@ class ProductViewSet(MyMixin, UpdateCache):
         return Response(ret)
 
     def get_data(self, queryset):
+        """
+        from index_page
+        如果他要產生product data 就不用重複寫這麼多
+        """
         page = self.paginate_queryset(queryset)
         if page is not None:
             serializer = self.get_serializer(page, many=True)
@@ -1168,7 +1319,7 @@ class ProductViewSet(MyMixin, UpdateCache):
         user = request.user
         page = self.paginate_queryset(queryset)
         if page is not None:
-            q = self.get_queryset()
+            # ret 要新增 最高價錢 跟最低 前端filter 會用到
             min_price = queryset.aggregate(min_price=Min('specifications_detail__price'))['min_price']
             max_price = queryset.aggregate(max_price=Max('specifications_detail__price'))['max_price']
             serializer = self.get_serializer(page, many=True)
@@ -1214,6 +1365,9 @@ class CartViewSet(MyMixin):
     authentication_classes = [MangerOrMemberAuthentication]
 
     def create(self, request, *args, **kwargs):
+        """
+        購物車create 前先判斷是否db 有
+        """
         instance = serializers.Cart.objects.filter(
             member=request.user, product=request.data.get('product'),
             specification_detail=request.data.get('specification_detail')).first()
@@ -1239,6 +1393,7 @@ class CartViewSet(MyMixin):
 
     @action(methods=['GET'], detail=False, authentication_classes=[MemberCheckAuthentication])
     def count(self, request, *args, **kwargs):
+        # 計算購物車數量
         from django.contrib.auth.models import AnonymousUser
         count = 0
         if not isinstance(request.user, AnonymousUser):
@@ -1249,6 +1404,7 @@ class CartViewSet(MyMixin):
 
     @action(methods=['GET'], detail=False, authentication_classes=[MemberCheckAuthentication])
     def total(self, request, *args, **kwargs):
+        # 計算購物車金額
         from django.contrib.auth.models import AnonymousUser
         total = 0
         if not isinstance(request.user, AnonymousUser):
@@ -1336,6 +1492,9 @@ class FreeShippingViewSet(UpdateModelMixin, ListModelMixin, viewsets.GenericView
         return super().get_permissions()
 
     def get_queryset(self):
+        """
+        如果不是manager 看到的免運費 只能看到 開啟的
+        """
         ret = super().get_queryset()
         if not isinstance(self.request.user, Manager):
             ret = ret.filter(enable=True)
@@ -1371,6 +1530,7 @@ class CouponViewSet(MyMixin, UpdateCache):
         return super().get_permissions()
 
     def retrieve(self, request, *args, **kwargs):
+        # 因為這個是客製化的才要寫 他不適用id 做filter 而是discount code
         queryset = self.filter_queryset(self.get_queryset())
         instance = queryset.filter(discount_code=self.kwargs.get('pk')).first()
         if not instance:
@@ -1426,6 +1586,9 @@ class RewardRecordTempViewSet(UpdateModelMixin, viewsets.GenericViewSet):
     permission_classes = [(permissions.ReadAuthenticated | permissions.CouponManagerEditPermission)]
 
     def get_queryset(self):
+        """
+        如果member 只能要自己的
+        """
         queryset = super().get_queryset()
         user = self.request.user
         if isinstance(user, Member) and self.action == 'list':
@@ -1455,7 +1618,7 @@ class RewardViewSet(CreateModelMixin, ListModelMixin, UpdateModelMixin, viewsets
         if page is not None:
             serializer = self.get_serializer(page, many=True)
             return self.get_paginated_response(serializer.data)
-
+        # 只抓第一筆
         serializer = self.get_serializer(queryset.first(), )
         return Response(serializer.data)
 
@@ -1468,13 +1631,19 @@ class MemberTokenViewSet(MyMixin):
     permission_classes = []
 
     def list(self, request, *args, **kwargs):
+        # get member token
         ret = dict(token=isinstance(request.user, serializers.Member))
         ret['msg'] = request.META.get("HTTP_AUTHORIZATION")
         return Response(ret)
 
 
 class PriceHandler:
+    """
+    抓價錢換算 美金跟台幣
+    """
     def __init__(self):
+        # todo 前幾天7月有問題
+        # 如果看好了就可以改這個 url: https://rate.bot.com.tw/cr/
         self.url = 'https://rate.bot.com.tw/cr/2020-06'
         self.format = '%Y-%m-%dT%H:%M:%S'
 
@@ -1503,6 +1672,7 @@ class PriceViewSet(MyMixin, UpdateCache):
     prefix_key = 'price'
 
     def list(self, request, *args, **kwargs):
+        # 計算價錢匯率
         ret = PriceHandler().crawl_data()
         return Response(ret)
 
@@ -1562,6 +1732,10 @@ class CountryViewSet(ListModelMixin, viewsets.GenericViewSet):
 
 
 def get_category_ids_mapping():
+    """
+    抓cateogry 跟底下的ids
+    給activity 抓出底下的products
+    """
     queryset = Category.objects.all()
     ret = defaultdict(list)
     for el in queryset:
@@ -1571,7 +1745,6 @@ def get_category_ids_mapping():
     keys = ret.keys()
     for main_category_id in ret:
         target_list = ret[main_category_id]
-        a = [1, 2, ]
         delete_ids = []
         for _id in target_list:
             if _id in keys:
@@ -1592,7 +1765,11 @@ class ActivityViewSet(MyMixin):
 
     @action(methods=['POST'], detail=False)
     def category(self, request, *args, **kwargs):
-        # todo 如國要做好 rest api 那邊應該要顯示 接收什麼參數.... etc
+        """
+        ids: category
+        將這些ids 裡面的product 全部加上activity_id
+        我們榜的不是category 而是product
+        """
         ids = request.data['ids']
         activity_id = request.data['activity']
         category_ids_mapping = get_category_ids_mapping()
@@ -1618,6 +1795,10 @@ class HomeActivityViewSet(MyMixin):
     permission_classes = [(permissions.ReadAuthenticated | permissions.CouponManagerEditPermission)]
 
     def list(self, request, *args, **kwargs):
+        """
+        首頁活動
+        如果沒有的話就新增預設 為什麼在這邊新增，怕未來 run_init 也不要用了
+        """
         if not HomeActivity.objects.first():
             HomeActivity.objects.create(
                 ch_name='預設文字',
@@ -1637,6 +1818,9 @@ class ExportOrderViewSet(ListModelMixin, viewsets.GenericViewSet):
             permissions.OrderAuthenticated | permissions.OrderManagerEditPermission & permissions.OrderManagerReadPermission)]
 
     def list(self, request, *args, **kwargs):
+        """
+        訂單資料輸出 給file name 讓前端可以找路徑下載
+        """
         def get_store(el):
             if not el['to_store']:
                 return '宅配'
@@ -1659,6 +1843,7 @@ class ExportOrderViewSet(ListModelMixin, viewsets.GenericViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         ret = []
+        # 組成資料
         for el in serializer.data:
             dct = {
                 '訂單編號': el['order_number'],
@@ -1672,7 +1857,8 @@ class ExportOrderViewSet(ListModelMixin, viewsets.GenericViewSet):
             }
             ret.append(dct)
         df = pd.DataFrame(data=ret)
-        # file_name = f'{str(uuid.uuid4())[:10]}.csv'
+        # 轉csv 並提供前端路徑 只有一個路徑沒有多寫
+        # 一來不想要越來越多csv 二來 後端manager 不可能很多 不可能很多人同時輸出
         file_name = f'訂單資訊.csv'
         df.to_csv(f'./media/{file_name}', encoding='big5')
         return Response(data=dict(
@@ -1691,6 +1877,7 @@ class ExportMemberViewSet(ListModelMixin, viewsets.GenericViewSet):
             permissions.MemberAuthenticated | permissions.MemberManagerEditPermission & permissions.MemberManagerReadPermission)]
 
     def list(self, request, *args, **kwargs):
+        # member 輸出
         ids = request.query_params.get('ids')
         ids = ids.split(',')
         queryset = self.filter_queryset(self.get_queryset()).filter()
@@ -1701,6 +1888,7 @@ class ExportMemberViewSet(ListModelMixin, viewsets.GenericViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         ret = []
+        # 組成資料
         for mid in ids:
             el = self.get_serializer(queryset.filter(pk=mid), many=True).data
             dct = {
@@ -1720,7 +1908,8 @@ class ExportMemberViewSet(ListModelMixin, viewsets.GenericViewSet):
             }
             ret.append(dct)
         df = pd.DataFrame(data=ret)
-        # file_name = f'{str(uuid.uuid4())[:10]}.csv'
+        # 轉csv 並提供前端路徑 只有一個路徑沒有多寫
+        # 一來不想要越來越多csv 二來 後端manager 不可能很多 不可能很多人同時輸出
         file_name = f'會員資訊.csv'
         df.to_csv(f'./media/{file_name}', encoding='big5')
         return Response(data=dict(
@@ -1737,6 +1926,9 @@ class ExportMemberEmailViewSet(ListModelMixin, viewsets.GenericViewSet):
             permissions.MemberAuthenticated | permissions.MemberManagerEditPermission & permissions.MemberManagerReadPermission)]
 
     def list(self, request, *args, **kwargs):
+        """
+        輸出會員email csv
+        """
         queryset = self.filter_queryset(self.get_queryset())
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -1745,6 +1937,7 @@ class ExportMemberEmailViewSet(ListModelMixin, viewsets.GenericViewSet):
 
         serializer = self.get_serializer(queryset, many=True)
         ret = []
+        # 組成資料
         for el in serializer.data:
             dct = {
                 '會員編號': el['member_number'],
@@ -1753,7 +1946,8 @@ class ExportMemberEmailViewSet(ListModelMixin, viewsets.GenericViewSet):
             }
             ret.append(dct)
         df = pd.DataFrame(data=ret)
-        # file_name = f'{str(uuid.uuid4())[:10]}.csv'
+        # 轉csv 並提供前端路徑 只有一個路徑沒有多寫
+        # 一來不想要越來越多csv 二來 後端manager 不可能很多 不可能很多人同時輸出
         file_name = f'訂閱電子報使用者mail資訊.csv'
         df.to_csv(f'./media/{file_name}', encoding='big5')
         return Response(data=dict(

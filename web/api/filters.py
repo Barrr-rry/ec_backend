@@ -6,6 +6,7 @@ from django.utils.timezone import make_aware
 from dateutil.relativedelta import relativedelta
 import datetime
 
+# queryset 查詢的語法
 or_q = lambda q, other_fn: other_fn if q is None else q | other_fn
 and_q = lambda q, other_fn: other_fn if q is None else q & other_fn
 
@@ -14,6 +15,7 @@ class MemberFilter(filters.BaseFilterBackend):
 
     def filter_queryset(self, request, queryset, view):
         q = None
+        # filter keywords
         keywords = request.query_params.get('keywords')
         if keywords is not None:
             q = or_q(q, Q(member_number__icontains=keywords))
@@ -22,25 +24,30 @@ class MemberFilter(filters.BaseFilterBackend):
             q = or_q(q, Q(account__icontains=keywords))
             q = or_q(q, Q(name__icontains=keywords))
 
+        # filter status
         status = request.query_params.get('status')
         if status is not None:
             q = and_q(q, Q(status=status))
 
+        # filter size
         sizes = request.query_params.get('size')
         if sizes is not None:
             for size in sizes.split(','):
                 q = and_q(q, Q(memberspec__name__icontains=size))
 
+        # filter gender
         gender = request.query_params.get('gender')
         if gender is not None and gender != '0':
             q = and_q(q, Q(gender=gender))
 
+        # filter local
         local = request.query_params.get('local')
         if local is not None and local != '0':
             local_map = {'1': '台灣', '2': '海外'}
             local = local_map[local]
             q = and_q(q, Q(local=local))
 
+        # filter reward point
         reward_upper = request.query_params.get('reward_upper')
         reward_lower = request.query_params.get('reward_lower')
         if reward_lower is not None or reward_upper is not None:
@@ -50,6 +57,7 @@ class MemberFilter(filters.BaseFilterBackend):
         if reward_lower is not None:
             q = and_q(q, Q(reward__point__sum__gte=reward_lower))
 
+        # filter birthday
         age_upper = request.query_params.get('age_upper')
         age_lower = request.query_params.get('age_lower')
         now = datetime.datetime.now()
@@ -60,6 +68,7 @@ class MemberFilter(filters.BaseFilterBackend):
             bir_lower = (now - relativedelta(years=int(age_lower))).strftime('%Y-%m-%d')
             q = and_q(q, Q(birthday__lte=bir_lower))
 
+        # filter bmi
         bmi_upper = request.query_params.get('bmi_upper')
         bmi_lower = request.query_params.get('bmi_lower')
         if bmi_upper is not None:
@@ -67,6 +76,7 @@ class MemberFilter(filters.BaseFilterBackend):
         if bmi_lower is not None:
             q = and_q(q, Q(bmi__gte=bmi_lower))
 
+        # filter order time
         start_date = request.query_params.get('start_date')
         if start_date:
             start_date = make_aware(datetime.datetime.strptime(start_date, '%Y-%m-%d'))
@@ -76,6 +86,7 @@ class MemberFilter(filters.BaseFilterBackend):
             end_date = make_aware(datetime.datetime.strptime(end_date, '%Y-%m-%d'))
             q = and_q(q, Q(order__created_at__lte=end_date))
 
+        # filter paytotal
         money_upper = request.query_params.get('money_upper')
         money_lower = request.query_params.get('money_lower')
         order_count_upper = request.query_params.get('order_count_upper')
@@ -85,11 +96,13 @@ class MemberFilter(filters.BaseFilterBackend):
         if money_upper:
             q = and_q(q, Q(pay_total__lte=money_upper))
 
+        # filter order count
         if order_count_upper:
             q = and_q(q, Q(order_count__lte=order_count_upper))
         if order_count_lower:
             q = and_q(q, Q(order_count__gte=order_count_lower))
 
+        # order by
         order_by = request.query_params.get('order_by')
         if order_by:
             order_by = order_by.replace('join_at', 'created_at')
@@ -221,25 +234,30 @@ class OrderFilter(filters.BaseFilterBackend):
 
     def filter_queryset(self, request, queryset, view):
         q = None
+        # filter keywords
         keywords = request.query_params.get('keywords')
         if keywords is not None:
             q = or_q(q, Q(shipping_name__icontains=keywords))
             q = or_q(q, Q(phone__contains=keywords))
             q = or_q(q, Q(order_number__contains=keywords))
 
+        # filte to_store
         to_store = request.query_params.get('to_store')
         if to_store is not None:
             q = and_q(q, Q(to_store=to_store))
 
+        # filter simple status
         simple_status = request.query_params.get('simple_status')
         if simple_status is not None:
             q = and_q(q, Q(simple_status=simple_status))
 
+        # filter ids
         ids = request.query_params.get('ids')
         if ids:
             ids = ids.split(',')
             q = and_q(q, Q(id__in=ids))
 
+        # order by
         order_by = request.query_params.get('order_by')
         if order_by:
             queryset = queryset.order_by(order_by)
@@ -317,41 +335,46 @@ class ProductFilter(filters.BaseFilterBackend):
                 q = or_q(q, Q(name__icontains=keyword))
                 q = or_q(q, Q(en_name__icontains=keyword))
 
+        # filter brand
         brand = request.query_params.get('brand')
         if brand is not None:
             q = and_q(q, Q(brand=brand))
 
+        # filter tag
         tag = request.query_params.get('tag')
         if tag is not None:
             q = and_q(q, Q(tag=tag))
 
+        # order_by
         order_by = request.query_params.get('order_by')
         if order_by:
             queryset = queryset.order_by(order_by)
 
+        # filter category
         category = request.query_params.get('category')
         if category is not None:
             q = and_q(q, Q(category=category))
-
         category_ids = request.query_params.get('category_ids')
         if category_ids is not None:
             category_ids = category_ids.split(',')
             q = and_q(q, Q(id__in=category_ids))
             q = and_q(q, Q(category=category))
 
+        # filter tag
         no_tag = request.query_params.get('no_tag')
         if no_tag is not None:
             q = and_q(q, Q(tag__isnull=True))
-
         only_tag = request.query_params.get('only_tag')
         if only_tag is not None:
             q = and_q(q, Q(tag__isnull=False))
 
+        # filter status
         status = request.query_params.get('status')
         if status is not None:
             status = bool(int(status))
             q = and_q(q, Q(status=status))
 
+        # filter inventory_status & spec
         inventory_status = request.query_params.get('inventory_status')
         if inventory_status is not None:
             inventory_status = int(inventory_status)
@@ -375,6 +398,7 @@ class ProductFilter(filters.BaseFilterBackend):
         if min_price is not None:
             q = and_q(q, Q(specifications_detail__price__gte=min_price))
 
+        # filter ids
         ids = request.query_params.get('ids')
         if ids:
             ids = ids.split(',')

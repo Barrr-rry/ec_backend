@@ -26,8 +26,8 @@ class MemberTokens(DefaultToken):
 
 class ParanoidQuerySet(models.QuerySet):
     """
-    Prevents objects from being hard-deleted. Instead, sets the
-    ``date_deleted``, effectively soft-deleting the object.
+    更改原本的queryset
+    不要讓他刪除原本的資料
     """
 
     def delete(self):

@@ -9,6 +9,9 @@ from django.contrib.auth.models import AnonymousUser
 class DefaultIsAuthenticated(BasePermission):
 
     def has_permission(self, request, view):
+        """
+        member or manager
+        """
         if view.action in ['retrieve', 'list']:
             return True
         user = request.user
@@ -21,6 +24,9 @@ class DefaultIsAuthenticated(BasePermission):
 
 class IsHightestPermission(BasePermission):
     def has_permission(self, request, view):
+        """
+        有沒有最高權限
+        """
         user = request.user
         return user.permission.highest_permission
 
@@ -35,6 +41,9 @@ class OrderOwnaerPermission(BasePermission):
 
 
 def factory_permission(target_method_list=None, field=None, validate_values=None):
+    """
+    許多要看權限的 都用factory 模式處理
+    """
     if target_method_list is None:
         target_method_list = []
     if validate_values is None:
@@ -120,7 +129,6 @@ OrderManagerReadPermission = factory_permission(
 )
 
 
-# todo 有問題之後再重構
 class RoleAuthenticated(BasePermission):
     def has_permission(self, request, view):
         # 判斷action是否為read or list
@@ -148,7 +156,6 @@ class RoleAuthenticated(BasePermission):
                 return False
 
 
-# todo 有問題之後再重構
 class ManagerAuthenticated(BasePermission):
 
     def has_permission(self, request, view):
@@ -177,7 +184,6 @@ class ManagerAuthenticated(BasePermission):
                 return False
 
 
-# todo 有問題之後再重構
 class CategoryAuthenticated(BasePermission):
 
     def has_permission(self, request, view):
@@ -201,7 +207,6 @@ class CategoryAuthenticated(BasePermission):
             return False
 
 
-# todo 有問題之後再重構
 class TagAuthenticated(BasePermission):
 
     def has_permission(self, request, view):
@@ -232,7 +237,6 @@ class TagAuthenticated(BasePermission):
     #         return True
 
 
-# todo 有問題之後再重構
 class BrandAuthenticated(BasePermission):
 
     def has_permission(self, request, view):

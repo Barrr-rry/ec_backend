@@ -7,6 +7,9 @@ from rest_framework.utils.serializer_helpers import BindingDict
 from django.utils import timezone
 
 
+"""
+所有的Meta 都是給serailizer 用的
+"""
 class CommonMeta:
     exclude = [
         'created_at',
@@ -48,6 +51,9 @@ class UpdateRequiredSerailizerMixin:
     @cached_property
     def fields(self):
         """
+        不要改成required
+        """
+        """
         A dictionary of {field_name: field_instance}.
         """
         # `fields` is evaluated lazily. We do this to ensure that we don't
@@ -69,11 +75,13 @@ class UpdateRequiredSerailizerMixin:
 class DefaultModelSerializer(UpdateRequiredSerailizerMixin, serializers.ModelSerializer):
 
     def update(self, instance, validated_data):
+        # update 自動更新時間
         if hasattr(instance, 'updated_at'):
             instance.updated_at = timezone.now()
         return super().update(instance, validated_data)
 
     def pull_validate_data(self, validated_data, key, default=None):
+        # 把不需要的delete 掉 這樣才不會存進db
         ret = validated_data.get(key, default)
         if key in validated_data:
             del validated_data[key]
@@ -130,6 +138,9 @@ def serializer_factory(model, serializer=WritebleSerailizer):
 
 
 class NestedModelSerializer(DefaultModelSerializer):
+    """
+    巢狀serailizer
+    """
     def __init__(self, *args, **kwargs):
         super(NestedModelSerializer, self).__init__(*args, **kwargs)
         self.forward_fields, self.reverse_fields = [], []
