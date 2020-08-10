@@ -353,8 +353,10 @@ class EcpayViewSet(GenericViewSet):
         member.gender = request.data.get('gender')
         member.height = request.data.get('height')
         member.weight = request.data.get('weight')
-        member.bmi = int(member.weight) / pow((int(member.height) / 100), 2)
-        # member.birthday = request.data.get('birthday')
+        if member.height and member.weight:
+            member.bmi = int(member.weight) / pow((int(member.height) / 100), 2)
+        if request.data.get('birthday', None) != 'Invalid date':
+            member.birthday = request.data.get('birthday', None)
         member.save()
         return product_shot, total_price
 
@@ -452,6 +454,8 @@ class EcpayViewSet(GenericViewSet):
             做的處理 update request 都做好了 serializer 只要直接儲存就好
             """
             self.update_request(request)
+            if request.data.get('birthday') == 'Invalid date':
+                request.data['birthday'] = None
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
