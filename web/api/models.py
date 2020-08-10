@@ -296,14 +296,16 @@ class Product(DefaultAbstract):
     en_product_info = models.TextField(help_text='商品英文資訊', null=True, blank=True)
     en_detail_info = models.TextField(help_text='詳細英文資訊', null=True, blank=True)
     level1_title = models.CharField(max_length=128, help_text="規則1 的主題 只有在config:product_specifications_setting",
-                                    default='規格',
+                                    default='尺寸',
                                     null=True)
     level2_title = models.CharField(max_length=128, help_text="規則1 的主題 只有在config:product_specifications_setting",
+                                    default='顏色',
                                     null=True)
     level1_en_title = models.CharField(max_length=128, help_text="規則1 的主題 只有在config:product_specifications_setting",
-                                       default='規格',
+                                       default='size',
                                        null=True)
     level2_en_title = models.CharField(max_length=128, help_text="規則1 的主題 只有在config:product_specifications_setting",
+                                       default='color',
                                        null=True)
     status = models.BooleanField(help_text='上架狀態', default=True)
     # todo 活動?

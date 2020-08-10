@@ -948,7 +948,7 @@ class ProductForCartSerializer(ProductListSerializer):
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'product_number', 'productimages', 'specifications',
+        fields = ('id', 'name', 'en_name', 'product_number', 'productimages', 'specifications',
                   'level1_title', 'level2_title', 'level1_en_title', 'level2_en_title', 'status', 'activity',
                   'activity_detail',
                   'specifications_detail')
