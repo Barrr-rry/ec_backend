@@ -4,8 +4,13 @@ from rest_framework.authentication import get_authorization_header, exceptions
 from .models import AdminTokens, MemberTokens
 from django.contrib.auth.models import AnonymousUser
 
+"""
+如果要針對 專案api 判定user 身份驗證就從這邊改寫 
+"""
+
 
 class AnnoymousAuthentication(BaseTokenAuthentication):
+    # 無角色
     model = None
 
     def authenticate(self, request):
@@ -25,6 +30,7 @@ class AnnoymousAuthentication(BaseTokenAuthentication):
 
 
 class NeedTokenAuthentication(BaseTokenAuthentication):
+    # 必須要有token
     model = None
 
     def authenticate(self, request):
@@ -50,22 +56,27 @@ class NeedTokenAuthentication(BaseTokenAuthentication):
 
 
 class TokenAuthentication(NeedTokenAuthentication):
+    # admin 必須要有token
     model = AdminTokens
 
 
 class TokenCheckAuthentication(AnnoymousAuthentication):
+    # admin or 無角色
     model = AdminTokens
 
 
 class MemberAuthentication(NeedTokenAuthentication):
+    # meber 必須要有token
     model = MemberTokens
 
 
 class MemberCheckAuthentication(AnnoymousAuthentication):
+    # member or 無角色
     model = MemberTokens
 
 
 class MangerOrMemberAuthentication(AnnoymousAuthentication):
+    # manager or 無角色
     model = AdminTokens
 
     def get_token(self, queryset):
