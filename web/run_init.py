@@ -472,7 +472,8 @@ def generate_products_for_test(count, config_data):
     spec_level2 = ['紅色', '藍色', '黃色', '綠色', '白色', '黑色']
     tag = Tag.objects.all()
     brand = Brand.objects.all()
-    category = Category.objects.all()
+    category = Category.objects.exclude(name='商品總覽').all()
+    all_category = Category.objects.filter(name='商品總覽').first()
     now = timezone.now().strftime('%Y%m%d')
     activity = Activity.objects.first()
     for i in range(count):
@@ -494,6 +495,7 @@ def generate_products_for_test(count, config_data):
         if i % 2 == 0:
             product.tag.add(random.choice(tag))
         product.category.add(random.choice(category))
+        product.category.add(all_category)
         product.save()
         ProductImage.objects.create(
             product=product,
