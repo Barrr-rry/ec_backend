@@ -729,6 +729,12 @@ class ManagerViewSet(MyMixin):
     permission_classes = [permissions.ManagerAuthenticated]
     __doc__ = docs.manager
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        AdminTokens.objects.filter(user=instance).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     def get_serializer_class(self):
         """
         login 的話 切換serializer
