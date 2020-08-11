@@ -387,7 +387,7 @@ class EcpayViewSet(GenericViewSet):
         # todo
         reward = serializers.Reward.objects.first()
         if reward.status == 1:
-            point = (total_price // 100) * reward.discount
+            point = (total_price // reward.pay_to) * reward.discount
 
         elif reward.status == 2:
             point = int(total_price * (reward.discount / 100))

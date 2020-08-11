@@ -555,6 +555,7 @@ class Coupon(DefaultAbstract):
 
 class Reward(DefaultAbstract):
     status = models.SmallIntegerField(help_text='回饋方式 1: 元 2: 百分比')
+    pay_to = models.IntegerField(help_text='status=1時, 達到多少錢回饋', null=True)
     discount = models.IntegerField(help_text='回饋金額, 回饋百分比')
     still_day = models.IntegerField(help_text='期限')
     start_day = models.IntegerField(help_text='忠誠獎勵發放天數 發送時間 n day 之後')
