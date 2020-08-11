@@ -182,7 +182,7 @@ def generate_cart():
 
 
 def generate_reward(member, count):
-    record = Reward.objects.create(status=1, discount=100, still_day=30, start_day=7)
+    record = Reward.objects.create(status=1, discount=100, still_day=30, start_day=7, pay_to=100)
     orders = Order.objects.filter(member=member).all()
     for order in orders:
         point = random.randint(1, 100)
