@@ -1900,6 +1900,7 @@ class ExportMemberViewSet(ListModelMixin, viewsets.GenericViewSet):
                 '會員所在地': el[0]['local'],
                 '姓名': el[0]['name'],
                 '會員帳號': el[0]['account'],
+                '會員生日': el[0]['birthday'],
                 'LINE ID': el[0]['line_id'],
                 '會員電話': el[0]['phone'],
                 '會員手機': el[0]['cellphone'],
