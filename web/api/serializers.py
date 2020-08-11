@@ -580,7 +580,7 @@ class ProductSerializer(DefaultModelSerializer):
     def validate(self, attrs):
         product_codes = []
         config = ConfigSetting.objects.first()
-        if config.product_specifications_setting == 2:
+        if config.product_specifications_setting == 2 and attrs.get('specifications_detail_data'):
             for el in attrs['specifications_detail_data']:
                 product_code = el.get('product_code', None)
                 if not product_code:
