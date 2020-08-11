@@ -1616,6 +1616,28 @@ class ActivityViewSet(MyMixin):
                 product.save()
         return Response(dict(msg='ok'), status=status.HTTP_201_CREATED)
 
+    @action(methods=['POST'], detail=False)
+    def del_category(self, request, *args, **kwargs):
+        """
+        ids: category
+        將這些ids 裡面的product 全部加上activity_id
+        我們榜的不是category 而是product
+        """
+        ids = request.data['ids']
+        category_ids_mapping = get_category_ids_mapping()
+        new_ids = []
+        for _id in ids:
+            if _id in category_ids_mapping:
+                new_ids.extend(category_ids_mapping[_id])
+            else:
+                new_ids.append(_id)
+        products = Product.objects.filter(category__in=new_ids)
+        with transaction.atomic():
+            for product in products:
+                product.activity_id = None
+                product.save()
+        return Response(dict(msg='ok'), status=status.HTTP_201_CREATED)
+
 
 @router_url('exportorder')
 class ExportOrderViewSet(ListModelMixin, viewsets.GenericViewSet):
