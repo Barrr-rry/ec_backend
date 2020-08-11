@@ -272,8 +272,8 @@ class Activity(DefaultAbstract):
 
 
 class HomeActivity(DefaultAbstract):
-    ch_name = models.CharField(max_length=256, help_text="首頁活動中文名稱")
-    en_name = models.CharField(max_length=256, help_text="首頁活動英文名稱")
+    ch_name = models.CharField(max_length=256, help_text="首頁活動中文名稱", null=True, blank=True)
+    en_name = models.CharField(max_length=256, help_text="首頁活動英文名稱", null=True, blank=True)
 
 
 class Product(DefaultAbstract):
