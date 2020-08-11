@@ -958,6 +958,8 @@ class OrderSerializer(DefaultModelSerializer):
     rewrad = RewardRecordSerializer(many=True, read_only=True, allow_null=True)
     rewrad_temp = RewardRecordTempSerializer(many=True, read_only=True, allow_null=True)
     coupon_id = serializers.IntegerField(write_only=True, required=False, help_text='coupon id')
+    in_blacklist = serializers.SerializerMethodField(read_only=True)
+    was_in_blacklist = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Order
@@ -966,6 +968,21 @@ class OrderSerializer(DefaultModelSerializer):
             'deleted_at',
             'deleted_status',
         ]
+
+    def get_in_blacklist(self, instance):
+        blacklist_record = BlacklistRecord.objects.filter(member=instance.member).first()
+        if blacklist_record:
+            return blacklist_record.status
+        return False
+
+    def get_was_in_blacklist(self, instance):
+        # 判斷黑名單紀錄
+        all_blacklist_record = BlacklistRecord.objects.filter(member=instance.member).all()
+        if len(all_blacklist_record) > 0:
+            for blacklist_record in all_blacklist_record:
+                if blacklist_record.status:
+                    return True
+        return False
 
     def validate(self, data):
         if 'product_shot' in data:
