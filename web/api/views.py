@@ -1663,6 +1663,14 @@ class ExportOrderViewSet(ListModelMixin, viewsets.GenericViewSet):
             }
             return f'超商( {mapping[el["store_type"]]} )'
 
+        def get_pay_type(el):
+            return '貨到付款' if el['pay_type'] else '線上付款'
+
+        def get_addr(el):
+            area = el.get('shipping_area', '')
+            addr = el.get('address', '')
+            return f'({area}){addr}'
+
         queryset = self.filter_queryset(self.get_queryset())
 
         page = self.paginate_queryset(queryset)
@@ -1676,9 +1684,13 @@ class ExportOrderViewSet(ListModelMixin, viewsets.GenericViewSet):
             dct = {
                 '訂單編號': el['order_number'],
                 '收件人': el['shipping_name'],
+                '收件人電話': el['phone'],
                 '訂單金額': el['total_price'],
                 '物流方式': get_store(el),
+                '付款方式': get_pay_type(el),
+                '寄件編號': el['all_pay_logistics_id'],
                 '店名': el['store_name'],
+                '收貨地址': get_addr(el),
                 '訂單日期': el['created_at'],
                 '訂單狀態': el['simple_status_display'],
                 '當前貨態': el['shipping_status_display'],
