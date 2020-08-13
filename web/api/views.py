@@ -709,7 +709,7 @@ class FileViewSet(MyMixin):
         headers = self.get_success_headers(serializer.data)
         rsps = dict(
             uploaded=True,
-            url=serializer.data['file']
+            url=serializer.data['file'].replace('https', 'http')
         )
         if request.data.get('upload'):
             return Response(rsps, status=status.HTTP_201_CREATED, headers=headers)
