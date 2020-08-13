@@ -273,6 +273,7 @@ class EcpayViewSet(GenericViewSet):
                 freeshipping_price = freeshipping.price
             if freeshipping.role <= product_price:
                 freeshipping_price = 0
+            request.data['use_ecpay_delivery'] = freeshipping.use_ecpay_delivery
         else:
             raise Exception('超出重量')
         activity_price = self.get_activity_price(carts)

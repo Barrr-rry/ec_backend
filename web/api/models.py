@@ -436,6 +436,7 @@ class Order(DefaultAbstract):
     simple_status = models.IntegerField(help_text="簡單對status 做分類", null=True, default=1)
     simple_status_display = models.CharField(max_length=64, help_text="簡單對status 做分類: 1: 待出貨; 2: 付款失敗; 3: 取號成功; 4: 取號失敗; 5: 已取消",
                                              null=True, default='未付款')
+    use_ecpay_delivery = models.BooleanField(default=True, help_text="使用ecpay 的物流機制")
     # --- only 國外 ---
     location = models.SmallIntegerField(help_text="地區: 1：國內 2: 國外", default=1)
     first_name = models.CharField(max_length=64, help_text="First Name(海外)", null=True)
