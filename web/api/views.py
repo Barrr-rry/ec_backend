@@ -583,6 +583,21 @@ class FileViewSet(MyMixin):
     permission_classes = []
     __doc__ = docs.file
 
+    def create(self, request, *args, **kwargs):
+        if request.data.get('upload'):
+            request.data['file'] = request.data['upload']
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        rsps = dict(
+            uploaded=True,
+            url=serializer.data['file']
+        )
+        if request.data.get('upload'):
+            return Response(rsps, status=status.HTTP_201_CREATED, headers=headers)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
 
 def get_urls():
     urls = router.get_urls()
