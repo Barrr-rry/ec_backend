@@ -20,7 +20,7 @@ def send_mail(subject, tomail, part_content, tourl):
     msg = EmailMultiAlternatives(subject, text_content, from_email, [tomail])
     msg.attach_alternative(html_content, "text/html")
 
-    with open('./api/mail/images/汴利購LOGO_白_90x22px.png', mode='rb') as f:
+    with open('./api/mail/images/亞帆_200x64px.png', mode='rb') as f:
         image = MIMEImage(f.read())
         image.add_header('Content-Id', '<logoimg>')  # angle brackets are important
         image.add_header("Content-Disposition", "inline", filename="logoimg")
