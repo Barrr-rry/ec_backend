@@ -119,7 +119,7 @@ def main(for_test=False, config_data=None):
     generate_members_with_token()
     generate_members(20)
     generate_banners(10)
-    generate_freeshipping()
+    generate_freeshipping(config_data)
     generate_coupon(10)
     generate_orders()
     for member in Member.objects.all():
@@ -633,7 +633,7 @@ def generate_products_ezgo(config_data):
             instance.category.add(category)
 
 
-def generate_freeshipping():
+def generate_freeshipping(config_data):
     oversea = FreeShipping.objects.create(
         cn_title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='10', price=60,
         cash_on_delivery=False, frontend_name='DHL', backstage_name='海外（DHL）', location=2,
@@ -684,6 +684,11 @@ def generate_freeshipping():
         cash_on_delivery=False, frontend_name='郵寄', backstage_name='郵寄', location=1,
         use_ecpay_delivery=False,
     )
+    if not config_data.weight:
+        fss = FreeShipping.objects.all()
+        for fs in fss:
+            fs.weight = None
+            fs.save()
 
 
 def generate_coupon(count):
