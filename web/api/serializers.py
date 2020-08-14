@@ -157,6 +157,8 @@ class ManagerSerializer(DefaultModelSerializer):
     def update(self, instance, validated_data):
         if validated_data.get('password'):
             validated_data['password'] = make_password(validated_data.get('password'))
+        if validated_data.get('status') is False:
+            AdminTokens.objects.filter(user=instance).delete()
         return super().update(instance, validated_data)
 
 
@@ -329,6 +331,8 @@ class MemberSerializer(DefaultModelSerializer):
     def update(self, instance, validated_data):
         if validated_data.get('password'):
             validated_data['password'] = make_password(validated_data.get('password'))
+        if validated_data.get('status') is False:
+            MemberTokens.objects.filter(user=instance).delete()
         return super().update(instance, validated_data)
 
 

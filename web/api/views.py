@@ -13,7 +13,7 @@ from rest_framework_nested import routers
 from rest_framework.parsers import MultiPartParser, FormParser
 from .models import (BannerContent, Banner, File, Permission, Manager, AdminTokens, Member, Category, Tag, Brand,
                      Product, ConfigSetting, SpecificationDetail, Country, RewardRecordTemp, Reward, RewardRecord,
-                     RewardRecordTemp, Activity, BlacklistRecord,
+                     RewardRecordTemp, Activity, BlacklistRecord, MemberTokens,
                      ProductImage, Cart, ProductQuitShot, TagImage, FreeShipping, Coupon, MemberStore)
 from .serializers import (BannerSerializer, FileSerializer, PermissionSerializer, ManagerSerializer,
                           ManagerLoginSerializer,
@@ -682,6 +682,12 @@ class MemberViewSet(MyMixin):
     authentication_classes = [TokenAuthentication]
     permission_classes = [permissions.MemberManagerEditPermission,
                           permissions.MemberManagerReadPermission]
+
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+        MemberTokens.objects.filter(user=instance).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     def get_serializer_class(self):
         serializer_class = self.serializer_class
