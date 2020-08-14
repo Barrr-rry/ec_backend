@@ -108,6 +108,8 @@ class MemberFilter(filters.BaseFilterBackend):
             order_by = order_by.replace('join_at', 'created_at')
             if 'returns' in order_by:
                 queryset = queryset.annotate(returns=Sum('reward__point'))
+            if 'reward_end_date' in order_by:
+                order_by = '-reward__end_date' if '-' in order_by else 'reward__end_date'
             queryset = queryset.order_by(order_by)
         if q:
             return queryset.filter(q)
