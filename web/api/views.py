@@ -547,8 +547,8 @@ class EcpayViewSet(GenericViewSet):
             instance.simple_status_display = '待出貨'
             instance.simple_status = 1
             # 如果是超商付款成功後建立物流
-            if instance.to_store:
-                ecpay.shipping(instance.store_type, instance.store_id, instance)
+            # if instance.to_store:
+                # ecpay.shipping(instance.store_type, instance.store_id, instance)
         if int(request.data['RtnCode']) == 10100141:
             ecpay_loggger.warning(f'pay fail instance: {request.data["MerchantTradeNo"]}')
             instance.simple_status_display = '付款失敗'
@@ -602,7 +602,7 @@ class EcpayViewSet(GenericViewSet):
             serializer.is_valid(raise_exception=True)
             serializer.save()
             self.reward_process(serializer.instance)
-        ecpay.shipping(sub_type, store_id, serializer.instance)
+        # ecpay.shipping(sub_type, store_id, serializer.instance)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(methods=['POST'], detail=False, authentication_classes=[], permission_classes=[])

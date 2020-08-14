@@ -25,6 +25,7 @@ from django.core import validators
 from api.sdk import shipping_map
 from api.util import get_config
 import math
+from .sdk import ecpay
 
 fmt = '%Y-%m-%d %H:%M:%S'
 
@@ -1080,6 +1081,10 @@ class OrderSerializer(DefaultModelSerializer):
                             point=reward_point,
                             total_point=reward_total_point,
                         )
+            if instance.use_ecpay_delivery and validated_data.get('shipping_status') == 2:
+                sub_type = instance.store_type
+                store_id = instance.store_id
+                ecpay.shipping(sub_type, store_id, instance)
             ret = super().update(instance, validated_data)
         return ret
 

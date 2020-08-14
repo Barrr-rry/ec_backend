@@ -9,7 +9,7 @@ import os
 # 根據環境 對應到相對應的url
 host_url_map = dict(
     prod='https://li1871-48.members.linode.com/',
-    dev='https://ff97b5572743.ngrok.io/',
+    dev='https://ff2fd2710786.ngrok.io/',
     test='https://li1871-48.members.linode.com/'
 )
 # 取得環境
