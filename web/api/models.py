@@ -535,8 +535,8 @@ class Coupon(DefaultAbstract):
             return super().save(force_insert, force_update, using, update_fields)
         if self.member.count():
             self.has_member_list = True
-        if self.start_time or self.end_time:
-            self.has_period = True
+        # if self.start_time or self.end_time:
+        #     self.has_period = True
         if self.member_use_limit is not None:
             self.has_member_use_limit = True
         if self.coupon_use_limit is not None:
