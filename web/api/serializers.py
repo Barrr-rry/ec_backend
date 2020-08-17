@@ -1085,6 +1085,7 @@ class OrderSerializer(DefaultModelSerializer):
                 sub_type = instance.store_type
                 store_id = instance.store_id
                 ecpay.shipping(sub_type, store_id, instance)
+                return instance
             ret = super().update(instance, validated_data)
         return ret
 
