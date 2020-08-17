@@ -262,6 +262,9 @@ class MemberSerializer(DefaultModelSerializer):
     was_in_blacklist = serializers.SerializerMethodField(read_only=True)
     location = serializers.SerializerMethodField(read_only=True)
     age = serializers.SerializerMethodField(read_only=True)
+    hheight = serializers.SerializerMethodField(read_only=True)
+    wweight = serializers.SerializerMethodField(read_only=True)
+    bbmi = serializers.SerializerMethodField(read_only=True)
 
     class Meta(UserCommonMeta):
         model = Member
@@ -269,6 +272,15 @@ class MemberSerializer(DefaultModelSerializer):
     def get_reward(self, obj):
         # 前10筆資料
         return RewardRecordSerializer(instance=obj.reward.all()[:10], many=True).data
+
+    def get_hheight(self, instance):
+        return round(instance.height, 2) if instance.height else None
+
+    def get_wweight(self, instance):
+        return round(instance.weight, 2) if instance.weight else None
+
+    def get_bbmi(self, instance):
+        return round(instance.bmi, 2) if instance.bmi else None
 
     def get_age(self, instance):
         if instance.birthday:

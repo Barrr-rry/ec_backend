@@ -355,7 +355,7 @@ class EcpayViewSet(GenericViewSet):
         member.height = request.data.get('height')
         member.weight = request.data.get('weight')
         if member.height and member.weight:
-            member.bmi = int(member.weight) / pow((int(member.height) / 100), 2)
+            member.bmi = float(member.weight) / pow((float(member.height) / 100), 2)
         if request.data.get('birthday', None) != 'Invalid date':
             member.birthday = request.data.get('birthday', None)
         member.save()

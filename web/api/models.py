@@ -188,9 +188,9 @@ class Member(DefaultAbstract, AbstractBaseUser):
     # ------ from order
     birthday = models.DateField(help_text='生日', null=True)
     gender = models.SmallIntegerField(help_text='性別 1: 男生 2:女生', default=1, null=True)
-    weight = models.IntegerField(help_text='體重', null=True)
-    height = models.IntegerField(help_text='身高', null=True)
-    bmi = models.IntegerField(help_text='bmi', null=True)
+    weight = models.FloatField(help_text='體重', null=True)
+    height = models.FloatField(help_text='身高', null=True)
+    bmi = models.FloatField(help_text='bmi', null=True)
 
     def __str__(self):
         return f'{self.name}({self.id})'
