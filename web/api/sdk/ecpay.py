@@ -5,6 +5,12 @@ import json
 from datetime import datetime
 from log import logger, ecpay_loggger
 import os
+import copy
+import collections
+from urllib.parse import quote_plus, parse_qsl, parse_qs
+import hashlib
+
+
 
 # 根據環境 對應到相對應的url
 host_url_map = dict(
@@ -205,6 +211,34 @@ def create_shipping_map(sub_type, member_id, callback_url):
         print('An exception happened: ' + str(error))
 
 
+def generate_check_value(self, params):
+    _params = copy.deepcopy(params)
+
+    if 'CheckMacValue' in _params:
+        _params.pop('CheckMacValue')
+
+    ordered_params = collections.OrderedDict(
+        sorted(_params.items(), key=lambda k: k[0]))
+
+    encoding_lst = []
+    encoding_lst.append('HashKey=%s&' % self['HashKey'])
+    encoding_lst.append(''.join(
+        ['{}={}&'.format(key, value) for key, value in ordered_params.items()]))
+    encoding_lst.append('HashIV=%s' % self['HashIV'])
+
+    safe_characters = '-_.!*()'
+
+    encoding_str = ''
+    for encoding_ls in encoding_lst:
+        encoding_str = f'{encoding_str}{encoding_ls}'
+    encoding_str = quote_plus(
+        str(encoding_str), safe=safe_characters).lower()
+
+    check_mac_value = hashlib.md5(
+        encoding_str.encode('utf-8')).hexdigest().upper()
+    return check_mac_value
+
+
 def shipping(sub_type, store_id, order):
     import re
     if check_env(ENV) is False and 'C2C' not in sub_type:
@@ -249,6 +283,15 @@ def shipping(sub_type, store_id, order):
     instance = ecpay_logistic_sdk.ECPayLogisticSdk(
         **ecpay_keys
     )
+    if not order.to_store:
+        create_shipping_order_params['LogisticsType'] = 'HOME'
+        create_shipping_order_params['LogisticsSubType'] = 'TCAT'
+        create_shipping_order_params['SenderAddress'] = '高雄市前金區中正四路148號11F'
+        create_shipping_order_params['SenderZipCode'] = '801'
+        create_shipping_order_params['ReceiverZipCode'] = order.shipping_area
+        create_shipping_order_params['ReceiverAddress'] = order.shipping_address
+        create_shipping_order_params['Temperature'] = '0001'
+        create_shipping_order_params['CheckMacValue'] = generate_check_value(ecpay_keys, create_shipping_order_params)
 
     try:
         # 介接路徑
