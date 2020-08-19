@@ -194,9 +194,9 @@ EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
 # todo change
-EMAIL_HOST_USER = 'Ezgobuyusa@gmail.com'
-EMAIL_HOST_PASSWORD = 'ez0910778133'
-EMAIL_FROM = 'Ezgobuyusa@gmail.com'
+EMAIL_HOST_USER = 'service@havefununderwear.com'
+EMAIL_HOST_PASSWORD = 'HaveFun100'
+EMAIL_FROM = 'service@havefununderwear.com'
 # EMAIL_HOST_USER = ''
 # EMAIL_HOST_PASSWORD = ''
 # EMAIL_FROM = ''

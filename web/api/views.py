@@ -865,13 +865,17 @@ class MemberViewSet(MyMixin):
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
-
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        user = Member.objects.filter(pk=serializer.data['id']).first()
+        token, created = serializers.MemberTokens.objects.get_or_create(user=user)
+        # return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        response = Response({'token': token.key})
+        return response
 
     @action(methods=['POST'], detail=False, authentication_classes=[], permission_classes=[])
     def register_validate(self, request, *args, **kwargs):
         """
         for registe validate
+        code:
         code:
         -> 1: 註冊成功
         -> 2: 已經驗證過
