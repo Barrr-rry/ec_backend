@@ -449,8 +449,8 @@ class EcpayViewSet(GenericViewSet):
             instance.simple_status_display = '待出貨'
             instance.simple_status = 1
             # 如果是超商付款成功後建立物流
-            if instance.to_store:
-                ecpay.shipping(instance.store_type, instance.store_id, instance)
+            # if instance.to_store:
+            #     ecpay.shipping(instance.store_type, instance.store_id, instance)
         if int(request.data['RtnCode']) == 10100141:
             instance.simple_status_display = '付款失敗'
             instance.simple_status = 2
@@ -484,20 +484,21 @@ class EcpayViewSet(GenericViewSet):
 
     @action(methods=['POST'], detail=False)
     def shipping(self, request, *args, **kwargs):
-        sub_type = request.data['store_type']
-        memberstore_id = request.data['memberstore_id']
-        memberstore = serializers.MemberStore.objects.get(pk=memberstore_id)
-        request.data['address'] = memberstore.address
-        store_id = memberstore.store_id
-        request.data['store_id'] = store_id
-        del request.data['memberstore_id']
+        if request.data.get('store_type'):
+            sub_type = request.data['store_type']
+            memberstore_id = request.data['memberstore_id']
+            memberstore = serializers.MemberStore.objects.get(pk=memberstore_id)
+            request.data['address'] = memberstore.address
+            store_id = memberstore.store_id
+            request.data['store_id'] = store_id
+            del request.data['memberstore_id']
         with transaction.atomic():
             self.update_request(request)
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             serializer.save()
             self.reward_process(serializer.instance)
-        ecpay.shipping(sub_type, store_id, serializer.instance)
+        # ecpay.shipping(sub_type, store_id, serializer.instance)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
     @action(methods=['POST'], detail=False, authentication_classes=[], permission_classes=[])
