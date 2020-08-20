@@ -1093,7 +1093,7 @@ class OrderSerializer(DefaultModelSerializer):
                             point=reward_point,
                             total_point=reward_total_point,
                         )
-            if instance.use_ecpay_delivery and validated_data.get('shipping_status') == 2:
+            if instance.use_ecpay_delivery and validated_data.get('shipping_status') == 2 and instance.to_store:
                 sub_type = instance.store_type
                 store_id = instance.store_id
                 ecpay.shipping(sub_type, store_id, instance)

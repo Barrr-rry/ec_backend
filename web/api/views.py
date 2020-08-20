@@ -586,13 +586,13 @@ class EcpayViewSet(GenericViewSet):
         """
         純粹物流
         """
-        sub_type = request.data['store_type']
-        memberstore_id = request.data['memberstore_id']
-        memberstore = serializers.MemberStore.objects.get(pk=memberstore_id)
-        request.data['address'] = memberstore.address
-        store_id = memberstore.store_id
-        request.data['store_id'] = store_id
-        del request.data['memberstore_id']
+        # sub_type = request.data['store_type']
+        # memberstore_id = request.data['memberstore_id']
+        # memberstore = serializers.MemberStore.objects.get(pk=memberstore_id)
+        # request.data['address'] = memberstore.address
+        # store_id = memberstore.store_id
+        # request.data['store_id'] = store_id
+        # del request.data['memberstore_id']
         with transaction.atomic():
             """
             物流也是要update 但是做的事情不一樣
