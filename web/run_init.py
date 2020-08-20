@@ -676,7 +676,7 @@ def generate_freeshipping(config_data):
     )
     home_delivery = FreeShipping.objects.create(
         cn_title='全館滿 3000就免運欸!! 太划算了', role='3000', weight='999', price=90,
-        cash_on_delivery=False, frontend_name='宅配', backstage_name='宅配', location=1,
+        cash_on_delivery=False, frontend_name='宅配到府', backstage_name='宅配到府', location=1,
         use_ecpay_delivery=False,
     )
     post = FreeShipping.objects.create(

@@ -1680,7 +1680,7 @@ class ExportOrderViewSet(ListModelMixin, viewsets.GenericViewSet):
     def list(self, request, *args, **kwargs):
         def get_store(el):
             if not el['to_store']:
-                return '宅配'
+                return '宅配到府'
             mapping = {
                 'FAMI': '全家',
                 'UNIMART': '7-11',
