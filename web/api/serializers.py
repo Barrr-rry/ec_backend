@@ -1089,7 +1089,7 @@ class OrderSerializer(DefaultModelSerializer):
             p_spec2 = product_shot[i]['specification_detail']['spec2_name']
             p_price = product_shot[i]['specification_detail']['price']
             p_q = product_shot[i]['quantity']
-            product_content += f'{p_name}/{p_spec1}/{p_spec2} X {p_q}' if i == len(product_shot) - 1 else f'{p_name}/{p_spec1}/{p_spec2} X {p_q}、'
+            product_content += f'{p_name}/{p_spec1}/{p_spec2}/{p_price} X {p_q}' if i == len(product_shot) - 1 else f'{p_name}/{p_spec1}/{p_spec2}/{p_price} X {p_q}、'
         instance.total_weight = total_weight
         instance.save()
         pay_display = '貨到付款' if instance.pay_type == 1 else '線上付款'

@@ -14,7 +14,7 @@ from rest_framework.parsers import MultiPartParser, FormParser
 from .models import (BannerContent, Banner, File, Permission, Manager, AdminTokens, Member, Category, Tag, Brand,
                      Product, ConfigSetting, SpecificationDetail, Country, RewardRecordTemp, Reward, RewardRecord,
                      RewardRecordTemp, Activity, BlacklistRecord, MemberSpec, HomeActivity, MemberTokens,
-                     ProductImage, Cart, ProductQuitShot, TagImage, FreeShipping, Coupon, MemberStore)
+                     ProductImage, Cart, ProductQuitShot, TagImage, FreeShipping, Coupon, MemberStore, Order)
 from .serializers import (BannerSerializer, FileSerializer, PermissionSerializer, ManagerSerializer,
                           ManagerLoginSerializer, HomeActivitySerializer,
                           MemberSerializer, CategorySerializer, TagSerializer, BrandSerializer, ProductSerializer,
@@ -1967,13 +1967,26 @@ class ExportMemberViewSet(ListModelMixin, viewsets.GenericViewSet):
         # 組成資料
         for mid in ids:
             el = self.get_serializer(queryset.filter(pk=mid), many=True).data
+            order = Order.objects.filter(member_id=mid).first()
+            context = ''
+            if order:
+                product_shot = json.loads(order.product_shot)
+                for i in range(len(product_shot)):
+                    p_name = product_shot[i]['name']
+                    p_spec1 = product_shot[i]['specification_detail']['spec1_name']
+                    p_spec2 = product_shot[i]['specification_detail']['spec2_name']
+                    p_price = product_shot[i]['specification_detail']['price']
+                    p_q = product_shot[i]['quantity']
+                    context += f'{p_name}/{p_spec1}/{p_spec2}/{p_price} X {p_q}' if i == len(product_shot) - 1 else f'{p_name}/{p_spec1}/{p_spec2}/{p_price} X {p_q}、'
+                    addr = f'{order.store_type}({order.store_name})' if order.to_store else f'{order.shipping_area}({order.shipping_address})'
+
             dct = {
                 '會員編號': el[0]['member_number'],
                 '會員所在地': el[0]['local'],
                 '姓名': el[0]['name'],
                 '會員帳號': el[0]['account'],
+                '性別': '男性' if el[0]['gender'] == 1 else '女性',
                 '會員生日': el[0]['birthday'],
-                'LINE ID': el[0]['line_id'],
                 '會員電話': el[0]['phone'],
                 '會員手機': el[0]['cellphone'],
                 '內部備註': el[0]['remarks'],
@@ -1982,6 +1995,11 @@ class ExportMemberViewSet(ListModelMixin, viewsets.GenericViewSet):
                 '消費次數': el[0]['order_count'],
                 '消費金額': el[0]['pay_total'],
                 '狀態': '啟用中' if el[0]['status'] else '停用中',
+                '訂單編號': order.order_number if order else None,
+                '購買內容': context if order else None,
+                '訂單日期': str(order.created_at.date()) if order else None,
+                '最終付款金額': order.total_price if order else None,
+                '地址/店號': addr if order else None,
             }
             ret.append(dct)
         df = pd.DataFrame(data=ret)
