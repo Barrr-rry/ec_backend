@@ -15,7 +15,7 @@ import hashlib
 # 根據環境 對應到相對應的url
 host_url_map = dict(
     prod='https://li1871-48.members.linode.com/',
-    dev='https://ff2fd2710786.ngrok.io/',
+    dev='https://2af3770b21ad.ngrok.io/',
     test='https://li1871-48.members.linode.com/'
 )
 # 取得環境

@@ -11,9 +11,9 @@ def send_mail(subject, tomail, part_content, tourl):
     :param tourl: 驗證網址等 傳給範例template
     :return:
     """
-    from_email = 'Ezgobuyusa@gmail.com'
+    from_email = 'service@havefununderwear.com'
     text_content = f'''
-            親愛的汴利購會員您好：
+            親愛的HaveFun Men’s Underwear會員您好：
             {part_content}：
             {tourl}
             '''
