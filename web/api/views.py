@@ -922,7 +922,12 @@ class MemberViewSet(MyMixin):
             return Response(data='帳號或密碼錯誤', status=403)
         # 給token
         token, created = serializers.MemberTokens.objects.get_or_create(user=user)
-        response = Response({'token': token.key})
+        instance = RewardRecord.objects.filter(member=user).order_by('end_date').first()
+        rewards_end_date = instance.end_date if instance else None
+        rewards_status = True if instance and rewards_end_date and (rewards_end_date - datetime.datetime.now().date()).days < 90 else False
+        response = Response({'token': token.key,
+                             'rewards_end_date': rewards_end_date,
+                             'rewards_status': rewards_status})
         # response.set_cookie('token', token.key)
         return response
 
