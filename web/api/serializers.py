@@ -1078,7 +1078,7 @@ class OrderSerializer(DefaultModelSerializer):
                   f'感謝您的購買，如果您需要查看詳細訂單資訊，請進入<a href="{host_url}">訂單明細頁</a>。'
 
         send_mail(
-            subject='【 訂單成立通知 】HaveFun Men’s Underwear 訂單成立通知信',
+            subject='【 訂單成立通知 】EC 訂單成立通知信',
             tomail=instance.member.account,
             part_content=content,
             tourl=''
