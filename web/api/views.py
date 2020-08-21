@@ -242,7 +242,7 @@ class EcpayViewSet(GenericViewSet):
         if 'reward_discount' in request.data:
             del request.data['reward_discount']
         freeshipping_price = 0
-        total_weight = 0
+        # total_weight = 0
         # 判斷coupon 時間用
         now = datetime.datetime.now()
         # 購物車沒有資料 就代表有問題
@@ -264,7 +264,7 @@ class EcpayViewSet(GenericViewSet):
             product_price += cart.quantity * cart.specification_detail.price
             obj['specification_detail'] = serializers.SpecificationDetailSerializer(cart.specification_detail).data
             obj['quantity'] = cart.quantity
-            total_weight += cart.specification_detail.weight * cart.quantity
+            # total_weight += cart.specification_detail.weight * cart.quantity
             product_shot.append(obj)
         # 清空購物車
         request.user.cart.all().delete()
@@ -327,14 +327,14 @@ class EcpayViewSet(GenericViewSet):
         """
         freeshipping_id = request.data.get('freeshipping_id')
         freeshipping = serializers.FreeShipping.objects.get(pk=freeshipping_id)
-        if freeshipping.weight >= total_weight:
-            if freeshipping_price == 0 or freeshipping_price > freeshipping.price:
-                freeshipping_price = freeshipping.price
-            if freeshipping.role <= product_price:
-                freeshipping_price = 0
-            request.data['use_ecpay_delivery'] = freeshipping.use_ecpay_delivery
-        else:
-            raise Exception('超出重量')
+        # if freeshipping.weight >= total_weight:
+        #     if freeshipping_price == 0 or freeshipping_price > freeshipping.price:
+        #         freeshipping_price = freeshipping.price
+        #     if freeshipping.role <= product_price:
+        #         freeshipping_price = 0
+        #     request.data['use_ecpay_delivery'] = freeshipping.use_ecpay_delivery
+        # else:
+        #     raise Exception('超出重量')
         # 計算活動折扣金額
         activity_price = self.get_activity_price(carts)
         # 計算總金額
