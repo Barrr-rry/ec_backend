@@ -25,6 +25,10 @@ from django.core import validators
 from api.sdk import shipping_map
 from api.util import get_config
 from .sdk import ecpay
+from api.mail.html_mail import send_mail
+import os
+
+
 
 fmt = '%Y-%m-%d %H:%M:%S'
 
@@ -1032,6 +1036,7 @@ class OrderSerializer(DefaultModelSerializer):
         product_shot = json.loads(instance.product_shot)
         total_weight = 0
         config = get_config()
+        product_content = ''
         for i in range(len(product_shot)):
             if config['weight']:
                 total_weight += product_shot[i]['specification_detail']['weight'] * product_shot[i]['quantity']
@@ -1040,8 +1045,44 @@ class OrderSerializer(DefaultModelSerializer):
             if config['product_stock_setting'] == 3 and specification_detail.quantity is not None:
                 specification_detail.quantity -= product_shot[i]['quantity']
                 specification_detail.save()
+            p_name = product_shot[i]['name']
+            p_spec1 = product_shot[i]['specification_detail']['spec1_name']
+            p_spec2 = product_shot[i]['specification_detail']['spec2_name']
+            p_price = product_shot[i]['specification_detail']['price']
+            p_q = product_shot[i]['quantity']
+            product_content += f'{p_name}/{p_spec1}/{p_spec2} X {p_q}' if i == len(product_shot) - 1 else f'{p_name}/{p_spec1}/{p_spec2} X {p_q}、'
         instance.total_weight = total_weight
         instance.save()
+        pay_display = '貨到付款' if instance.pay_type == 1 else '線上付款'
+        store_display = '超商取貨' if instance.to_store else '宅配到府'
+        addr_display = f'取貨店名 : {instance.store_name}({instance.address})' if instance.to_store else f'取貨地址 : {instance.shipping_address}'
+        host_url_map = dict(
+            prod='https://li1858-106.members.linode.com/ordertracking',
+            dev='http://10.0.0.17:54156/ordertracking',
+            test='https://li1858-106.members.linode.com/ordertracking'
+        )
+        # 取得環境
+        ENV = os.environ.get('ENV')
+        host_url = host_url_map[ENV]
+        content = f'親愛的會員您好，以下是您本次的訂單明細：<br><br>' \
+                  f'訂單編號 : <a href="{host_url}">{instance.order_number}</a><br>' \
+                  f'訂單日期 : {str(instance.created_at.date())}<br>' \
+                  f'訂單內容：{product_content}<br>' \
+                  f'付款方式 : {pay_display}<br>' \
+                  f'寄送方式 : {store_display}<br>' \
+                  f'{addr_display}<br>' \
+                  f'收貨人姓名 : {instance.shipping_name}<br>' \
+                  f'收貨人電話 : <a href="tel:{instance.phone}">{instance.phone}</a><br>' \
+                  f'訂單備註 : {instance.remark}<br>' \
+                  f'付款金額 : ${instance.total_price} <br><br>' \
+                  f'感謝您的購買，如果您需要查看詳細訂單資訊，請進入<a href="{host_url}">訂單明細頁</a>。'
+
+        send_mail(
+            subject='【 訂單成立通知 】HaveFun Men’s Underwear 訂單成立通知信',
+            tomail=instance.member.account,
+            part_content=content,
+            tourl=''
+        )
         return instance
 
     def update(self, instance, validated_data):
