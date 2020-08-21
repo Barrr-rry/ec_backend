@@ -1142,8 +1142,14 @@ class ProductQuitShotSerializer(DefaultModelSerializer):
 
 
 class FreeShippingSerializer(DefaultModelSerializer):
+    en_frontend_name = serializers.SerializerMethodField(read_only=True)
+
     class Meta(CommonMeta):
         model = FreeShipping
+
+    def get_en_frontend_name(self, instance):
+        en_mapping = {'宅配到府': 'Delivery', '全家': 'FamilyMart', '萊爾富': 'Hi-Life', 'OK 超商': 'OK mart', '郵寄': 'Post'}
+        return en_mapping.get(instance.frontend_name[:-6] if '免運' in instance.frontend_name else instance.frontend_name)
 
 
 class CouponSerializer(DefaultModelSerializer):
