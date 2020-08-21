@@ -965,6 +965,7 @@ class OrderSerializer(DefaultModelSerializer):
     coupon_id = serializers.IntegerField(write_only=True, required=False, help_text='coupon id')
     in_blacklist = serializers.SerializerMethodField(read_only=True)
     was_in_blacklist = serializers.SerializerMethodField(read_only=True)
+    en_simple_status_display = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Order
@@ -973,6 +974,17 @@ class OrderSerializer(DefaultModelSerializer):
             'deleted_at',
             'deleted_status',
         ]
+
+    def get_en_simple_status_display(self, instance):
+        en_mapping = dict(
+            待出貨='To Ship',
+            已取消='Cancelled',
+            等待付款='Unpaid',
+            取號成功='Order Received',
+            已出貨='To Receive'
+
+        )
+        return en_mapping.get(instance.simple_status_display)
 
     def get_in_blacklist(self, instance):
         blacklist_record = BlacklistRecord.objects.filter(member=instance.member).first()
