@@ -468,8 +468,8 @@ def generate_product_image():
 
 
 def generate_products_for_test(count, config_data):
-    spec_level1 = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL']
-    spec_level2 = ['紅色', '藍色', '黃色', '綠色', '白色', '黑色']
+    spec_level1 = ['紅色', '藍色', '黃色', '綠色', '白色', '黑色']
+    spec_level2 = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL']
     tag = Tag.objects.all()
     brand = Brand.objects.all()
     category = Category.objects.exclude(name='商品總覽').all()
@@ -510,28 +510,30 @@ def generate_products_for_test(count, config_data):
         # 規格細節
         if config_data.product_specifications_setting == 2:
             # 規格1, 規格2
-            product.level1_title = '尺寸'
-            product.level2_title = '顏色'
+            product.level1_title = '顏色'
+            product.level2_title = '尺寸'
+            product.level1_en_title = 'color'
+            product.level2_en_title = 'size'
             product.save()
-            sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL']
             colors = ['Blue', 'Red', 'Yello', 'White', 'RGB三原色']
+            sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL']
             random.shuffle(sizes)
             random.shuffle(colors)
             spec1_list = []
             spec2_list = []
-            for size in sizes[:random.randint(1, len(sizes))]:
+            for color in colors[:random.randint(1, len(colors))]:
                 spec1_list.append(
                     Specification.objects.create(
                         product=product,
-                        name=size,
+                        name=color,
                         level=1,
                     )
                 )
-            for color in colors[:random.randint(1, len(colors))]:
+            for size in sizes[:random.randint(1, len(sizes))]:
                 spec2_list.append(
                     Specification.objects.create(
                         product=product,
-                        name=color,
+                        name=size,
                         level=2,
                     )
                 )
