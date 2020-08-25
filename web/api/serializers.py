@@ -274,7 +274,7 @@ class MemberSerializer(DefaultModelSerializer):
 
     def get_reward(self, obj):
         # 前10筆資料
-        return RewardRecordSerializer(instance=obj.reward.all()[:10], many=True).data
+        return RewardRecordSerializer(instance=obj.reward.all(), many=True).data
 
     def get_hheight(self, instance):
         return round(instance.height, 2) if instance.height else None
