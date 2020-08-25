@@ -191,6 +191,7 @@ class RewardRecordSerializer(DefaultModelSerializer):
     end_date = serializers.DateField(format="%Y-%m-%d")
     created_at = serializers.DateTimeField(read_only=True, format="%Y-%m-%d")
     total_point = serializers.IntegerField(help_text='回饋點數總共餘額', read_only=True)
+    en_desc = serializers.SerializerMethodField(read_only=True)
 
     class Meta(CreateCommonMeta):
         model = RewardRecord
@@ -200,6 +201,16 @@ class RewardRecordSerializer(DefaultModelSerializer):
         total_point = 0 if not instance else instance.total_point
         validated_data['total_point'] = total_point + validated_data['point']
         return super().create(validated_data)
+
+    def get_en_desc(self, instance):
+        if instance.desc == '已取消訂單':
+            return 'Order Successfully Cancelled'
+        elif instance.desc == '購物回饋點數':
+            return 'Reward Points'
+        elif '購物獎勵金折抵' in instance.desc:
+            return instance.desc.replace('購物獎勵金折抵', 'Reward Points Redeemed').replace('訂單編號', 'Order Number')
+
+        return None
 
 
 class RewardRecordTempSerializer(DefaultModelSerializer):
