@@ -71,7 +71,7 @@ CACHES = {
 }
 
 CRONJOBS = [
-    ('* * * * *', 'api.cron.demo')
+    ('0 0 * * *', 'api.cron.demo')
 ]
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
