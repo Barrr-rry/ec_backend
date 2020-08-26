@@ -961,6 +961,7 @@ class MemberViewSet(MyMixin):
             serializer = self.get_serializer(user)
             # 生效日期 n 天
             still_day = Reward.objects.first().still_day
+            start_day = Reward.objects.first().start_day
 
             instance = RewardRecord.objects.filter(member=user).first()
             total_point = 0 if not instance else instance.total_point
@@ -980,14 +981,15 @@ class MemberViewSet(MyMixin):
             record_temp = dict(
                 total_point=total_point,
                 last_point=0 if not instance else instance.point,
-                year=None if not instance else instance.end_date.year,
-                month=None if not instance else instance.end_date.month,
-                day=None if not instance else instance.end_date.day,
+                year=None if not instance else instance.start_date.year,
+                month=None if not instance else instance.start_date.month,
+                day=None if not instance else instance.start_date.day,
             )
             record_info = dict(
                 record=record,
                 record_temp=record_temp,
                 still_day=still_day,
+                start_day=start_day
             )
 
             return Response(dict(record_info=record_info, **serializer.data))
