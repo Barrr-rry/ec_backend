@@ -1992,6 +1992,7 @@ class ExportMemberViewSet(ListModelMixin, viewsets.GenericViewSet):
                 '內部備註': el[0]['remarks'],
                 '註冊時間': el[0]['join_at'],
                 '回饋點數': el[0]['returns'],
+                '回饋點數到期日': el[0].get('reward_end_date'),
                 '消費次數': el[0]['order_count'],
                 '消費金額': el[0]['pay_total'],
                 '狀態': '啟用中' if el[0]['status'] else '停用中',
