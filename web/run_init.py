@@ -447,8 +447,8 @@ def generate_brands():
 
 
 def generate_products_for_test(count, config_data):
-    spec_level1 = ['S', 'SM', 'M', 'L', 'XL', 'XX']
-    spec_level2 = ['紅色', '藍色', '黃色', '綠色', '白色', '黑色']
+    spec_level1 = ['紅色', '藍色', '黃色', '綠色', '白色', '黑色']
+    spec_level2 = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL']
     tag = Tag.objects.all()
     brand = Brand.objects.all()
     category = Category.objects.all()
@@ -489,11 +489,13 @@ def generate_products_for_test(count, config_data):
         # 規格細節
         if config_data.product_specifications_setting == 2:
             # 規格1, 規格2
-            product.level1_title = '尺寸'
-            product.level2_title = '顏色'
+            product.level1_title = '顏色'
+            product.level2_title = '尺寸'
+            product.level1_en_title = 'color'
+            product.level2_en_title = 'size'
             product.save()
-            sizes = ['X', 'B', 'C', 'D', 'XL', 'S', 'L', 'LLL', 'XXXL']
             colors = ['Blue', 'Red', 'Yello', 'White', 'RGB三原色']
+            sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL']
             random.shuffle(sizes)
             random.shuffle(colors)
             spec1_list = []
@@ -504,7 +506,7 @@ def generate_products_for_test(count, config_data):
                         product=product,
                         cn_name=size,
                         en_name=size,
-                        level=1,
+                        level=2,
                     )
                 )
             for color in colors[:random.randint(1, len(colors))]:
@@ -513,7 +515,7 @@ def generate_products_for_test(count, config_data):
                         product=product,
                         cn_name=color,
                         en_name=color,
-                        level=2,
+                        level=1,
                     )
                 )
             for spec1 in spec1_list:
