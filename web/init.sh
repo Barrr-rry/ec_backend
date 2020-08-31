@@ -1,8 +1,8 @@
 #!/bin/sh
-#rm api/migrations/00*.py
+rm api/migrations/00*.py
 rm test.db
 python clear_mysql.py
-#python manage.py makemigrations
+python manage.py makemigrations
 python manage.py migrate
-#python run_init.py
-python manage.py loaddata db.json
+python run_init.py
+#python manage.py loaddata db.json
