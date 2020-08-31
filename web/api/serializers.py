@@ -1109,7 +1109,7 @@ class OrderSerializer(DefaultModelSerializer):
         host_url_map = dict(
             prod='https://havefununderwear.com/ordertracking',
             dev='http://10.0.0.17:54156/ordertracking',
-            test='https://li1871-48.members.linode.com/ordertracking'
+            test='https://li1543-24.members.linode.com/ordertracking'
         )
         # 取得環境
         ENV = os.environ.get('ENV')

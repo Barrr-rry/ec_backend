@@ -16,7 +16,7 @@ import hashlib
 host_url_map = dict(
     prod='https://havefununderwear.com/',
     dev='https://41af65444404.ngrok.io/',
-    test='https://li1871-48.members.linode.com/'
+    test='https://li1543-24.members.linode.com/'
 )
 # 取得環境
 ENV = os.environ.get('ENV')

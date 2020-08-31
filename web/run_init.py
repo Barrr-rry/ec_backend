@@ -369,7 +369,7 @@ def generate_banners(count):
         banner_arg = random.choice(banner_args)
         banner = Banner.objects.create(
             bigimage='banner.png',
-            link='https://li1871-48.members.linode.com/',
+            link='https://li1543-24.members.linode.com/',
             queue=i,
             status=True,
             **banner_arg
